@@ -89,6 +89,14 @@
             ],
             "problemMatcher": []
         },
+        {
+            "label": "restartdecky",
+            "detail": "restart decky plugin_loader service",
+            "type": "shell",
+            "group": "none",
+            "command": "ssh deck@${config:deckip} -p ${config:deckport} ${config:deckkey} 'echo '${config:deckpass}' | sudo -S systemctl restart plugin_loader'",
+            "problemMatcher": []
+        },
         // ALL-IN-ONE
         {
             "label": "allinone",
@@ -97,7 +105,108 @@
             "group": "test",
             "dependsOn": [
                 "buildall",
-                "deployall"
+                "deployall",
+                "restartdecky"
+            ],
+            "problemMatcher": []
+        },
+        // Publish: Add required files to zip
+        {
+            "label": "pnpmCheck",
+            "type": "shell",
+            "group": "none",
+            "detail": "Check pnpm lockfile",
+            "command": "pnpm i --frozen-lockfile",
+            "problemMatcher": []
+        },
+        {
+            "label": "Publish:Clean",
+            "detail": "Delete previous zip",
+            "type": "shell",
+            "group": "none",
+            "command": "find ${workspaceFolder}/dist -maxdepth 1 -type f -iname '${workspaceFolderBasename}*.zip' -delete",
+            "problemMatcher": []
+        },
+        {
+            "label": "Publish:Required",
+            "detail": "Add dist folder, package.json, and plugin.json",
+            "type": "shell",
+            "group": "none",
+            "options": {
+                "cwd": "../"
+            },
+            "command": "zip -r ${workspaceFolder}/dist/${workspaceFolderBasename}.zip ${workspaceFolderBasename}/dist ${workspaceFolderBasename}/package.json ${workspaceFolderBasename}/plugin.json",
+            "problemMatcher": []
+        },
+        {
+            "label": "Publish:PythonBackend",
+            "detail": "Add python files",
+            "type": "shell",
+            "group": "none",
+            "options": {
+                "cwd": "../"
+            },
+            "command": "find ${workspaceFolderBasename} -maxdepth 1 -type f -iname '*.py' -exec zip -r ${workspaceFolder}/dist/${workspaceFolderBasename}.zip {} \\;",
+            "problemMatcher": []
+        },
+        {
+            "label": "Publish:CompiledBackend",
+            "detail": "Add compiled backend files (precompile before running)",
+            "type": "shell",
+            "group": "none",
+            "options": {
+                "cwd": "dist"
+            },
+            "command": "mkdir -p ${workspaceFolderBasename}/bin; [ -d '${workspaceFolder}/backend/out/' ] && cp ${workspaceFolder}/backend/out/* ${workspaceFolderBasename}/bin/; find ${workspaceFolderBasename} -maxdepth 1 -type f -exec zip -r ${workspaceFolderBasename}.zip {} \\;; rm -rf ${workspaceFolderBasename}",
+            "problemMatcher": []
+        },
+        {
+            "label": "Publish:License",
+            "detail": "Add license file",
+            "type": "shell",
+            "group": "none",
+            "options": {
+                "cwd": "../"
+            },
+            "command": "find ${workspaceFolderBasename} -maxdepth 1 -type f \\( -iname 'license' -o -iname 'license.md' \\) -exec zip -r ${workspaceFolder}/dist/${workspaceFolderBasename}.zip {} \\;",
+            "problemMatcher": []
+        },
+        {
+            "label": "Publish:Readme",
+            "detail": "Add readme file",
+            "type": "shell",
+            "group": "none",
+            "options": {
+                "cwd": "../"
+            },
+            "command": "find ${workspaceFolderBasename} -maxdepth 1 -type f -iname 'readme.md' -exec zip -r ${workspaceFolder}/dist/${workspaceFolderBasename}.zip {} \\;",
+            "problemMatcher": []
+        },
+        {
+            "label": "Publish:Defaults",
+            "detail": "Add default files",
+            "type": "shell",
+            "group": "none",
+            "options": {
+                "cwd": "dist"
+            },
+            "command": "mkdir -p ${workspaceFolderBasename}; cp ${workspaceFolder}/defaults/* ${workspaceFolderBasename}/; find ${workspaceFolderBasename} -maxdepth 1 -type f -not -iname 'defaults.txt' -exec zip -r ${workspaceFolderBasename}.zip {} \\;; rm -rf ${workspaceFolderBasename}",
+            "problemMatcher": []
+        },
+        {
+            "label": "publish",
+            "detail": "Publish all files into a release zip archive for github",
+            "dependsOrder": "sequence",
+            "group": "test",
+            "dependsOn": [
+                "Publish:pnpmCheck",
+                "Publish:Clean",
+                "Publish:Required",
+                "Publish:PythonBackend",
+                "Publish:CompiledBackend",
+                "Publish:License",
+                "Publish:Readme",
+                "Publish:Defaults"
             ],
             "problemMatcher": []
         }
