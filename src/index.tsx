@@ -1,105 +1,189 @@
 import {
-  ButtonItem,
   definePlugin,
+  Toggle,
+  ToggleField,
   DialogButton,
-  Menu,
-  MenuItem,
+  Focusable,
   PanelSection,
   PanelSectionRow,
-  Router,
   ServerAPI,
-  showContextMenu,
   staticClasses,
+  Button
 } from "decky-frontend-lib";
-import { VFC } from "react";
-import { FaShip } from "react-icons/fa";
+import { VFC, useState, useEffect } from "react";
+import { FaBox, FaRedoAlt, FaArrowUp, FaArrowDown } from "react-icons/fa";
+import { MdSystemUpdateAlt } from "react-icons/md";
+import { loadSettingsFromLocalStorage, Settings, saveSettingsToLocalStorage } from "./settings";
+import { Backend } from "./utils";
 
-import logo from "../assets/logo.png";
+let settings: Settings;
 
-// interface AddMethodArgs {
-//   left: number;
-//   right: number;
-// }
+const Content: VFC<{ settings: Settings, backend: Backend }> = ({ settings, backend }) => {
+  const splitMinutes = (interval: number) => {
+    const days = Math.floor(interval/(24*60))
+    const hours = Math.floor((interval%(24*60))/60)
+    const minutes = Math.floor((interval%(24*60))%60)
+    return ({'d': days, 'h': hours, 'm': minutes})
+  }
 
-const Content: VFC<{ serverAPI: ServerAPI }> = ({}) => {
-  // const [result, setResult] = useState<number | undefined>();
+  const [notificationEnabled, setNotificationEnabled] = useState<boolean>(settings.notificationEnabled);
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(settings.soundEnabled);
+  const [checkOnBootEnabled, setCheckOnBootEnabled] = useState<boolean>(settings.checkOnBootEnabled);
+  const [unattendedUpgradesEnabled, setUnattendedUpgradesEnabled] = useState<boolean>(settings.unattendedUpgradesEnabled);
+  const [interval, setInterval] = useState<number>(settings.updateInterval);
+  var splitTime = splitMinutes(interval);
+  const [dayDuration, setDayDuration] = useState<number>(splitTime.d);
+  const [hourDuration, setHourDuration] = useState<number>(splitTime.h);
+  const [minuteDuration, setMinuteDuration] = useState<number>(splitTime.m);
+  
+  useEffect(() => {
+    if (settings.soundEnabled != soundEnabled) settings.soundEnabled = soundEnabled;
+    if (settings.notificationEnabled != notificationEnabled) settings.notificationEnabled = notificationEnabled;
+    if (settings.checkOnBootEnabled != checkOnBootEnabled) settings.checkOnBootEnabled = checkOnBootEnabled;
+    if (settings.unattendedUpgradesEnabled != unattendedUpgradesEnabled) settings.unattendedUpgradesEnabled = unattendedUpgradesEnabled;
+    if (settings.updateInterval != interval) settings.updateInterval = interval;
+    saveSettingsToLocalStorage(settings);
+  }, [soundEnabled, notificationEnabled, checkOnBootEnabled, unattendedUpgradesEnabled, interval]);
 
-  // const onClick = async () => {
-  //   const result = await serverAPI.callPluginMethod<AddMethodArgs, number>(
-  //     "add",
-  //     {
-  //       left: 2,
-  //       right: 2,
-  //     }
-  //   );
-  //   if (result.success) {
-  //     setResult(result.result);
-  //   }
-  // };
+  useEffect(() => {
+    setInterval((dayDuration * 24 * 60)+(hourDuration * 60)+minuteDuration)
+  }, [dayDuration, hourDuration, minuteDuration])
+  
 
   return (
-    <PanelSection title="Panel Section">
+    <PanelSection>
       <PanelSectionRow>
-        <ButtonItem
-          layout="below"
-          onClick={(e) =>
-            showContextMenu(
-              <Menu label="Menu" cancelText="CAAAANCEL" onCancel={() => {}}>
-                <MenuItem onSelected={() => {}}>Item #1</MenuItem>
-                <MenuItem onSelected={() => {}}>Item #2</MenuItem>
-                <MenuItem onSelected={() => {}}>Item #3</MenuItem>
-              </Menu>,
-              e.currentTarget ?? window
-            )
-          }
-        >
-          Server says yolo
-        </ButtonItem>
+        <Focusable
+          style={{ marginTop: "5px", marginBottom: "5px", display: "flex" }}
+          flow-children="horizontal">
+          <DialogButton
+            style={{minWidth:"0"}}
+            onClick={async () => {
+              backend.notify('AutoFlatpaks', 'Checking for updates...', settings.notificationEnabled, settings.soundEnabled, 3000)
+              var package_count = await backend.getPackageCount();
+              backend.notify('AutoFlatpaks', `${package_count} updates available`, settings.notificationEnabled, settings.soundEnabled, 5000)
+            }}
+          ><FaRedoAlt /></DialogButton><DialogButton
+            style={{minWidth:"0"}}
+            onClick={() => {
+              backend.notify('AutoFlatpaks', 'Updating all packages...', settings.notificationEnabled, settings.soundEnabled)
+              backend.updateAllPackages(true);
+            }}
+          ><MdSystemUpdateAlt /></DialogButton>
+        </Focusable>
       </PanelSectionRow>
 
+      <div className={staticClasses.PanelSectionTitle}>Update Interval</div>
       <PanelSectionRow>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <img src={logo} />
+      <div className={staticClasses.PanelSectionTitle} style={{ minHeight: "0px" }}></div>
+        <div style={{ minHeight: "0px", marginLeft: "0px", marginRight: "0px", display: "flex", justifyContent: "space-between" }} flow-children="horizontal">
+          <div className={staticClasses.PanelSectionTitle}>Day</div>
+          <div className={staticClasses.PanelSectionTitle}>{dayDuration}</div>
+          <Focusable
+            style={{ minHeight: "0px", marginLeft: "0px", marginRight: "0px", display: "flex", justifyContent: "space-evenly" }}
+            flow-children="vertical">
+            <Button style={{minHeight: '0'}} onClick={()=>{setDayDuration(dayDuration+1)}}><FaArrowUp/></Button>
+            <Button style={{minHeight: '0'}} onClick={()=>{if (dayDuration) setDayDuration(dayDuration-1)}}><FaArrowDown/></Button>
+          </Focusable>
+        </div>
+        <div style={{ minHeight: "0px", marginLeft: "0px", marginRight: "0px", display: "flex", justifyContent: "space-between" }} flow-children="horizontal">
+          <div className={staticClasses.PanelSectionTitle}>Hrs</div>
+          <div className={staticClasses.PanelSectionTitle}>{hourDuration}</div>
+          <Focusable
+            style={{ minHeight: "0px", marginLeft: "0px", marginRight: "0px", display: "flex", justifyContent: "space-evenly" }}
+            flow-children="vertical">
+            <Button style={{minHeight: '0'}} onClick={()=>{if (hourDuration < 24) setHourDuration(hourDuration+1)}}><FaArrowUp/></Button>
+            <Button style={{minHeight: '0'}} onClick={()=>{if (hourDuration) setHourDuration(hourDuration-1)}}><FaArrowDown/></Button>
+          </Focusable>
+        </div>
+        <div style={{ minHeight: "0px", marginLeft: "0px", marginRight: "0px", display: "flex", justifyContent: "space-between" }} flow-children="horizontal">
+          <div className={staticClasses.PanelSectionTitle}>Min</div>
+          <div className={staticClasses.PanelSectionTitle}>{minuteDuration}</div>
+          <Focusable
+            style={{ minHeight: "0px", marginLeft: "0px", marginRight: "0px", display: "flex", justifyContent: "space-evenly" }}
+            flow-children="vertical">
+            <Button style={{minHeight: '0'}} onClick={()=>{if (minuteDuration < 60) setMinuteDuration(minuteDuration+5)}}><FaArrowUp/></Button>
+            <Button style={{minHeight: '0'}} onClick={()=>{if (minuteDuration) setMinuteDuration(minuteDuration-5)}}><FaArrowDown/></Button>
+          </Focusable>
         </div>
       </PanelSectionRow>
 
+      <div className={staticClasses.PanelSectionTitle}>Settings</div>
       <PanelSectionRow>
-        <ButtonItem
-          layout="below"
-          onClick={() => {
-            Router.CloseSideMenus();
-            Router.Navigate("/decky-plugin-test");
+        <ToggleField
+          label="Check on Boot"
+          checked={checkOnBootEnabled}
+          onChange={(checkOnBootEnabled) => {
+            setCheckOnBootEnabled(checkOnBootEnabled);
           }}
-        >
-          Router
-        </ButtonItem>
+        />
+      </PanelSectionRow>
+
+      <PanelSectionRow>
+        <ToggleField
+          label="Unattended Upgrades"
+          checked={unattendedUpgradesEnabled}
+          onChange={(unattendedUpgradesEnabled) => {
+            setUnattendedUpgradesEnabled(unattendedUpgradesEnabled);
+          }}
+        />
+      </PanelSectionRow>
+
+      <PanelSectionRow>
+        <div style={{ minHeight: "0px", marginTop: "0px", marginBottom: "0px", display: "flex", justifyContent: "space-between" }} flow-children="horizontal">
+          <div className={staticClasses.PanelSectionTitle}>Toast</div><div className={staticClasses.PanelSectionTitle}>Sound</div>
+        </div>
+        <Focusable
+          style={{ minHeight: "0px", marginLeft: "25px", marginRight: "25px", display: "flex", justifyContent: "space-between" }}
+          flow-children="horizontal">
+          <Toggle
+            value={notificationEnabled}
+            onChange={(notificationEnabled) => {
+              setNotificationEnabled(notificationEnabled);
+            }}
+          />
+          <Toggle
+            value={soundEnabled}
+            onChange={(soundEnabled) => {
+              setSoundEnabled(soundEnabled);
+            }}
+          />
+        </Focusable>
       </PanelSectionRow>
     </PanelSection>
   );
 };
 
-const DeckyPluginRouterTest: VFC = () => {
-  return (
-    <div style={{ marginTop: "50px", color: "white" }}>
-      Hello World!
-      <DialogButton onClick={() => Router.NavigateToStore()}>
-        Go to Store
-      </DialogButton>
-    </div>
-  );
-};
-
 export default definePlugin((serverApi: ServerAPI) => {
-  serverApi.routerHook.addRoute("/decky-plugin-test", DeckyPluginRouterTest, {
-    exact: true,
-  });
+  // load settings
+  settings = loadSettingsFromLocalStorage()
+  const backend = new Backend(serverApi, settings)
+
+  if (settings.checkOnBootEnabled) {
+    var date = new Date()
+    date.setMinutes(date.getMinutes() - settings.updateInterval)
+    settings.lastCheckTimestamp = date
+  }
+
+  // interval check loop
+  SteamClient.System.RegisterForBatteryStateChanges(async ()=> {
+    var currentTime = new Date()
+    if (!((currentTime.getTime() - settings.lastCheckTimestamp.getTime())/1000/60 > settings.updateInterval)) return
+    // Time to check for updates
+    settings.lastCheckTimestamp = currentTime
+    var package_count = await backend.getPackageCount()
+    if (!package_count) return
+    var notificationText = `${package_count} updates available`
+    if (settings.unattendedUpgradesEnabled) {
+      notificationText = `Updating ${package_count} packages...`
+      backend.updateAllPackages()
+    }
+    backend.notify('AutoFlatpaks', notificationText)
+  })
 
   return {
-    title: <div className={staticClasses.Title}>Example Plugin</div>,
-    content: <Content serverAPI={serverApi} />,
-    icon: <FaShip />,
-    onDismount() {
-      serverApi.routerHook.removeRoute("/decky-plugin-test");
-    },
+    title: <div className={staticClasses.Title}>AutoFlatpaks</div>,
+    content: <Content settings={settings} backend={backend}/>,
+    icon: <FaBox />,
   };
 });
