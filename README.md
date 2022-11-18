@@ -1,6 +1,6 @@
 ## Decky-AutoFlatpaks Plugin
 A plugin to notify and automatically update flatpaks on your steamdeck console after an interval of time without DesktopMode. Requires root permissions.
-![Main View](./assets/thumbnail.jpg)
+![Main View](./assets/thumbnail.png)
 
 ## Overview
 This plugin provides audible and toast notifications when finding flatpak package updates and allows the user to update them at their leisure or automatically at user-defined intervals. The notifications can be toggled off if completely silent updates are preferred.
@@ -12,9 +12,6 @@ This plugin provides audible and toast notifications when finding flatpak packag
 ## Notes
 - All settings changes are instantly applied
 - A full flatpak manager interface probably won't happen (there is the Discover store)
-
-## Possible Future Plans
-- show updateable package list
 
 ## Thanks
 - All of the decky-loader devs
