@@ -39,8 +39,12 @@ export const QAMPanel: VFC = () => {
   //#endregion
 
   //#region Input Functions
+  const onTestProcess = async () => {
+    var maskList = await Backend.getMaskList()
+    console.log(maskList)
+    Backend.long_process()
+  }
   const onOpenFlatpakManager = async () => {
-    await Backend.long_process()
     Router.CloseSideMenus()
     Router.Navigate("/flatpak-manager")
   }
@@ -101,7 +105,7 @@ export const QAMPanel: VFC = () => {
       <PanelSectionRow>
         <Focusable style={{ display: "flex" }} flow-children="horizontal">
           <DialogButton style={FlatpakManagerButtons} disabled={state != "Idle"} onClick={onOpenFlatpakManager}><FaBoxOpen /></DialogButton>
-          <DialogButton style={FlatpakManagerButtons} disabled={state != "Idle"} onClick={onCheckForUpdates}><FaRedoAlt /></DialogButton>
+          <DialogButton style={FlatpakManagerButtons} disabled={state != "Idle"} onSecondaryButton={onTestProcess} onClick={onCheckForUpdates}><FaRedoAlt /></DialogButton>
           <DialogButton style={FlatpakManagerButtons} disabled={state != "Idle"} onClick={onUpdateAllPackages}><FaDownload /></DialogButton>
         </Focusable>
       </PanelSectionRow>
