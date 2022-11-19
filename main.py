@@ -26,19 +26,59 @@ class Plugin:
     async def settings_setSetting(self, key: str, value):
         return settings.setSetting(key, value)
 
-    async def pyexec_subprocess(cmd:str):
-        logging.info(f"Calling python subprocess: {cmd}")
+    async def pyexec_subprocess(self, cmd:str, input:str=''):
+        logging.info(f'Calling python subprocess: "{cmd}"')
         proc = await asyncio.create_subprocess_shell(cmd,
             stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE)
-        stdout, stderr = await proc.communicate()
-        output = stdout.decode()
-        if proc.returncode != 0:
-            output = stderr.decode()
-        return {'exitcode': proc.returncode, 'output': output}
+            stderr=asyncio.subprocess.PIPE,
+            stdin=asyncio.subprocess.PIPE)
+        stdout, stderr = await proc.communicate(input.encode())
+        stdout = stdout.decode()
+        stderr = stderr.decode()
+        return {'exitcode': proc.returncode, 'stdout': stdout, 'stderr': stderr}
     
     async def CheckForUpdates(self):
-        return await self.pullRemotePackageList(self, updateOnly=True)
+        logging.info('Received request for list of available updates')
+        cmd = 'flatpak update'
+        proc = await self.pyexec_subprocess(self, cmd)
+        
+        package_list = []
+        lines = proc['stdout'].split('\n')
+        for line in lines:
+            if not line: continue
+            package_match = re.match(r'(|\s)(?:\d+.)\s+(?P<application>[^\s]+?)\s+(?P<branch>.*?)\s+(?P<op>(i|u|r))\s+(?P<remote>[^\s]+?)\s+<\s+(?P<download_size>((\d+(\.\d+)?)|(\.\d+)).(bytes|kB|MB|GB))(\s\((?P<partial>partial)\)|)', line)
+            if not package_match:
+                if not line in ['Looking for updates…', 'Proceed with these changes to the system installation? [Y/n]: n']:
+                    logging.info(f'Failed to parse: "{line}"')
+                continue
+            partial = False
+            if package_match['partial']: partial = True
+            package = {
+                'application':      package_match['application'],
+                'branch':           package_match['branch'],
+                'op':               package_match['op'],
+                'remote':           package_match['remote'],
+                'download_size':    package_match['download_size'],
+                'partial':          partial,
+            }
+            package_list.append(package)
+        return package_list
+
+    async def getMaskList(self):
+        logging.info('Received request for list of masks')
+        cmd = 'flatpak mask'
+        proc = await self.pyexec_subprocess(self, cmd)
+
+        mask_list = []
+        lines = proc['stdout'].split('\n')
+        for line in lines:
+            if not line: continue
+            package_match = re.match(r'(\s+)(?P<mask>.*)', line)
+            if not package_match: continue
+            mask_list.append(package_match['mask'])
+        return mask_list
+
+
 
     async def pullRemotePackageList(self, updateOnly=False):
         loggingInfo = 'Received request for list of remote packages'
@@ -49,7 +89,7 @@ class Plugin:
         proc = await self.pyexec_subprocess(cmd)
         if proc['exitcode'] != 0: raise NotImplementedError
 
-        lines = proc['output'].split('\n')
+        lines = proc['stdout'].split('\n')
         package_list = {}
         for line in lines:
             package_match = re.match(r'(?P<name>.*?)\s+(?P<installed_size>((\d+(\.\d+)?)|(\.\d+)).(bytes|kB|MB|GB))\s+(?P<description>.*)\s+(?P<download_size>((\d+(\.\d+)?)|(\.\d+)).(bytes|kB|MB|GB))\s+(?P<version>.*?)\s+(?P<commit>[aA-fF0-9]{12})\s+(?P<branch>.*?)\s+(?P<ref>\S+)\s+(?P<origin>.*?)\s+(?P<arch>(x86_64|i386|aarch64|arm))\s+(?P<runtime>.*?)\s+(?P<application>\S+)(|\s+(?P<options>.*))', line)
@@ -100,7 +140,7 @@ class Plugin:
         proc = await self.pyexec_subprocess(cmd)
         if proc['exitcode'] != 0: raise NotImplementedError
 
-        lines = proc['output'].split('\n')
+        lines = proc['stdout'].split('\n')
         package_list = {}
         for line in lines:
             package_match = re.match(r'(?P<name>.*?)\s+(?P<installation>(system|user))\s+(?P<description>.*)\s+(?P<size>((\d+(\.\d+)?)|(\.\d+)).(bytes|kB|MB|GB))\s+(?P<version>.*?)\s+(?P<active>[aA-fF0-9]{12})\s+(?P<branch>.*?)\s+(?P<ref>\S+)\s+(?P<origin>.*?)\s+(?P<arch>(x86_64|i386|aarch64|arm))\s+(?P<runtime>.*?)\s+(?P<application>\S+)\s+(?P<options>.*)\s+(?P<latest>(-|[aA-fF0-9]{12}))', line)
@@ -130,6 +170,5 @@ class Plugin:
         logging.info('Received request to update all packages')
         cmd = 'flatpak update --noninteractive'
         proc = await self.pyexec_subprocess(cmd)
-        if proc['exitcode'] != 0: raise NotImplementedError
-        logging.info(proc['output'])
-        return proc['output']
+        if proc['exitcode'] == 0: logging.info(proc['stderr'])
+        return proc['stdout']

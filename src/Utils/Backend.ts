@@ -1,4 +1,5 @@
 import { ServerAPI } from "decky-frontend-lib"
+import { FlatpakUpdate } from "./Flatpak"
 
 export class Backend {
   private static serverAPI: ServerAPI
@@ -40,12 +41,17 @@ export class Backend {
     return output
   }
 
-  static async CheckForUpdates() {
+  static async CheckForUpdates(): Promise<Array<FlatpakUpdate> | undefined > {
     if (this.getAppState() != "Idle") return undefined
     this.setAppState("CheckForUpdates")
     var output = await this.bridge("CheckForUpdates")
     this.setAppState("Idle")
-    return output
+    return output as Array<FlatpakUpdate>
+  }
+  static async getMaskList(): Promise<Array<string> | undefined> {
+    if (this.getAppState() != "Idle") return undefined
+    var output = await this.bridge("getMaskList")
+    return output as Array<string>
   }
   static async UpdateAllPackages() {
     if (this.getAppState() != "Idle") return undefined
@@ -65,7 +71,7 @@ export class Backend {
   static async getPackageCount() {
     var packages = await this.CheckForUpdates()
     if (!packages) return undefined
-    var package_count = Object.keys(packages).length
+    var package_count = packages.length
     return package_count
   }
 
