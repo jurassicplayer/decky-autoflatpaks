@@ -35,12 +35,13 @@ const registerLoop = () => {
     Settings.lastCheckTimestamp = currentTime
     var package_count = await Backend.getPackageCount()
     if (!package_count) return
-    var notificationText = `${package_count} updates available`
     if (Settings.unattendedUpgradesEnabled) {
-      notificationText = `Updating ${package_count} packages...`
-      Backend.UpdateAllPackages()
+      SteamUtils.notify('AutoFlatpaks', `Updating ${package_count} packages...`)
+      await Backend.UpdateAllPackages()
+      SteamUtils.notify('AutoFlatpaks', 'Updated all packages')
+    } else {
+      SteamUtils.notify('AutoFlatpaks', `${package_count} updates available`)
     }
-    SteamUtils.notify('AutoFlatpaks', notificationText)
   })
 }
 
