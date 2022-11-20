@@ -8,20 +8,20 @@ specifiers:
   '@rollup/plugin-typescript': ^8.5.0
   '@types/react': 16.14.0
   '@types/webpack': ^5.28.0
-  decky-frontend-lib: ^3.9.0
+  decky-frontend-lib: ^3.11.0
   pnpm: ^7.14.2
   react-icons: ^4.6.0
+  react-intersection-observer: ^9.4.1
   rollup: ^2.79.1
   rollup-plugin-import-assets: ^1.1.1
   shx: ^0.3.4
   tslib: ^2.4.1
   typescript: ^4.8.4
-  typescript-json-serializer: ^4.3.0
 
 dependencies:
-  decky-frontend-lib: 3.9.0
+  decky-frontend-lib: 3.11.0
   react-icons: 4.6.0
-  typescript-json-serializer: 4.3.0
+  react-intersection-observer: 9.4.1
 
 devDependencies:
   '@rollup/plugin-commonjs': 21.1.0_rollup@2.79.1
@@ -422,8 +422,8 @@ packages:
     resolution: {integrity: sha512-uX1KG+x9h5hIJsaKR9xHUeUraxf8IODOwq9JLNPq6BwB04a/xgpq3rcx47l5BZu5zBPlgD342tdke3Hom/nJRA==}
     dev: true
 
-  /decky-frontend-lib/3.9.0:
-    resolution: {integrity: sha512-8JYeNYc9F/VklcaQzHAwBFA6byjqVIqZtVpks6RyeXp2O77eop7xYsu5DGC2IClsXvOgZItegK6H2Vt/RsyThQ==}
+  /decky-frontend-lib/3.11.0:
+    resolution: {integrity: sha512-TyBE3jgwaOauh9BZ4I4GaPwNyFUr4ZTx+HIA3G6Z6txr9wE3JnNVauBHRlhCYo3eO/ewDIcQg44VV6YLgibq3A==}
     dev: false
 
   /deepmerge/4.2.2:
@@ -700,16 +700,21 @@ packages:
         optional: true
     dev: false
 
+  /react-intersection-observer/9.4.1:
+    resolution: {integrity: sha512-IXpIsPe6BleFOEHKzKh5UjwRUaz/JYS0lT/HPsupWEQou2hDqjhLMStc5zyE3eQVT4Fk3FufM8Fw33qW1uyeiw==}
+    peerDependencies:
+      react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+    peerDependenciesMeta:
+      react:
+        optional: true
+    dev: false
+
   /rechoir/0.6.2:
     resolution: {integrity: sha512-HFM8rkZ+i3zrV+4LQjwQ0W+ez98pApMGM3HUrN04j3CqzPOzl9nmP15Y8YXNm8QHGv/eacOVEjqhmWpkRV0NAw==}
     engines: {node: '>= 0.10'}
     dependencies:
       resolve: 1.22.1
     dev: true
-
-  /reflect-metadata/0.1.13:
-    resolution: {integrity: sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==}
-    dev: false
 
   /resolve/1.22.1:
     resolution: {integrity: sha512-nBpuuYuY5jFsli/JIs1oldw6fOQCBioohqWZg/2hiaOybXOft4lonv85uDOKXdf8rhyK159cxU5cDcK/NKk8zw==}
@@ -852,13 +857,7 @@ packages:
 
   /tslib/2.4.1:
     resolution: {integrity: sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==}
-
-  /typescript-json-serializer/4.3.0:
-    resolution: {integrity: sha512-992VnHgazGO0S2AxN2UOCB8BjUOMvmhi0wUIJb89URtLuPayxsED8w10gWhzSPAxlu97p6M76ZSeiKzLtSEaQg==}
-    dependencies:
-      reflect-metadata: 0.1.13
-      tslib: 2.4.1
-    dev: false
+    dev: true
 
   /typescript/4.8.4:
     resolution: {integrity: sha512-QCh+85mCy+h0IGff8r5XWzOVSbBO+KfeYrMQh7NJ58QujwcE22u+NUSmUxqF+un70P9GXKxa2HCNiTTMJknyjQ==}
