@@ -1,5 +1,5 @@
 import { ServerAPI } from "decky-frontend-lib"
-import { FlatpakUpdate } from "./Flatpak"
+import { FlatpakUpdate, LocalFlatpakMetadata, RemoteFlatpakMetadata } from "./Flatpak"
 
 export class Backend {
   private static serverAPI: ServerAPI
@@ -49,7 +49,6 @@ export class Backend {
     return output as Array<FlatpakUpdate>
   }
   static async getMaskList(): Promise<Array<string> | undefined> {
-    if (this.getAppState() != "Idle") return undefined
     var output = await this.bridge("getMaskList")
     return output as Array<string>
   }
@@ -60,13 +59,13 @@ export class Backend {
     this.setAppState("Idle")
     return output
   }
-  static async getLocalPackageList() {
+  static async getLocalPackageList(): Promise<Array<LocalFlatpakMetadata> | undefined > {
     var output = await this.bridge("LocalPackageList")
-    return output
+    return output as Array<LocalFlatpakMetadata>
   }
-  static async getRemotePackageList() {
+  static async getRemotePackageList(): Promise<Array<RemoteFlatpakMetadata> | undefined > {
     var output = await this.bridge("pullRemotePackageList")
-    return output
+    return output as Array<RemoteFlatpakMetadata>
   }
   static async getPackageCount() {
     var packages = await this.CheckForUpdates()

@@ -35,11 +35,14 @@ class Plugin:
         stdout, stderr = await proc.communicate(input.encode())
         stdout = stdout.decode()
         stderr = stderr.decode()
+        logging.info(f'Exitcode: {proc.returncode}')
+        logging.info(f'STDOUT: {stdout}')
+        logging.info(f'STDERR: {stderr}')
         return {'exitcode': proc.returncode, 'stdout': stdout, 'stderr': stderr}
     
     async def CheckForUpdates(self):
         logging.info('Received request for list of available updates')
-        cmd = 'flatpak update'
+        cmd = 'flatpak update --no-deps'
         proc = await self.pyexec_subprocess(self, cmd)
         
         package_list = []
@@ -48,8 +51,7 @@ class Plugin:
             if not line: continue
             package_match = re.match(r'(|\s)(?:\d+.)\s+(?P<application>[^\s]+?)\s+(?P<branch>.*?)\s+(?P<op>(i|u|r))\s+(?P<remote>[^\s]+?)\s+<\s+(?P<download_size>((\d+(\.\d+)?)|(\.\d+)).(bytes|kB|MB|GB))(\s\((?P<partial>partial)\)|)', line)
             if not package_match:
-                if not line in ['Looking for updates…', 'Proceed with these changes to the system installation? [Y/n]: n']:
-                    logging.info(f'Failed to parse: "{line}"')
+                logging.info(f'Failed to parse: "{line}"')
                 continue
             partial = False
             if package_match['partial']: partial = True
@@ -86,11 +88,11 @@ class Plugin:
         logging.info(loggingInfo)
         cmd = 'flatpak remote-ls --columns=name:f,installed-size:f,description:f,download-size:f,version:f,commit:f,branch:f,ref:f,origin:f,arch:f,runtime:f,application:f,options:f'
         if updateOnly: cmd += ' --updates'
-        proc = await self.pyexec_subprocess(cmd)
+        proc = await self.pyexec_subprocess(self, cmd)
         if proc['exitcode'] != 0: raise NotImplementedError
 
         lines = proc['stdout'].split('\n')
-        package_list = {}
+        package_list = []
         for line in lines:
             package_match = re.match(r'(?P<name>.*?)\s+(?P<installed_size>((\d+(\.\d+)?)|(\.\d+)).(bytes|kB|MB|GB))\s+(?P<description>.*)\s+(?P<download_size>((\d+(\.\d+)?)|(\.\d+)).(bytes|kB|MB|GB))\s+(?P<version>.*?)\s+(?P<commit>[aA-fF0-9]{12})\s+(?P<branch>.*?)\s+(?P<ref>\S+)\s+(?P<origin>.*?)\s+(?P<arch>(x86_64|i386|aarch64|arm))\s+(?P<runtime>.*?)\s+(?P<application>\S+)(|\s+(?P<options>.*))', line)
             if not package_match:
@@ -111,20 +113,15 @@ class Plugin:
                 'download-size':    package_match['download_size'],
                 'options':          package_match['options'],
             }
-            package_list.update({package['ref']:package})
+            package_list.append(package)
         return package_list
 
     async def LocalPackageList(self):
-        LocalPackageList = {}
-        LocalPackageList.update(await self.LocalPackageListRuntimes(self))
-        LocalPackageList.update(await self.LocalPackageListApplications(self))
+        LocalPackageList = []
+        LocalPackageList += (await self.pullLocalPackageList(self, packageType="runtime"))
+        LocalPackageList += (await self.pullLocalPackageList(self, packageType="app"))
+        #LocalPackageList.update(await self.pullLocalPackageList(self, packageType="app"))
         return LocalPackageList
-    
-    async def LocalPackageListRuntimes(self):
-        return await self.pullLocalPackageList(self, packageType="runtime")
-    
-    async def LocalPackageListApplications(self):
-        return await self.pullLocalPackageList(self, packageType="app")
 
     async def pullLocalPackageList(self, packageType=""):
         loggingInfo = 'Received request for list of all local packages'
@@ -137,15 +134,16 @@ class Plugin:
             cmd+=" --app"
         if packageType: packageType += '/'
         logging.info(loggingInfo)
-        proc = await self.pyexec_subprocess(cmd)
+        proc = await self.pyexec_subprocess(self, cmd)
         if proc['exitcode'] != 0: raise NotImplementedError
 
         lines = proc['stdout'].split('\n')
-        package_list = {}
+        package_list = []
         for line in lines:
             package_match = re.match(r'(?P<name>.*?)\s+(?P<installation>(system|user))\s+(?P<description>.*)\s+(?P<size>((\d+(\.\d+)?)|(\.\d+)).(bytes|kB|MB|GB))\s+(?P<version>.*?)\s+(?P<active>[aA-fF0-9]{12})\s+(?P<branch>.*?)\s+(?P<ref>\S+)\s+(?P<origin>.*?)\s+(?P<arch>(x86_64|i386|aarch64|arm))\s+(?P<runtime>.*?)\s+(?P<application>\S+)\s+(?P<options>.*)\s+(?P<latest>(-|[aA-fF0-9]{12}))', line)
             if not package_match:
-                if line: logging.info(f'Failed to parse: "{line}"')
+                if line and line not in ["Looking for updates…", "Proceed with these changes to the system installation? [Y/n]: n"]:
+                    logging.info(f'Failed to parse: "{line}"')
                 continue
             package = {
                 'name':             package_match['name'],
@@ -155,20 +153,28 @@ class Plugin:
                 'branch':           package_match['branch'],
                 'arch':             package_match['arch'],
                 'origin':           package_match['origin'],
-                'ref':              "{}{}".format(packageType, package_match['ref']),
+                'ref':              package_match['ref'],
                 'active':           package_match['active'],
                 'runtime':          package_match['runtime'],
                 'latest':           package_match['latest'],
                 'installation':     package_match['installation'],
                 'size':             package_match['size'],
-                'options':          package_match['options']
+                'options':          package_match['options'],
+                'packagetype':      packageType
             }
-            package_list.update({"{}{}".format(packageType, package_match['ref']):package})
+            package_list.append(package)
         return package_list
+
+    async def UpdatePackage(self, appid):
+        logging.info(f'Received request to update package: {appid}')
+        cmd = f'flatpak update --noninteractive {appid}'
+        proc = await self.pyexec_subprocess(self, cmd)
+        if proc['exitcode'] == 0: logging.info(proc['stderr'])
+        return proc['stdout']
 
     async def UpdateAllPackages(self):
         logging.info('Received request to update all packages')
         cmd = 'flatpak update --noninteractive'
-        proc = await self.pyexec_subprocess(cmd)
+        proc = await self.pyexec_subprocess(self, cmd)
         if proc['exitcode'] == 0: logging.info(proc['stderr'])
         return proc['stdout']
