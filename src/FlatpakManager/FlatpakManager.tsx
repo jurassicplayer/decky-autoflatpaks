@@ -15,7 +15,7 @@ export const FlatpakManager: VFC = () => {
       style={{
         marginTop: "40px",
         height: "calc(100% - 40px)",
-        background: "#0005",
+        background: "#0c1519",
       }}
     >
       <Tabs

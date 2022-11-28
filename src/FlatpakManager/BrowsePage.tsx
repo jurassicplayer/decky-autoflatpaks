@@ -64,15 +64,16 @@ export const BrowsePage: VFC = () => {
   useEffect(()=>()=>{unregister()}, [])
 
   return (
-    <div style={{ alignItems: "center", backgroundColor: "#0c1519", display: "flex", flexDirection: "column", justifyContent: "center", minHeight: "100%" }}>
+    <div style={{ alignItems: "center", backgroundColor: "#0c1519", display: "flex", flexDirection: "column", justifyContent: "center", minHeight: "100%"}}>
       {browseReady ?
         <Focusable
           onOptionsButton={refresh}
           onOptionsActionDescription="Refresh"
           onSecondaryButton={ProcessQueue}
-          onSecondaryActionDescription="Apply">
+          onSecondaryActionDescription="Apply"
+          style={{ minWidth: "100%" }}>
           {lpl
-            .filter(data => data.packagetype == "runtime")
+            .filter(data => data.packagetype == "app")
             .sort((a, b) => a.name.localeCompare(b.name))
             .map(data => {
               const CardContext = {
