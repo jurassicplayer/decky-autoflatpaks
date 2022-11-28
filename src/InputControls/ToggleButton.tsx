@@ -1,6 +1,6 @@
 import { DialogButton, DialogButtonProps } from "decky-frontend-lib"
-import { useState, CSSProperties } from "react"
-import { Card } from "../FlatpakManager/BrowsePage.css"
+import { CSSProperties } from "react"
+import { Card } from "../FlatpakManager/FlatpakCard.css"
 
 
 export interface ToggleButtonProps extends DialogButtonProps {
@@ -12,17 +12,16 @@ export interface ToggleButtonProps extends DialogButtonProps {
 export const ToggleButton: React.FC<DialogButtonProps & ToggleButtonProps> = ({
   ...props
 }) => {
-  const [value, setValue] = useState<boolean>(props.value ? props.value : false)
   if (props.toggledCSS == undefined) props.toggledCSS = Card.mask
   if (props.untoggledCSS == undefined) props.untoggledCSS = Card.mask
   return (
     <DialogButton
-      {...props}    
-      onClick={e => {
-        setValue(!value)
-        props.onClick?.(e)
+      {...props}
+      onOKButton={e => {
+        props.value = !props.value
+        props.onOKButton?.(e)
       }}
-      style={ value ? props.toggledCSS : props.untoggledCSS }
+      style={ props.value ? props.toggledCSS : props.untoggledCSS }
       >
       {props.children}
     </DialogButton>

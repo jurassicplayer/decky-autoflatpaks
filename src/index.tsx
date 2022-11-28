@@ -13,7 +13,6 @@ import { SteamUtils } from "./Utils/SteamUtils"
 const initPlugin = async () => {
   await Settings.loadFromLocalStorage()
   checkOnBoot()
-  registerLoop()
   Backend.setAppInitialized(true)
 }
 
@@ -26,9 +25,13 @@ const checkOnBoot = () => {
   }
 }
 
-const registerLoop = () => {
+export default definePlugin((serverApi: ServerAPI) => {
+  Backend.initBackend(serverApi)
+  serverApi.routerHook.addRoute("/flatpak-manager", FlatpakManager)
+  initPlugin()
+
   // interval check loop
-  SteamClient.System.RegisterForBatteryStateChanges(async ()=> {
+  const batteryStateRegistration = SteamClient.System.RegisterForBatteryStateChanges(async ()=> {
     var currentTime = new Date()
     if (!((currentTime.getTime() - Settings.lastCheckTimestamp.getTime())/1000/60 > Settings.updateInterval)) return
     // Time to check for updates
@@ -43,20 +46,14 @@ const registerLoop = () => {
       SteamUtils.notify('AutoFlatpaks', `${package_count} updates available`)
     }
   })
-}
-
-export default definePlugin((serverApi: ServerAPI) => {
-  Backend.initBackend(serverApi)
-  serverApi.routerHook.addRoute("/flatpak-manager", FlatpakManager)
-
-  initPlugin()
 
   return {
     title: <div className={staticClasses.Title}>AutoFlatpaks</div>,
     content: <QAMPanel />,
     icon: <FaBox />,
     onDismount: () => {
-      serverApi.routerHook.removeRoute('/flatpak-manager');
+      serverApi.routerHook.removeRoute('/flatpak-manager')
+      batteryStateRegistration.unregister()
     }
   };
 });

@@ -40,8 +40,6 @@ export const QAMPanel: VFC = () => {
 
   //#region Input Functions
   const onTestProcess = async () => {
-    var maskList = await Backend.getMaskList()
-    console.log(maskList)
     Backend.long_process()
   }
   const onOpenFlatpakManager = async () => {
@@ -89,6 +87,9 @@ export const QAMPanel: VFC = () => {
     } else if (state == "UpdatingFlatpaks") {
       StatusText = "Updating flatpaks..."
       bgColor = "#7a0a0a"
+    } else if (state == "ProcessingQueue") {
+      StatusText = "Processing queue..."
+      bgColor = "#7a0a0a"
     }
     return (
       <PanelSectionRow>
@@ -104,7 +105,7 @@ export const QAMPanel: VFC = () => {
       {state != "Idle" ? <StatusBar /> : null}
       <PanelSectionRow>
         <Focusable style={{ display: "flex" }} flow-children="horizontal">
-          <DialogButton style={FlatpakManagerButtons} disabled={state != "Idle"} onClick={onOpenFlatpakManager}><FaBoxOpen /></DialogButton>
+          <DialogButton style={FlatpakManagerButtons} onClick={onOpenFlatpakManager}><FaBoxOpen /></DialogButton>
           <DialogButton style={FlatpakManagerButtons} disabled={state != "Idle"} onSecondaryButton={onTestProcess} onClick={onCheckForUpdates}><FaRedoAlt /></DialogButton>
           <DialogButton style={FlatpakManagerButtons} disabled={state != "Idle"} onClick={onUpdateAllPackages}><FaDownload /></DialogButton>
         </Focusable>

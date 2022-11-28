@@ -40,7 +40,7 @@ class Plugin:
         logging.info(f'STDERR: {stderr}')
         return {'exitcode': proc.returncode, 'stdout': stdout, 'stderr': stderr}
     
-    async def CheckForUpdates(self):
+    async def getUpdates(self):
         logging.info('Received request for list of available updates')
         cmd = 'flatpak update --no-deps'
         proc = await self.pyexec_subprocess(self, cmd)
@@ -49,7 +49,7 @@ class Plugin:
         lines = proc['stdout'].split('\n')
         for line in lines:
             if not line: continue
-            package_match = re.match(r'(|\s)(?:\d+.)\s+(?P<application>[^\s]+?)\s+(?P<branch>.*?)\s+(?P<op>(i|u|r))\s+(?P<remote>[^\s]+?)\s+<\s+(?P<download_size>((\d+(\.\d+)?)|(\.\d+)).(bytes|kB|MB|GB))(\s\((?P<partial>partial)\)|)', line)
+            package_match = re.match(r'(|\s)(?:\d+.)\s+(?P<application>[^\s,]+?)\s+(?P<branch>.*?)\s+(?P<op>(i|u|r))\s+(?P<remote>[^\s]+?)\s+<\s+(?P<download_size>((\d+(\.\d+)?)|(\.\d+)).(bytes|kB|MB|GB))(\s\((?P<partial>partial)\)|)', line)
             if not package_match:
                 logging.info(f'Failed to parse: "{line}"')
                 continue
@@ -80,21 +80,16 @@ class Plugin:
             mask_list.append(package_match['mask'])
         return mask_list
 
-
-
-    async def pullRemotePackageList(self, updateOnly=False):
-        loggingInfo = 'Received request for list of remote packages'
-        if updateOnly: loggingInfo = 'Received request to check for updates'
-        logging.info(loggingInfo)
-        cmd = 'flatpak remote-ls --columns=name:f,installed-size:f,description:f,download-size:f,version:f,commit:f,branch:f,ref:f,origin:f,arch:f,runtime:f,application:f,options:f'
-        if updateOnly: cmd += ' --updates'
+    async def getRemotePackageList(self):
+        logging.info('Received request for list of remote packages')
+        cmd = 'flatpak remote-ls --app --columns=name:f,installed-size:f,description:f,download-size:f,version:f,commit:f,branch:f,ref:f,origin:f,arch:f,runtime:f,application:f,options:f'
         proc = await self.pyexec_subprocess(self, cmd)
         if proc['exitcode'] != 0: raise NotImplementedError
 
         lines = proc['stdout'].split('\n')
         package_list = []
         for line in lines:
-            package_match = re.match(r'(?P<name>.*?)\s+(?P<installed_size>((\d+(\.\d+)?)|(\.\d+)).(bytes|kB|MB|GB))\s+(?P<description>.*)\s+(?P<download_size>((\d+(\.\d+)?)|(\.\d+)).(bytes|kB|MB|GB))\s+(?P<version>.*?)\s+(?P<commit>[aA-fF0-9]{12})\s+(?P<branch>.*?)\s+(?P<ref>\S+)\s+(?P<origin>.*?)\s+(?P<arch>(x86_64|i386|aarch64|arm))\s+(?P<runtime>.*?)\s+(?P<application>\S+)(|\s+(?P<options>.*))', line)
+            package_match = re.match(r'(?P<name>.*?)\s+(?P<installed_size>((\d+(\.\d+)?)|(\.\d+)).(bytes|kB|MB|GB))\s+(?P<description>.*)\s+(?P<download_size>((\d+(\.\d+)?)|(\.\d+)).(bytes|kB|MB|GB))\s+(?P<version>.*?)\s+(?P<commit>[aA-fF0-9]{12})\s+(?P<branch>.*?)\s+(?P<ref>\S+)\s+(?P<origin>.*?)\s+(?P<arch>(x86_64|i386|aarch64|arm))\s+(?P<runtime>.*?)\s+(?P<application>[^\s,]+)(|\s+(?P<options>.*))', line)
             if not package_match:
                 if line: logging.info(f'Failed to parse: "{line}"')
                 continue
@@ -116,7 +111,7 @@ class Plugin:
             package_list.append(package)
         return package_list
 
-    async def LocalPackageList(self):
+    async def getLocalPackageList(self):
         LocalPackageList = []
         LocalPackageList += (await self.pullLocalPackageList(self, packageType="runtime"))
         LocalPackageList += (await self.pullLocalPackageList(self, packageType="app"))
@@ -125,14 +120,13 @@ class Plugin:
 
     async def pullLocalPackageList(self, packageType=""):
         loggingInfo = 'Received request for list of all local packages'
-        cmd = 'flatpak list --columns=name:f,installation:f,description:f,size:f,version:f,active:f,branch:f,ref:f,origin:f,arch:f,runtime:f,application:f,options:f,latest:f'
+        cmd = 'flatpak list -a --columns=name:f,installation:f,description:f,size:f,version:f,active:f,branch:f,ref:f,origin:f,arch:f,runtime:f,application:f,options:f,latest:f'
         if packageType == "runtime":
             loggingInfo = 'Received request for list of local runtime packages'
             cmd+=" --runtime"
         elif packageType == "app":
             loggingInfo = 'Received request for list of local app packages'
             cmd+=" --app"
-        if packageType: packageType += '/'
         logging.info(loggingInfo)
         proc = await self.pyexec_subprocess(self, cmd)
         if proc['exitcode'] != 0: raise NotImplementedError
@@ -140,7 +134,7 @@ class Plugin:
         lines = proc['stdout'].split('\n')
         package_list = []
         for line in lines:
-            package_match = re.match(r'(?P<name>.*?)\s+(?P<installation>(system|user))\s+(?P<description>.*)\s+(?P<size>((\d+(\.\d+)?)|(\.\d+)).(bytes|kB|MB|GB))\s+(?P<version>.*?)\s+(?P<active>[aA-fF0-9]{12})\s+(?P<branch>.*?)\s+(?P<ref>\S+)\s+(?P<origin>.*?)\s+(?P<arch>(x86_64|i386|aarch64|arm))\s+(?P<runtime>.*?)\s+(?P<application>\S+)\s+(?P<options>.*)\s+(?P<latest>(-|[aA-fF0-9]{12}))', line)
+            package_match = re.match(r'(?P<name>.*?)\s+(?P<installation>(system|user))\s+(?P<description>.*)\s+(?P<size>((\d+(\.\d+)?)|(\.\d+)).(bytes|kB|MB|GB))\s+(?P<version>.*?)\s+(?P<active>[aA-fF0-9]{12})\s+(?P<branch>.*?)\s+(?P<ref>\S+)\s+(?P<origin>.*?)\s+(?P<arch>(x86_64|i386|aarch64|arm))\s+(?P<runtime>.*?)\s+(?P<application>[^\s,]+)\s+(?P<options>.*)\s+(?P<latest>(-|[aA-fF0-9]{12}))', line)
             if not package_match:
                 if line and line not in ["Looking for updates…", "Proceed with these changes to the system installation? [Y/n]: n"]:
                     logging.info(f'Failed to parse: "{line}"')
@@ -165,9 +159,17 @@ class Plugin:
             package_list.append(package)
         return package_list
 
-    async def UpdatePackage(self, appid):
-        logging.info(f'Received request to update package: {appid}')
-        cmd = f'flatpak update --noninteractive {appid}'
+    async def MaskPackage(self, pkgref):
+        pass
+    async def UnMaskPackage(self, pkgref):
+        pass
+    async def InstallPackage(self, pkgref):
+        pass
+    async def UnInstallPackage(self, pkgref):
+        pass
+    async def UpdatePackage(self, pkgref):
+        logging.info(f'Received request to update package: {pkgref}')
+        cmd = f'flatpak update --noninteractive {pkgref}'
         proc = await self.pyexec_subprocess(self, cmd)
         if proc['exitcode'] == 0: logging.info(proc['stderr'])
         return proc['stdout']
