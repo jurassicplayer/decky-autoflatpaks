@@ -160,13 +160,13 @@ class Plugin:
         return package_list
 
     async def MaskPackage(self, pkgref):
-        pass
+        logging.info(f'Received request to mask package: {pkgref}')
     async def UnMaskPackage(self, pkgref):
-        pass
+        logging.info(f'Received request to unmask package: {pkgref}')
     async def InstallPackage(self, pkgref):
-        pass
+        logging.info(f'Received request to install package: {pkgref}')
     async def UnInstallPackage(self, pkgref):
-        pass
+        logging.info(f'Received request to uninstall package: {pkgref}')
     async def UpdatePackage(self, pkgref):
         logging.info(f'Received request to update package: {pkgref}')
         cmd = f'flatpak update --noninteractive {pkgref}'

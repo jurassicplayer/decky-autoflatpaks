@@ -83,11 +83,12 @@ export class Backend {
     for (var item of this.queue) {
       console.log("Processing Queue Item: ", item)
       // Run await action: mask/unmask, install/uninstall, update
-      if (item.action == 'install') { console.log("Not implemented yet") }
-      if (item.action == 'uninstall') { console.log("Not implemented yet") }
-      if (item.action == 'mask') { console.log("Not implemented yet") }
-      if (item.action == 'unmask') { console.log("Not implemented yet") }
-      if (item.action == 'update') { await this.UpdatePackage(item.packageRef) }
+      if (item.action == 'mask')      { await this.MaskPackage(item.packageRef) }
+      if (item.action == 'unmask')    { await this.UnMaskPackage(item.packageRef) }
+      if (item.action == 'install')   { await this.InstallPackage(item.packageRef) }
+      if (item.action == 'uninstall') { await this.UnInstallPackage(item.packageRef) }
+      if (item.action == 'update')    { await this.UpdatePackage(item.packageRef) }
+      // Run setter to update flatpak card UI elements
       item.setter()
       await this.dequeueAction(item, true)
     }
