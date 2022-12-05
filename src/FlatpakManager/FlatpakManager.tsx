@@ -1,6 +1,9 @@
 import { Focusable, Tabs } from "decky-frontend-lib"
 import { VFC, useEffect, useState } from "react"
+import { AboutPage } from "./About/AboutPage"
+import { AdvancedPage } from "./Advanced/AdvancedPage"
 import { BrowsePage } from "./Browse/BrowsePage"
+import { LoggerPage } from "./Logger/LoggerPage"
 
 export const FlatpakManager: VFC = () => {
   const [currentTabRoute, setCurrentTabRoute] = useState<string>("browser")
@@ -28,6 +31,21 @@ export const FlatpakManager: VFC = () => {
             title: "Browse",
             content: <BrowsePage />,
             id: "browser",
+          },
+          {
+            title: "Logger",
+            content: <LoggerPage />,
+            id: "logger",
+          },
+          {
+            title: "Advanced",
+            content: <AdvancedPage />,
+            id: "advanced",
+          },
+          {
+            title: "About",
+            content: <AboutPage />,
+            id: "about",
           }
         ]}
       />
