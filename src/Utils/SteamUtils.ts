@@ -56,8 +56,8 @@ export class SteamUtils {
   //#region Notification Wrapper
   static async notifyPlus(title: string, message: string, showToast?: boolean, playSound?: boolean, sound?: number, duration?: number) {
     if (sound === undefined ) sound = NavSoundMap?.ToastMisc // Not important, could pass the actual number instead (6)
-    if (playSound === undefined ) playSound = Settings.soundEnabled
-    if (showToast === undefined ) showToast = Settings.notificationEnabled
+    if (playSound === undefined ) playSound = Settings.playSound
+    if (showToast === undefined ) showToast = Settings.showToast
     let toastData = {
       title: title,
       body: message,
@@ -70,18 +70,18 @@ export class SteamUtils {
     console.log("Sending toast via new toaster")
   }
   // Configurable notification wrapper
-  static async notify(title: string, message: string, notificationEnabled?: boolean, soundEnabled?: boolean, duration?: number) {
+  static async notify(title: string, message: string, showToast?: boolean, playSound?: boolean, duration?: number) {
     let soundfx = NavSoundMap?.ToastMisc // Not important, could pass the actual number instead (6)
-    if (soundEnabled === undefined ) soundEnabled = Settings.soundEnabled
-    if (notificationEnabled === undefined ) notificationEnabled = Settings.notificationEnabled
+    if (playSound === undefined ) playSound = Settings.playSound
+    if (showToast === undefined ) showToast = Settings.showToast
     let toastData: ToastDataExtended = {
       title: title,
       body: message,
       duration: duration,
       etype: 11,
       sound: soundfx,
-      playSound: soundEnabled,
-      showToast: notificationEnabled
+      playSound: playSound,
+      showToast: showToast
     }
     this.toast(toastData)
   }

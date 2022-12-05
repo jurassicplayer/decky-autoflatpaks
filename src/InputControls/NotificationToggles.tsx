@@ -4,17 +4,17 @@ import { Settings } from "../Utils/Settings"
 import { NotificationsContainer, NotificationsText, NotificationsToggle } from "./NotificationToggles.css"
 
 export function NotificationToggles() {
-  const [notificationEnabled, setNotificationEnabled] = useState<boolean>(Settings.notificationEnabled)
-  const [soundEnabled, setSoundEnabled] = useState<boolean>(Settings.soundEnabled)
+  const [showToast, setShowToast] = useState<boolean>(Settings.showToast)
+  const [playSound, setPlaySound] = useState<boolean>(Settings.playSound)
 
-  const onNotificationToggle = (notificationEnabled: boolean) => { setNotificationEnabled(notificationEnabled) }
-  const onSoundToggle = (soundEnabled: boolean) => { setSoundEnabled(soundEnabled) }
+  const onNotificationToggle = (showToast: boolean) => { setShowToast(showToast) }
+  const onSoundToggle = (playSound: boolean) => { setPlaySound(playSound) }
 
   useEffect(() => {
-    if (Settings.soundEnabled != soundEnabled) Settings.soundEnabled = soundEnabled;
-    if (Settings.notificationEnabled != notificationEnabled) Settings.notificationEnabled = notificationEnabled;
+    if (Settings.playSound != playSound) Settings.playSound = playSound;
+    if (Settings.showToast != showToast) Settings.showToast = showToast;
     Settings.saveToLocalStorage()
-  }, [notificationEnabled, soundEnabled])
+  }, [showToast, playSound])
 
   return (
     <div style={NotificationsContainer}>
@@ -25,11 +25,11 @@ export function NotificationToggles() {
         style={NotificationsToggle}
         flow-children="horizontal">
         <Toggle
-          value={notificationEnabled}
+          value={showToast}
           onChange={onNotificationToggle}
         />
         <Toggle
-          value={soundEnabled}
+          value={playSound}
           onChange={onSoundToggle}
         />
       </Focusable>
