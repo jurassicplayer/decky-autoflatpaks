@@ -12,7 +12,7 @@ import { Spinner } from "../InputControls/Spinner"
 import { NotificationToggles } from "../InputControls/NotificationToggles"
 import { FaBoxOpen, FaRedoAlt, FaDownload } from "react-icons/fa"
 import { Settings } from "../Utils/Settings"
-import { Backend } from "../Utils/Backend"
+import { appStates, Backend } from "../Utils/Backend"
 import { SteamUtils } from "../Utils/SteamUtils"
 import { FlatpakManagerButtons } from "./QAMPanel.css"
 
@@ -35,7 +35,7 @@ export const QAMPanel: VFC = () => {
   const [dayDuration, setDayDuration] = useState<number>(splitTime.d);
   const [hourDuration, setHourDuration] = useState<number>(splitTime.h);
   const [minuteDuration, setMinuteDuration] = useState<number>(splitTime.m);
-  const [state, setState] = useState<string>(Backend.getAppState())
+  const [state, setState] = useState<number>(Backend.getAppState())
   //#endregion
 
   //#region Input Functions
@@ -65,7 +65,7 @@ export const QAMPanel: VFC = () => {
   const onMinSpinnerUp   = () => { if (minuteDuration < 60) setMinuteDuration(minuteDuration+1) }
   const onMinSpinnerDown = () => { if (minuteDuration) setMinuteDuration(minuteDuration-1) }
 
-  setInterval(() => getAppState(), 100)
+  setInterval(() => getAppState(), 500)
   //#endregion
 
   //#region Effects
@@ -82,12 +82,12 @@ export const QAMPanel: VFC = () => {
   const StatusBar = () => {
     let StatusText = ""
     let bgColor = "#0b6f4c"
-    if (state == "CheckForUpdates") {
+    if (state == appStates.checkingForUpdates) {
       StatusText = "Checking for updates..."
-    } else if (state == "UpdatingFlatpaks") {
+    } else if (state == appStates.updatingAllPackages) {
       StatusText = "Updating flatpaks..."
       bgColor = "#7a0a0a"
-    } else if (state == "ProcessingQueue") {
+    } else if (state == appStates.processingQueue) {
       StatusText = "Processing queue..."
       bgColor = "#7a0a0a"
     }
@@ -102,12 +102,12 @@ export const QAMPanel: VFC = () => {
   //#region Layout
   return (
     <PanelSection>
-      {state != "Idle" ? <StatusBar /> : null}
+      {state != appStates.idle ? <StatusBar /> : null}
       <PanelSectionRow>
         <Focusable style={{ display: "flex" }} flow-children="horizontal">
           <DialogButton style={FlatpakManagerButtons} onClick={onOpenFlatpakManager}><FaBoxOpen /></DialogButton>
-          <DialogButton style={FlatpakManagerButtons} disabled={state != "Idle"} onSecondaryButton={onTestProcess} onClick={onCheckForUpdates}><FaRedoAlt /></DialogButton>
-          <DialogButton style={FlatpakManagerButtons} disabled={state != "Idle"} onClick={onUpdateAllPackages}><FaDownload /></DialogButton>
+          <DialogButton style={FlatpakManagerButtons} disabled={state != appStates.idle} onSecondaryButton={onTestProcess} onClick={onCheckForUpdates}><FaRedoAlt /></DialogButton>
+          <DialogButton style={FlatpakManagerButtons} disabled={state != appStates.idle} onClick={onUpdateAllPackages}><FaDownload /></DialogButton>
         </Focusable>
       </PanelSectionRow>
 
