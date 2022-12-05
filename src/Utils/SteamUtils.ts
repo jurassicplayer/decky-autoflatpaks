@@ -1,22 +1,46 @@
 import { ToastData, findModuleChild, Module } from "decky-frontend-lib"
-import { Settings } from "./Settings"
+import { Backend } from "./Backend";
+import { Settings } from "./Settings";
 
 //#region Find SteamOS modules
 const findModule = (property: string) => {
   return findModuleChild((m: Module) => {
     if (typeof m !== "object") return undefined;
-    for (let prop in m)
+    for (let prop in m) {
       try {
         if (m[prop][property])
-          return m[prop];
-      } catch (e) {
-        // console.log(`Unable to findModuleChild for '${property}'`)
-        return undefined;
+          return m[prop]
+      } catch {
+        return undefined
       }
-  });
+    }
+  })
 }
 
-const AudioParent = findModule("GamepadUIAudio");
+const audioModule = findModuleChild((m: Module) => {
+  if (typeof m !== "object") return undefined;
+  for (let prop in m) {
+    try {
+      if (m[prop].PlayNavSound && m[prop].RegisterCallbackOnPlaySound)
+        return m[prop]
+    } catch {
+      return undefined
+    }
+  }
+})
+const settingsStore = findModuleChild((m: Module) => {
+  if (typeof m !== "object") return undefined;
+  for (let prop in m) {
+    try {
+      if (m[prop].m_Settings && m[prop].m_FriendSettings && m[prop].m_BatteryPreferences && m[prop].m_StorePreferences)
+        return m[prop]
+    } catch {
+      return undefined
+    }
+  }
+})
+
+//const AudioParent = findModule("GamepadUIAudio");
 const NavSoundMap = findModule("ToastMisc");
 const NotificationStore = findModule("BIsUserInGame")
 //#endregion
@@ -25,22 +49,38 @@ interface ToastDataExtended extends ToastData {
   etype?: number
   sound?: number
   showToast?: boolean
+  playSound?: boolean
 }
 
 export class SteamUtils {
   //#region Notification Wrapper
+  static async notifyPlus(title: string, message: string, showToast?: boolean, playSound?: boolean, sound?: number, duration?: number) {
+    if (sound === undefined ) sound = NavSoundMap?.ToastMisc // Not important, could pass the actual number instead (6)
+    if (playSound === undefined ) playSound = Settings.soundEnabled
+    if (showToast === undefined ) showToast = Settings.notificationEnabled
+    let toastData = {
+      title: title,
+      body: message,
+      duration: duration,
+      sound: sound,
+      playSound: playSound,
+      showToast: showToast
+    }
+    Backend.getServer().toaster.toast(toastData)
+    console.log("Sending toast via new toaster")
+  }
   // Configurable notification wrapper
   static async notify(title: string, message: string, notificationEnabled?: boolean, soundEnabled?: boolean, duration?: number) {
-    duration            = (duration) ? duration : 5e3
-    notificationEnabled = (notificationEnabled) ? notificationEnabled : Settings.notificationEnabled
-    soundEnabled        = (soundEnabled) ? soundEnabled : Settings.soundEnabled
-    let soundfx = NavSoundMap?.ToastMisc // Not important, could pass the actual number instead
+    let soundfx = NavSoundMap?.ToastMisc // Not important, could pass the actual number instead (6)
+    if (soundEnabled === undefined ) soundEnabled = Settings.soundEnabled
+    if (notificationEnabled === undefined ) notificationEnabled = Settings.notificationEnabled
     let toastData: ToastDataExtended = {
       title: title,
       body: message,
       duration: duration,
-      etype: 12,
-      sound: (soundEnabled) ? soundfx : undefined,
+      etype: 11,
+      sound: soundfx,
+      playSound: soundEnabled,
       showToast: notificationEnabled
     }
     this.toast(toastData)
@@ -54,20 +94,22 @@ export class SteamUtils {
     let toastData = {
       nNotificationID: NotificationStore.m_nNextTestNotificationID++,
       rtCreated: Date.now(),
-      eType: toast.etype || (toast.etype = 15),
+      eType: toast.etype || 11,
       nToastDurationMS: toast.duration || (toast.duration = 5e3),
       data: toast,
       decky: true,
     }
     // @ts-ignore
-    toastData.data.appid = ()=>0
+    toastData.data.appid = ()=> 0
+    if (toast.sound === undefined) toast.sound = 6
+    if (toast.playSound === undefined) toast.playSound = true
+    if (toast.showToast === undefined) toast.showToast = true
     // Check for system notification settings
-    // @ts-ignore
     if ((settingsStore.settings.bDisableAllToasts && !toast.critical) || (settingsStore.settings.bDisableToastsInGame && !toast.critical && NotificationStore.BIsUserInGame())) {
       console.log("[AutoFlatpaks] Disable/hide non-critical turned on, skipping notification")
       return
     }
-    if(toast.sound) AudioParent.GamepadUIAudio.PlayNavSound(toast.sound)
+    if(toast.playSound) audioModule.PlayNavSound(toast.sound)
     if(toast.showToast) {
       NotificationStore.m_rgNotificationToasts.push(toastData)
       NotificationStore.DispatchNextToast()
