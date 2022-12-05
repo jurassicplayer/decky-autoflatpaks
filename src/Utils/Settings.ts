@@ -9,12 +9,19 @@ export class Settings {
   public static lastCheckTimestamp:         Date = new Date()
 
   static async loadFromLocalStorage() {
+    var returncode = true
     for (let key in this) {
-      if (typeof this[key] == "boolean") this[key] = (await Backend.getSetting(key, this[key])) as boolean
-      else if (typeof this[key] == "number") this[key] = (await Backend.getSetting(key, this[key])) as number
-      else if (typeof this[key] == "string") this[key] = (await Backend.getSetting(key, this[key])) as string
-      else if (this[key] instanceof Date) this[key] = new Date((await Backend.getSetting(key, this[key])).toString())
+      try {
+        if (typeof this[key] == "boolean") this[key] = (await Backend.getSetting(key, this[key])) as boolean
+        else if (typeof this[key] == "number") this[key] = (await Backend.getSetting(key, this[key])) as number
+        else if (typeof this[key] == "string") this[key] = (await Backend.getSetting(key, this[key])) as string
+        else if (this[key] instanceof Date) this[key] = new Date((await Backend.getSetting(key, this[key])).toString())
+      } catch (error) {
+        returncode = false
+        console.log('Failed to load setting: ', key)
+      }
     }
+    return returncode
   }
 
   static async saveToLocalStorage() {
