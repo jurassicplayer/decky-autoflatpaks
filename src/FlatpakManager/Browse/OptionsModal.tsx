@@ -16,7 +16,7 @@ export const OptionsModal = (props: {selectedOptions: FPMOptions, setSelectedOpt
     let newOptions = {
       ...currentOptions,
     }
-    if (options.filterSearch) newOptions = {...newOptions, filterSearch:  options.filterSearch}
+    if (typeof options.filterSearch == 'string') newOptions = {...newOptions, filterSearch:  options.filterSearch}
     if (options.filterType)   newOptions = {...newOptions, filterType:    options.filterType}
     if (options.filterStatus) newOptions = {...newOptions, filterStatus:  options.filterStatus}
     if (options.filterMask)   newOptions = {...newOptions, filterMask:    options.filterMask}
