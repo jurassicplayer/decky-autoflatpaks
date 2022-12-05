@@ -7,13 +7,19 @@ import { FaBox } from "react-icons/fa"
 import { FlatpakManager } from "./FlatpakManager/FlatpakManager"
 import { QAMPanel } from "./QAM/QAMPanel"
 import { Settings } from "./Utils/Settings"
-import { Backend } from "./Utils/Backend"
+import { appStates, Backend } from "./Utils/Backend"
 import { SteamUtils } from "./Utils/SteamUtils"
 
 const initPlugin = async () => {
-  await Settings.loadFromLocalStorage()
+  var settings = await Settings.loadFromLocalStorage()
+  if (!settings) {
+    SteamUtils.notify('AutoFlatpaks', 'Failed to load setting, skipping check for sanity')
+    Backend.setAppState(appStates.failedInitialize)
+    return
+  }
   checkOnBoot()
   Backend.setAppInitialized(true)
+  Backend.setAppState(appStates.idle)
 }
 
 const checkOnBoot = () => {
@@ -25,6 +31,17 @@ const checkOnBoot = () => {
   }
 }
 
+const UpdateAllPackages = async (success?: boolean) => {
+  if (success === undefined) success = await Backend.UpdateAllPackages()
+  if (success) {
+    SteamUtils.notify('AutoFlatpaks', 'Updated all packages')
+    return true
+  }
+  console.log('Failed to auto-update all packages, retrying in 5 seconds...')
+  setTimeout(UpdateAllPackages, 5000)
+  return false
+}
+
 export default definePlugin((serverApi: ServerAPI) => {
   Backend.initBackend(serverApi)
   serverApi.routerHook.addRoute("/flatpak-manager", FlatpakManager)
@@ -32,6 +49,7 @@ export default definePlugin((serverApi: ServerAPI) => {
 
   // interval check loop
   const batteryStateRegistration = SteamClient.System.RegisterForBatteryStateChanges(async ()=> {
+    if (!Backend.getAppInitialized()) return
     var currentTime = new Date()
     if (!((currentTime.getTime() - Settings.lastCheckTimestamp.getTime())/1000/60 > Settings.updateInterval)) return
     // Time to check for updates
@@ -40,8 +58,7 @@ export default definePlugin((serverApi: ServerAPI) => {
     if (!package_count) return
     if (Settings.unattendedUpgradesEnabled) {
       SteamUtils.notify('AutoFlatpaks', `Updating ${package_count} packages...`)
-      await Backend.UpdateAllPackages()
-      SteamUtils.notify('AutoFlatpaks', 'Updated all packages')
+      UpdateAllPackages()
     } else {
       SteamUtils.notify('AutoFlatpaks', `${package_count} updates available`)
     }
