@@ -53,8 +53,9 @@ export default definePlugin((serverApi: ServerAPI) => {
     var currentTime = new Date()
     if (!((currentTime.getTime() - Settings.lastCheckTimestamp.getTime())/1000/60 > Settings.updateInterval)) return
     // Time to check for updates
-    Settings.lastCheckTimestamp = currentTime
     var package_count = await Backend.getPackageCount()
+    Settings.lastCheckTimestamp = currentTime
+    await Settings.saveLastCheckTimestamp()
     if (!package_count) return
     if (Settings.unattendedUpgradesEnabled) {
       SteamUtils.notify('AutoFlatpaks', `Updating ${package_count} packages...`)

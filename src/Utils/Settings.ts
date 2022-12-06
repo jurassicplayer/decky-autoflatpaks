@@ -32,4 +32,9 @@ export class Settings {
       await Backend.commitSettings()
     })
   }
+
+  static async saveLastCheckTimestamp() {
+    await Backend.setSetting('lastCheckTimestamp', this.lastCheckTimestamp)
+    await Backend.commitSettings()
+  }
 }
