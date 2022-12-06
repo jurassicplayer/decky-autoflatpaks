@@ -5,7 +5,7 @@ export const LoggerPage: VFC = () => {
     <div>
       <h2>Work In Progress</h2>
       <p>
-        This area will be a place that acts as a UI to the "flatpak history" command.
+        This is a tentative area that will be a place that acts as a UI to the "flatpak history" command.
       </p>
       <ul>
         <li>Provides options for since time, until time, reverse order</li>

@@ -6,6 +6,7 @@ export const AboutPage: VFC = () => {
       <h2>Work In Progress</h2>
       <p>
         While AutoFlatpaks isn't intended to be a fully featured flatpak manager/store, it may end up being close, or even seen as one by some standards.<br />
+        The final UI and features are not set in stone, and may be expanded upon/removed. The notes left in WIP pages are merely notes and ideas so I won't forget.<br />
         <br />
         This area will be a place to see information about the project including:<br />
       </p>
