@@ -16,14 +16,12 @@ export const AboutPage: VFC = () => {
         <li>List of things I intend to add</li>
       </ul>
       <ul>
+        <li>Fix the bugginess of touch navigation in the flatpak manager</li>
         <li>Flathub API integration (?)</li>
         <li>Add to Steam (?)</li>
-        <li>Align update interval numbers</li>
         <li>Align steamspinner</li>
-        <li>Make filter search option similar to other filters (within one row), but with a larger width</li>
-        <li>Add padding to options menu</li>
-        <li>Add padding to refresh button</li>
         <li>Remove minutes option</li>
+        <li>Remove debug long process function</li>
         <li>Flatpak detailed info button</li>
         <li>Filter Search refinement (?)</li>
         <li>Filter Mask refinement (?)</li>
