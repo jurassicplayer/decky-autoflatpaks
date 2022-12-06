@@ -2,6 +2,7 @@
 A plugin to manage, notify, and automatically update flatpaks on your steamdeck console after an interval of time without DesktopMode. Requires root permissions.
 <details>
   <summary>Screenshots</summary>
+
   ![Main View](./assets/thumbnail.png)
   ![PackageManager](./assets/thumbnail02.png)
   ![OptionsMenu](./assets/thumbnail03.png)
