@@ -20,7 +20,6 @@ export const AboutPage: VFC = () => {
         <li>Fix the bugginess of touch navigation in the flatpak manager</li>
         <li>Flathub API integration (?)</li>
         <li>Add to Steam (?)</li>
-        <li>Align steamspinner</li>
         <li>Remove minutes option</li>
         <li>Remove debug long process function</li>
         <li>Flatpak detailed info button</li>
