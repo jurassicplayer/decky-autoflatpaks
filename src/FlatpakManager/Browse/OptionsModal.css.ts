@@ -12,6 +12,6 @@ export const OptionRowLabel: CSSProperties = {
   padding: "0px"
 }
 
-export const Dropdown: CSSProperties = {
+export const DropdownContainer: CSSProperties = {
   minWidth: "45%"
 }
