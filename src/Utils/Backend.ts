@@ -101,13 +101,13 @@ export class Backend {
   static async queueAction(queueData: queueData): Promise<boolean> {
     if (this.getAppState() != appStates.idle) return false
     this.queue.push(queueData)
-    console.log("queueAction: ", this.queue)
+    console.log("queueAction: ", queueData, this.queue)
     return true
   }
   static async dequeueAction(queueData: queueData, processQueue?: boolean): Promise<boolean> {
     if (this.getAppState() != appStates.idle && !processQueue) return false
     this.queue = this.queue.filter(item => !(item.action == queueData.action && item.packageRef == queueData.packageRef))
-    console.log("dequeueAction: ", this.queue)
+    console.log("dequeueAction: ", queueData, this.queue)
     return true
   }
   static async ProcessQueue(): Promise<boolean> {
