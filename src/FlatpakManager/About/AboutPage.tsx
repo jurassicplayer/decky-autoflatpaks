@@ -24,8 +24,12 @@ export const AboutPage: VFC = () => {
         <li>Add padding to options menu</li>
         <li>Add padding to refresh button</li>
         <li>Remove minutes option</li>
+        <li>Flatpak detailed info button</li>
         <li>Filter Search refinement (?)</li>
         <li>Filter Mask refinement (?)</li>
+        <li>Add remaining space check</li>
+        <li>Add check if package running</li>
+        <li>Split progress/status bar into separate component</li>
         <li>Add debugging information</li>
         <li>Add logger page functionality</li>
         <li>Add advanced page functionality</li>
