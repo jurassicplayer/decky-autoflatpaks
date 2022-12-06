@@ -64,7 +64,7 @@ export const BrowsePage: VFC = () => {
           //.filter(data => data.application.includes('.Debug'))
           .filter(data => {
             if (selectedOptions.filterSearch.length == 0) return true
-            if (data.name.includes(selectedOptions.filterSearch) || data.description.includes(selectedOptions.filterSearch) || data.application.includes(selectedOptions.filterSearch) || data.ref.includes(selectedOptions.filterSearch) || data.origin.includes(selectedOptions.filterSearch)) return true
+            if (data.name.includes(selectedOptions.filterSearch) || data.description.includes(selectedOptions.filterSearch) || data.ref.includes(selectedOptions.filterSearch) || data.origin.includes(selectedOptions.filterSearch)) return true
             return false
           })
           .filter(data => selectedOptions.filterType == 'all' || data.packagetype == selectedOptions.filterType)
