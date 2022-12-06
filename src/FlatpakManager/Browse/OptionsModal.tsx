@@ -1,5 +1,6 @@
 import { Focusable, Dropdown, ModalRoot, staticClasses, TextField } from 'decky-frontend-lib'
 import { useState } from 'react'
+import { DropdownContainer, OptionRowContainer, OptionRowLabel } from "./OptionsModal.css"
 
 export interface FPMOptions {
   sortOrder: string
@@ -33,17 +34,22 @@ export const OptionsModal = (props: {selectedOptions: FPMOptions, setSelectedOpt
         if (props.closeModal) { props.closeModal() }
       }}>
       <Focusable>
-        <div className={staticClasses.PanelSectionTitle}>Filter: Search</div>
-        <TextField
-          bShowClearAction={true}
-          bAlwaysShowClearAction={true}
-          contentEditable={true}
-          onChange={(e) => {setSearch(e.currentTarget.value)}}
-          defaultValue={props.selectedOptions.filterSearch}/>
-        <div style={{display:"flex", flexDirection: "row", justifyContent: "space-between"}}>
+        <div style={OptionRowContainer}>
+          <div className={staticClasses.PanelSectionTitle} style={OptionRowLabel}>Filter: Search</div>
+          <Focusable style={{minWidth: "75%"}}>
+            <TextField
+              style={{borderRadius: "2px"}}
+              bShowClearAction={true}
+              bAlwaysShowClearAction={true}
+              contentEditable={true}
+              onChange={(e) => {setSearch(e.currentTarget.value)}}
+              defaultValue={props.selectedOptions.filterSearch}/>
+          </Focusable>
+        </div>
+        <div style={OptionRowContainer}>
           {/* Package Type */}
-          <div className={staticClasses.PanelSectionTitle}>Filter: Type</div>
-          <Focusable style={{minWidth: "50%"}}>
+          <div className={staticClasses.PanelSectionTitle} style={OptionRowLabel}>Filter: Type</div>
+          <Focusable style={DropdownContainer}>
             <Dropdown
               selectedOption={props.selectedOptions.filterType}
               onChange={(e) => {updateSelectedOptions({filterType: e.data})}}
@@ -54,10 +60,10 @@ export const OptionsModal = (props: {selectedOptions: FPMOptions, setSelectedOpt
             ]} />
           </Focusable>
         </div>
-        <div style={{display:"flex", flexDirection: "row", justifyContent: "space-between"}}>
+        <div style={OptionRowContainer}>
           {/* Package Status */}
-          <div className={staticClasses.PanelSectionTitle}>Filter: Status</div>
-          <Focusable style={{minWidth: "50%"}}>
+          <div className={staticClasses.PanelSectionTitle} style={OptionRowLabel}>Filter: Status</div>
+          <Focusable style={DropdownContainer}>
           <Dropdown selectedOption={props.selectedOptions.filterStatus}
             onChange={(e) => {updateSelectedOptions({filterStatus: e.data})}}
             rgOptions={[
@@ -68,10 +74,10 @@ export const OptionsModal = (props: {selectedOptions: FPMOptions, setSelectedOpt
             { label: 'Updateable',    data: 'updateable' },
           ]} /></Focusable>
         </div>
-        <div style={{display:"flex", flexDirection: "row", justifyContent: "space-between"}}>
-          <div className={staticClasses.PanelSectionTitle}>Filter: Mask</div>
+        <div style={OptionRowContainer}>
+          <div className={staticClasses.PanelSectionTitle} style={OptionRowLabel}>Filter: Mask</div>
           {/* Package Mask */}
-          <Focusable style={{minWidth: "50%"}}>
+          <Focusable style={DropdownContainer}>
           <Dropdown selectedOption={props.selectedOptions.filterMask}
             onChange={(e) => {updateSelectedOptions({filterMask: e.data})}}
             rgOptions={[
@@ -80,9 +86,9 @@ export const OptionsModal = (props: {selectedOptions: FPMOptions, setSelectedOpt
             { label: 'Unmasked', data: 'unmasked' },
           ]} /></Focusable>
         </div>
-        <div style={{display:"flex", flexDirection: "row", justifyContent: "space-between"}}>
-          <div className={staticClasses.PanelSectionTitle}>Sort</div>
-          <Focusable style={{minWidth: "50%"}}>
+        <div style={OptionRowContainer}>
+          <div className={staticClasses.PanelSectionTitle} style={OptionRowLabel}>Sort Order</div>
+          <Focusable style={DropdownContainer}>
           <Dropdown selectedOption={props.selectedOptions.sortOrder}
             onChange={(e) => {updateSelectedOptions({sortOrder: e.data})}}
             rgOptions={[
