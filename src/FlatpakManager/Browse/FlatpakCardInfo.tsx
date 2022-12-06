@@ -72,7 +72,7 @@ export const FlatpakCardInfo: VFC<{data: FlatpakMetadata}> = (props) => {
             if (appState != appStates.idle) return
             setMaskToggled(!maskToggled)
             maskToggled
-              ? Backend.dequeueAction(packageInfo.masked ? queueActions.mask : queueActions.unmask)
+              ? Backend.dequeueAction(packageInfo.masked ? queueActions.unmask : queueActions.mask)
               : Backend.queueAction(packageInfo.masked ? queueActions.unmask : queueActions.mask)
           }}>
           { packageInfo.masked ? <FaEyeSlash /> : <FaEye /> }
@@ -101,7 +101,7 @@ export const FlatpakCardInfo: VFC<{data: FlatpakMetadata}> = (props) => {
             if (appState != appStates.idle) return
             setInstallToggled(!installToggled)
             installToggled
-              ? Backend.dequeueAction(packageInfo.installed ? queueActions.install : queueActions.uninstall)
+              ? Backend.dequeueAction(packageInfo.installed ? queueActions.uninstall : queueActions.install)
               : Backend.queueAction(packageInfo.installed ? queueActions.uninstall : queueActions.install)
           }}>
           { packageInfo.installed ? <FaTrashAlt /> : <FaDownload /> }
