@@ -46,13 +46,14 @@ export const BrowsePage: VFC = () => {
 
   return (
     <Focusable
+      style={{display: "flex", justifyContent: "center", minHeight: "100%"}}
       onOptionsButton={()=>{showModal(<OptionsModal selectedOptions={selectedOptions} setSelectedOptions={setSelectedOptions} />, findSP())}}
       onOptionsActionDescription="Options"
       onSecondaryButton={()=>Backend.ProcessQueue()}
       onSecondaryActionDescription="Apply">
       { browseReady
-      ? <div
-        style={{ display: "flex", flexDirection: "column", maxHeight: "100%", overflow: "scroll" }}>
+      ? <Focusable
+        style={{ display: "flex", flexDirection: "column", maxHeight: "100%", minWidth: "100%", overflow: "scroll" }}>
         <DialogButton style={{margin: "2px", maxWidth: "99.5%", borderRadius: "7px"}} onClick={()=>refreshBrowse()}><FaRedoAlt /></DialogButton>
         {packageList
           /*  Filter out packages with no description
@@ -110,8 +111,8 @@ export const BrowsePage: VFC = () => {
             return(<FlatpakCard data={data} />)
           })
         }
-      </div>
-      : <div style={{minHeight: "100%", display:"flex", justifyContent: "center"}}><SteamSpinner/></div>
+      </Focusable>
+      : <div style={{alignItems: "center"}}><SteamSpinner/></div>
       }
     </Focusable>
   )
