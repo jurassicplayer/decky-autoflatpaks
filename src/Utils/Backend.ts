@@ -118,14 +118,16 @@ export class Backend {
     let queueLength = this.getQueueLength()
     for (var item of this.queue) {
       console.log("Processing Queue Item: ", item)
+      let retcode = true
       this.setQueueProgress(this.queue.length)
       this.eventBus.dispatchEvent(new CustomEvent('QueueProgress', {detail: {queueItem: item, queueLength: queueLength, queueProgress: this.getQueueProgress()}}))
       // Run await action: mask/unmask, install/uninstall, update
-      if (item.action == 'mask')      { await this.MaskPackage(item.packageRef) }
-      if (item.action == 'unmask')    { await this.UnMaskPackage(item.packageRef) }
-      if (item.action == 'install')   { await this.InstallPackage(item.packageRef) }
-      if (item.action == 'uninstall') { await this.UnInstallPackage(item.packageRef) }
-      if (item.action == 'update')    { await this.UpdatePackage(item.packageRef) }
+      if (item.action == 'mask')      { retcode = await this.MaskPackage(item.packageRef) }
+      if (item.action == 'unmask')    { retcode = await this.UnMaskPackage(item.packageRef) }
+      if (item.action == 'install')   { retcode = await this.InstallPackage(item.packageRef) }
+      if (item.action == 'uninstall') { retcode = await this.UnInstallPackage(item.packageRef) }
+      if (item.action == 'update')    { retcode = await this.UpdatePackage(item.packageRef) }
+      if (!retcode) returncode = false 
       await this.dequeueAction(item, true)
     }
     if (queueLength) this.eventBus.dispatchEvent(new CustomEvent('QueueCompletion', {detail: {queueLength: queueLength}}))
@@ -251,14 +253,11 @@ export class Backend {
       upl = value[0]
       lpl = value[1]
     })
-    // this.setAppState(appStates.updatingAllPackages)
+    if (!upl.length) return undefined
     for (let uplitem of upl) {
       var idx = lpl.findIndex(lplitem => lplitem.application == uplitem.application && lplitem.branch == uplitem.branch && lplitem.origin == uplitem.remote)
       this.queueAction({action: 'update', packageRef: lpl[idx].ref})
-      // var proc = await this.UpdatePackage(lpl[idx].ref)
-      // if (!proc) returncode = false // return failure if at least one package command fails
     }
-    // this.setAppState(appStates.idle)
     returncode = await this.ProcessQueue()
     return returncode
   }
