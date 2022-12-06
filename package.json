@@ -1,7 +1,7 @@
 {
   "name": "decky-autoflatpaks",
   "version": "1.1.0",
-  "description": "Automatically update available flatpaks between intervals",
+  "description": "Flatpak manager to un/install, un/mask, update, and autoupdate flatpaks",
   "scripts": {
     "build": "shx rm -rf dist && rollup -c",
     "watch": "rollup -c -w",

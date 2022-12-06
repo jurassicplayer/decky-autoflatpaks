@@ -4,7 +4,7 @@
   "flags": ["root"],
   "publish": {
     "tags": ["flatpak", "package-management", "utility", "update"],
-    "description": "Automatically update available flatpaks between intervals.",
+    "description": "Flatpak manager to un/install, un/mask, update, and autoupdate flatpaks",
     "image": "https://github.com/jurassicplayer/decky-autoflatpaks/blob/main/assets/thumbnail.png"
   }
 }
