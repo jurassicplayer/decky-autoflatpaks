@@ -1,7 +1,7 @@
 {
   "name": "decky-autoflatpaks",
   "version": "1.1.0",
-  "description": "Flatpak manager to un/install, un/mask, update, and autoupdate flatpaks",
+  "description": "A plugin to manage, notify, and automatically update flatpaks on your steamdeck console",
   "scripts": {
     "build": "shx rm -rf dist && rollup -c",
     "watch": "rollup -c -w",
