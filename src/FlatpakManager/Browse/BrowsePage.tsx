@@ -36,7 +36,7 @@ export const BrowsePage: VFC = () => {
   useEffect(() => {
     console.log("Browse loaded")
     Backend.eventBus.addEventListener('QueueCompletion', onQueueCompletion)
-    refreshBrowse()
+    refreshBrowse(Backend.getPL().length > 0)
   },[])
   useEffect(() => { if (browseReady) {refreshBrowse(true)} }, [selectedOptions])
   useEffect(() => () => {
