@@ -18,14 +18,15 @@ export enum appStates {
   failedInitialize,
   idle,
   checkingForUpdates,
-  processingQueue,
-  updatingAllPackages
+  processingQueue
 } 
 
 export class Backend {
   private static serverAPI: ServerAPI
   private static packageList: FlatpakMetadata[]
   private static queue: queueData[]
+  private static queueLength: number
+  private static queueProgress: number
   private static appState: {
     initialized : boolean
     state: number
@@ -43,6 +44,8 @@ export class Backend {
     this.eventBus = new EventTarget()
     this.packageList = []
     this.queue = []
+    this.queueLength = 0
+    this.queueProgress = 0
   }
   static setServer(server: ServerAPI) { this.serverAPI = server }
   static getServer() { return this.serverAPI }
@@ -64,6 +67,10 @@ export class Backend {
   }
   static getQueue() { return this.queue }
   static setQueue(queue: queueData[]) { this.queue = queue } // Basically one use-case: clear the queue
+  static getQueueLength() { return this.queueLength }
+  static setQueueLength() { this.queueLength = Backend.getQueue().length}
+  static getQueueProgress() { return (this.queueLength - this.queueProgress + 1) } // Offset by one to show current number instead of previous
+  static setQueueProgress(currentQueueLength: number) { this.queueProgress = currentQueueLength}
   static setAppInitialized(state: boolean) {this.appState.initialized = state}
   static getAppInitialized() { return this.appState.initialized}
 
@@ -103,12 +110,16 @@ export class Backend {
     console.log("dequeueAction: ", this.queue)
     return true
   }
-  static async ProcessQueue(): Promise<any | undefined> {
-    if (this.getAppState() != appStates.idle) return undefined
+  static async ProcessQueue(): Promise<boolean> {
+    if (this.getAppState() != appStates.idle) return false
     this.setAppState(appStates.processingQueue)
-    let queueLength = this.queue.length
+    let returncode = true
+    this.setQueueLength()
+    let queueLength = this.getQueueLength()
     for (var item of this.queue) {
       console.log("Processing Queue Item: ", item)
+      this.setQueueProgress(this.queue.length)
+      this.eventBus.dispatchEvent(new CustomEvent('QueueProgress', {detail: {queueItem: item, queueLength: queueLength, queueProgress: this.getQueueProgress()}}))
       // Run await action: mask/unmask, install/uninstall, update
       if (item.action == 'mask')      { await this.MaskPackage(item.packageRef) }
       if (item.action == 'unmask')    { await this.UnMaskPackage(item.packageRef) }
@@ -117,8 +128,9 @@ export class Backend {
       if (item.action == 'update')    { await this.UpdatePackage(item.packageRef) }
       await this.dequeueAction(item, true)
     }
-    this.setAppState(appStates.idle)
     if (queueLength) this.eventBus.dispatchEvent(new CustomEvent('QueueCompletion', {detail: {queueLength: queueLength}}))
+    this.setAppState(appStates.idle)
+    return returncode
   }
   //#endregion
 
@@ -239,13 +251,15 @@ export class Backend {
       upl = value[0]
       lpl = value[1]
     })
-    this.setAppState(appStates.updatingAllPackages)
+    // this.setAppState(appStates.updatingAllPackages)
     for (let uplitem of upl) {
       var idx = lpl.findIndex(lplitem => lplitem.application == uplitem.application && lplitem.branch == uplitem.branch && lplitem.origin == uplitem.remote)
-      var proc = await this.UpdatePackage(lpl[idx].ref)
-      if (!proc) returncode = false // return failure if at least one package command fails
+      this.queueAction({action: 'update', packageRef: lpl[idx].ref})
+      // var proc = await this.UpdatePackage(lpl[idx].ref)
+      // if (!proc) returncode = false // return failure if at least one package command fails
     }
-    this.setAppState(appStates.idle)
+    // this.setAppState(appStates.idle)
+    returncode = await this.ProcessQueue()
     return returncode
   }
   //#endregion

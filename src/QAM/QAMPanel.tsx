@@ -24,7 +24,6 @@ export const QAMPanel: VFC = () => {
     const minutes = Math.floor((interval%(24*60))%60)
     return ({'d': days, 'h': hours, 'm': minutes})
   }
-  const getAppState = async () => { setState(Backend.getAppState()) }
   //#endregion
 
   //#region Variables
@@ -35,7 +34,12 @@ export const QAMPanel: VFC = () => {
   const [dayDuration, setDayDuration] = useState<number>(splitTime.d);
   const [hourDuration, setHourDuration] = useState<number>(splitTime.h);
   const [minuteDuration, setMinuteDuration] = useState<number>(splitTime.m);
-  const [state, setState] = useState<number>(Backend.getAppState())
+  const [appState, setAppState] = useState<number>(Backend.getAppState())
+  const [queueProgress, setQueueProgress] = useState<{[key: string]: any}>({
+    currentItem: Backend.getQueue()[0],
+    queueProgress: Backend.getQueueProgress(),
+    queueLength: Backend.getQueueLength()
+  })
   //#endregion
 
   //#region Input Functions
@@ -57,18 +61,51 @@ export const QAMPanel: VFC = () => {
     SteamUtils.notify('AutoFlatpaks', 'Updated all packages')
   }
 
-
+  const onQueueProgress = ((e: CustomEvent) => {
+    if (!e.detail.queueLength) return
+    console.log('Event (QueueProgress): ', e.detail)
+    setQueueProgress({
+      currentItem: e.detail.queueItem,
+      queueProgress: Number(e.detail.queueProgress),
+      queueLength: Number(e.detail.queueLength)
+    })
+  }) as EventListener
+  const onQueueCompletion = ((e: CustomEvent) => {
+    if (!e.detail.queueLength) return
+    console.log('Event (QueueCompletion): ', e.detail)
+    setQueueProgress({
+      currentItem: undefined,
+      queueProgress: undefined,
+      queueLength: undefined
+    })
+  }) as EventListener
+  const onAppStateChange = ((e: CustomEvent) => {
+    if (!e.detail.state) return
+    console.log('Event (AppState): QAM Panel')
+    setAppState(e.detail.state)
+  }) as EventListener
   const onDaySpinnerUp   = () => { setDayDuration(dayDuration+1) }
   const onDaySpinnerDown = () => { if (dayDuration) setDayDuration(dayDuration-1) }
   const onHrsSpinnerUp   = () => { if (hourDuration < 24) setHourDuration(hourDuration+1) }
   const onHrsSpinnerDown = () => { if (hourDuration) setHourDuration(hourDuration-1) }
   const onMinSpinnerUp   = () => { if (minuteDuration < 60) setMinuteDuration(minuteDuration+1) }
   const onMinSpinnerDown = () => { if (minuteDuration) setMinuteDuration(minuteDuration-1) }
-
-  setInterval(() => getAppState(), 500)
   //#endregion
 
   //#region Effects
+  useEffect(() => {
+    console.log("QAM Panel loaded")
+    // Register listener
+    Backend.eventBus.addEventListener('QueueProgress', onQueueProgress)
+    Backend.eventBus.addEventListener('QueueCompletion', onQueueCompletion)
+    Backend.eventBus.addEventListener('AppStateChange', onAppStateChange)
+  }, [])
+  useEffect(() => () => {
+    Backend.eventBus.removeEventListener('QueueProgress', onQueueProgress)
+    Backend.eventBus.removeEventListener('QueueCompletion', onQueueCompletion)
+    Backend.eventBus.removeEventListener('AppStateChange', onAppStateChange)
+    console.log("QAM Panel unloaded")
+  }, [])
   useEffect(() => { setIntervalTime((dayDuration * 24 * 60)+(hourDuration * 60)+minuteDuration) }, [dayDuration, hourDuration, minuteDuration])
   useEffect(() => {
     if (Settings.checkOnBootEnabled != checkOnBootEnabled) Settings.checkOnBootEnabled = checkOnBootEnabled;
@@ -82,18 +119,17 @@ export const QAMPanel: VFC = () => {
   const StatusBar = () => {
     let StatusText = ""
     let bgColor = "#0b6f4c"
-    if (state == appStates.checkingForUpdates) {
+    if (appState == appStates.checkingForUpdates) {
       StatusText = "Checking for updates..."
-    } else if (state == appStates.updatingAllPackages) {
-      StatusText = "Updating flatpaks..."
-      bgColor = "#7a0a0a"
-    } else if (state == appStates.processingQueue) {
+    } else if (appState == appStates.processingQueue) {
       StatusText = "Processing queue..."
+      if (queueProgress.currentItem && queueProgress.queueLength && queueProgress.queueProgress)
+        StatusText = `(${queueProgress.queueProgress}/${queueProgress.queueLength}) ${queueProgress.currentItem.action} ${queueProgress.currentItem.packageRef}...`
       bgColor = "#7a0a0a"
     }
     return (
       <PanelSectionRow>
-        <div className={staticClasses.PanelSectionTitle} style={{ backgroundColor: bgColor, color: "#FFFFFF" }}>{StatusText}</div>
+        <div style={{ backgroundColor: bgColor, color: "#FFFFFF" }}>{StatusText}</div>
       </PanelSectionRow>
     )
   }
@@ -102,12 +138,12 @@ export const QAMPanel: VFC = () => {
   //#region Layout
   return (
     <PanelSection>
-      {state != appStates.idle ? <StatusBar /> : null}
+      {appState != appStates.idle ? <StatusBar /> : null}
       <PanelSectionRow>
         <Focusable style={{ display: "flex" }} flow-children="horizontal">
           <DialogButton style={FlatpakManagerButtons} onClick={onOpenFlatpakManager}><FaBoxOpen /></DialogButton>
-          <DialogButton style={FlatpakManagerButtons} disabled={state != appStates.idle} onSecondaryButton={onTestProcess} onClick={onCheckForUpdates}><FaRedoAlt /></DialogButton>
-          <DialogButton style={FlatpakManagerButtons} disabled={state != appStates.idle} onClick={onUpdateAllPackages}><FaDownload /></DialogButton>
+          <DialogButton style={FlatpakManagerButtons} disabled={appState != appStates.idle} onSecondaryButton={onTestProcess} onClick={onCheckForUpdates}><FaRedoAlt /></DialogButton>
+          <DialogButton style={FlatpakManagerButtons} disabled={appState != appStates.idle} onClick={onUpdateAllPackages}><FaDownload /></DialogButton>
         </Focusable>
       </PanelSectionRow>
 
