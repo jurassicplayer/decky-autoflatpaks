@@ -150,9 +150,9 @@ export const QAMPanel: VFC = () => {
       <div className={staticClasses.PanelSectionTitle}>Update Interval</div>
       <PanelSectionRow>
         <div style={{ display: "none" }}>{/* Fixes strange styling issue */}</div>
-        <Spinner label="Day" value={dayDuration} onClickUp={onDaySpinnerUp} onClickDown={onDaySpinnerDown} />
-        <Spinner label="Hrs" value={hourDuration} onClickUp={onHrsSpinnerUp} onClickDown={onHrsSpinnerDown} />
-        <Spinner label="Min" value={minuteDuration} onClickUp={onMinSpinnerUp} onClickDown={onMinSpinnerDown} />
+        <Spinner label="DAY" value={dayDuration} onClickUp={onDaySpinnerUp} onClickDown={onDaySpinnerDown} />
+        <Spinner label="HRS" value={hourDuration} onClickUp={onHrsSpinnerUp} onClickDown={onHrsSpinnerDown} />
+        <Spinner label="MIN" value={minuteDuration} onClickUp={onMinSpinnerUp} onClickDown={onMinSpinnerDown} />
       </PanelSectionRow>
 
       <div className={staticClasses.PanelSectionTitle}>Settings</div>
