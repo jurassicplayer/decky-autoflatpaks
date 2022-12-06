@@ -53,7 +53,7 @@ export const BrowsePage: VFC = () => {
       { browseReady
       ? <div
         style={{ display: "flex", flexDirection: "column", maxHeight: "100%", overflow: "scroll" }}>
-        <DialogButton style={{margin: "1px", borderRadius: "10px"}} onClick={()=>refreshBrowse()}><FaRedoAlt /></DialogButton>
+        <DialogButton style={{margin: "2px", maxWidth: "99.5%", borderRadius: "7px"}} onClick={()=>refreshBrowse()}><FaRedoAlt /></DialogButton>
         {packageList
           /*  Filter out packages with no description
               primarily because there are few, if any, relevant packages that people would install
