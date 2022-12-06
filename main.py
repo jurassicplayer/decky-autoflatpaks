@@ -117,7 +117,8 @@ class Plugin:
                 'packagetype':      reference[0],
                 'parent':           None
             }
-            if package['options'] and 'eol=' in package['options']: continue
+            if package['options'] and 'eol=' in package['options']: continue # Remove end of life packages from list
+            if not package['description']: package['description'] = package['application']
             if package['application'] and (package['application'].endswith('.Debug') or package['application'].endswith('.Locale') or package['application'].endswith('.Sources')):
                 package['parent'] = '{}/{}/{}'.format(package['application'].rsplit('.', 1)[0], package['arch'], package['branch'])
             package_list.append(package)
@@ -170,6 +171,7 @@ class Plugin:
                 'packagetype':      packageType,
                 'parent':           None
             }
+            if not package['description']: package['description'] = package['application']
             if package['application'] and (package['application'].endswith('.Debug') or package['application'].endswith('.Locale') or package['application'].endswith('.Sources')):
                 package['parent'] = '{}/{}/{}'.format(package['application'].rsplit('.', 1)[0], package['arch'], package['branch'])
             package_list.append(package)
