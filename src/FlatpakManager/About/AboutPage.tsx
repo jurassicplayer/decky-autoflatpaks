@@ -31,6 +31,7 @@ export const AboutPage: VFC = () => {
         <li>Add debugging information</li>
         <li>Add logger page functionality</li>
         <li>Add advanced page functionality</li>
+        <li>Add aggressive filtering with toggle-able option in advanced page</li>
       </ul>
     </div>
   )

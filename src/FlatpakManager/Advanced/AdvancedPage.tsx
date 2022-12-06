@@ -11,6 +11,7 @@ export const AdvancedPage: VFC = () => {
         <li>Flatpak repair (and --dry-run?)</li>
         <li>List and remove unused packages (flatpak uninstall --unused)</li>
         <li>Complex mask handling and controls</li>
+        <li>Toggle for aggressive filtering for app (BaseApp, BaseExtension)</li>
         <li>Permissions Manager (GameMode integrated Flatseal maybe?)</li>
       </ul>
     </div>
