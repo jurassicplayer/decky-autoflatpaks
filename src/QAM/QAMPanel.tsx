@@ -129,7 +129,7 @@ export const QAMPanel: VFC = () => {
     }
     return (
       <PanelSectionRow>
-        <div style={{ backgroundColor: bgColor, color: "#FFFFFF" }}>{StatusText}</div>
+        <div style={{ backgroundColor: bgColor, color: "#FFFFFF", fontSize: "13px", overflow: "hidden", whiteSpace: "nowrap"}}>{StatusText}</div>
       </PanelSectionRow>
     )
   }
