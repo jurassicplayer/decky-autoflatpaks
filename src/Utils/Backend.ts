@@ -66,7 +66,7 @@ export class Backend {
     this.eventBus.dispatchEvent(new CustomEvent(pkgref, {detail: {packageInfo: this.packageList[idx]}}))
   }
   static getQueue() { return this.queue }
-  static setQueue(queue: queueData[]) { this.queue = queue } // Basically one use-case: clear the queue
+  static setQueue(queue: queueData[]) { this.queue = queue }
   static getQueueLength() { return this.queueLength }
   static setQueueLength() { this.queueLength = Backend.getQueue().length}
   static getQueueProgress() { return (this.queueLength - this.queueProgress + 1) } // Offset by one to show current number instead of previous
@@ -254,11 +254,14 @@ export class Backend {
       lpl = value[1]
     })
     if (!upl.length) return undefined
+    let liveFPMQueue = [...this.queue]
+    if (liveFPMQueue) this.setQueue([])
     for (let uplitem of upl) {
       var idx = lpl.findIndex(lplitem => lplitem.application == uplitem.application && lplitem.branch == uplitem.branch && lplitem.origin == uplitem.remote)
       this.queueAction({action: 'update', packageRef: lpl[idx].ref})
     }
     returncode = await this.ProcessQueue()
+    if (liveFPMQueue) this.setQueue(liveFPMQueue)
     return returncode
   }
   //#endregion
