@@ -1,5 +1,6 @@
 import { ServerAPI } from "decky-frontend-lib"
 import { FlatpakMetadata, FlatpakUpdate, LocalFlatpakMetadata, RemoteFlatpakMetadata } from "./Flatpak"
+import { JournalEntry } from "./History"
 
 export interface queueData {
   action: string
@@ -206,6 +207,10 @@ export class Backend {
     if (!packages) return undefined
     var package_count = packages.length
     return package_count
+  }
+  static async getPackageHistory(): Promise<JournalEntry[]> {
+    var proc = await this.bridge("getPackageHistory")
+    return proc.output as JournalEntry[]
   }
   //#endregion
 
