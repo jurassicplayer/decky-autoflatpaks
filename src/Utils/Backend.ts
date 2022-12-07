@@ -138,7 +138,7 @@ export class Backend {
   //#endregion
 
   //#region Flatpak getInfo interactions
-  static async getPackageList(localOnly?: boolean): Promise<Array<FlatpakMetadata>> {
+  static async getPackageList(localOnly?: boolean): Promise<FlatpakMetadata[]> {
     console.log('Creating package list')
     var output: FlatpakMetadata[] = []
     await Promise.all([this.getRemotePackageList(), this.getRemotePackageList(true), this.getLocalPackageList(), this.getMaskList()]).then((value: [RemoteFlatpakMetadata[], RemoteFlatpakMetadata[], LocalFlatpakMetadata[], string[]]) => {
@@ -182,25 +182,25 @@ export class Backend {
       console.log('PL (LPL+U+RPL+MPL): ', output)
     })
     this.setPL(output)
-    return output as Array<FlatpakMetadata>
+    return output as FlatpakMetadata[]
   }
-  static async getLocalPackageList(): Promise<Array<LocalFlatpakMetadata>> {
+  static async getLocalPackageList(): Promise<LocalFlatpakMetadata[]> {
     var proc = await this.bridge("getLocalPackageList")
-    return proc.output as Array<LocalFlatpakMetadata>
+    return proc.output as LocalFlatpakMetadata[]
   }
-  static async getRemotePackageList(updateOnly?: boolean): Promise<Array<RemoteFlatpakMetadata>> {
+  static async getRemotePackageList(updateOnly?: boolean): Promise<RemoteFlatpakMetadata[]> {
     var proc = await this.bridge("getRemotePackageList", {updateOnly: updateOnly})
-    return proc.output as Array<RemoteFlatpakMetadata>
+    return proc.output as RemoteFlatpakMetadata[]
   }
-  static async getMaskList(): Promise<Array<string>> {
+  static async getMaskList(): Promise<string[]> {
     var proc = await this.bridge("getMaskList")
-    return proc.output as Array<string>
+    return proc.output as string[]
   }
-  static async getUpdatePackageList(): Promise<Array<FlatpakUpdate>> {
+  static async getUpdatePackageList(): Promise<FlatpakUpdate[]> {
     this.setAppState(appStates.checkingForUpdates)
     var proc = await this.bridge("getUpdatePackageList")
     this.setAppState(appStates.idle)
-    return proc.output as Array<FlatpakUpdate>
+    return proc.output as FlatpakUpdate[]
   }
   static async getPackageCount() {
     var packages = await this.getUpdatePackageList()
