@@ -17,6 +17,7 @@ export const AboutPage: VFC = () => {
         <li>List of things I intend to add</li>
       </ul>
       <ul>
+        <li>Fix settings instantly being saved on QAM panel open</li>
         <li>Fix the bugginess of touch navigation in the flatpak manager</li>
         <li>Flathub API integration (?)</li>
         <li>Add to Steam (?)</li>
