@@ -7,7 +7,7 @@ logger=logging.getLogger()
 logger.setLevel(logging.INFO) # can be changed to logging.DEBUG for debugging issues
 
 import asyncio
-import os, re
+import json, os, re
 
 from settings import SettingsManager
 from helpers import get_home_path, get_homebrew_path, get_user
@@ -44,6 +44,19 @@ class Plugin:
         logging.info(f'STDERR: {stderr}')
         return {'returncode': proc.returncode, 'stdout': stdout, 'stderr': stderr}
     
+    async def getPackageHistory(self):
+        logging.info(f'Received request for package history')
+        # Returns json objects with most recent on top
+        proc = await self.pyexec_subprocess(self, 'journalctl $(which flatpak) -t flatpak -o json -r --output-fields=MESSAGE')
+        history_list = []
+        lines = proc['stdout'].split('\n')
+        for line in lines:
+            if not line: continue
+            history_list.append(json.loads(line))
+        proc.update({'output': history_list})
+        return proc
+
+
     async def getUpdatePackageList(self):
         logging.info('Received request for list of available updates')
         cmd = 'flatpak update --no-deps'
@@ -193,7 +206,3 @@ class Plugin:
     async def UpdatePackage(self, pkgref):
         logging.info(f'Received request to update package: {pkgref}')
         return await self.pyexec_subprocess(self, f'flatpak update --noninteractive {pkgref}')
-
-    async def UpdateAllPackages(self):
-        logging.info('Received request to update all packages')
-        return await self.pyexec_subprocess(self, 'flatpak update --noninteractive')
