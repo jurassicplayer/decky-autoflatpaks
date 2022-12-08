@@ -270,11 +270,4 @@ export class Backend {
     return returncode
   }
   //#endregion
-
-  static async long_process() {
-    if (this.getAppState() != appStates.idle) return undefined
-    this.setAppState(appStates.checkingForUpdates)
-    setTimeout(()=>{this.setAppState(appStates.idle)}, 60000)
-    return 1
-  }
 }
