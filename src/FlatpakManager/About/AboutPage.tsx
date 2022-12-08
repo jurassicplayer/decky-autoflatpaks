@@ -17,13 +17,11 @@ export const AboutPage: VFC = () => {
         <li>List of things I intend to add</li>
       </ul>
       <ul>
-        <li>Fix settings instantly being saved on QAM panel open</li>
         <li>Fix the bugginess of touch navigation in the flatpak manager</li>
         <li>Add options for since-time, until-time, reverse order to logging</li>
         <li>Flathub API integration (?)</li>
         <li>Add to Steam (?)</li>
         <li>Remove minutes option</li>
-        <li>Remove debug long process function</li>
         <li>Flatpak detailed info button</li>
         <li>Filter Search refinement (?)</li>
         <li>Filter Mask refinement (?)</li>
@@ -31,7 +29,6 @@ export const AboutPage: VFC = () => {
         <li>Add check if package running</li>
         <li>Split progress/status bar into separate component</li>
         <li>Add debugging information</li>
-        <li>Add logger page functionality</li>
         <li>Add advanced page functionality</li>
         <li>Add aggressive filtering with toggle-able option in advanced page</li>
       </ul>
