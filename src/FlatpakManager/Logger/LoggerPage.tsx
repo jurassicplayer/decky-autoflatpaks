@@ -1,30 +1,50 @@
-import { useEffect, useState, VFC } from "react"
-import { Focusable } from "decky-frontend-lib"
+import { useEffect, useRef, useState, VFC } from "react"
+import { Focusable, SteamSpinner } from "decky-frontend-lib"
 import { Backend } from "../../Utils/Backend"
 import { JournalEntry } from "../../Utils/History"
+import { ScrollPanel } from "../../InputControls/ScrollPanel"
+import { LogEntry } from "./LogEntry"
+import { HistoryLogContainer, HistoryReadyScrollPanel, HistoryNotReadyScrollPanel } from "./LoggerPage.css"
 
 export const LoggerPage: VFC = () => {
+  const historyLogView = useRef<HTMLDivElement>(null)
   const [history, setHistory] = useState<JournalEntry[]>([])
+  const [historyReady, setHistoryReady] = useState<boolean>(false)
+  const refreshHistory = () => {
+    setHistoryReady(false)
+    Backend.getPackageHistory().then((history) => setHistory(history)).then(() => setHistoryReady(true))
+  }
+
   useEffect(() => {
-    Backend.getPackageHistory().then((history) => setHistory(history))
+    console.log('Logs page loaded')
+    refreshHistory()
+    Backend.eventBus.addEventListener('QueueProgress', refreshHistory)
   }, [])
-  useEffect(() => {
-    console.log(history)
-  }, [history])
+  useEffect(() => () => { console.log('Logs page unloaded') }, [])
 
   return (
-    <Focusable>
-      {history ? 
-        history.map(entry => {return (<div>{entry.MESSAGE}</div>)})
-      : null}
-      <h2>Work In Progress</h2>
-      <p>
-        This is a tentative area that will be a place that acts as a UI to the "flatpak history" command.
-      </p>
-      <ul>
-        <li>Provides options for since time, until time, reverse order</li>
-        <li>Lists installs, updates, and removals of applications and runtimes</li>
-      </ul>
-    </Focusable>
+    <ScrollPanel
+      style={historyReady ? HistoryReadyScrollPanel : HistoryNotReadyScrollPanel}
+      focusable={false}
+      noFocusRing={true}
+      onClick={()=> {historyLogView.current?.focus()}}
+      onOKButton={()=> {historyLogView.current?.focus()}}>
+      <Focusable
+        style={HistoryLogContainer}
+        // @ts-ignore
+        focusableIfNoChildren={true}
+        noFocusRing={true}
+        ref={historyLogView}>
+        { historyReady
+        ? history
+          .filter((entry) => entry.MESSAGE.includes('system:'))
+          .map(entry => {return (
+            <LogEntry entry={entry}/>
+          )})
+        : <div style={{minHeight: "100%"}}><SteamSpinner/></div> }
+      </Focusable>
+    </ScrollPanel>
   )
 }
+
+
