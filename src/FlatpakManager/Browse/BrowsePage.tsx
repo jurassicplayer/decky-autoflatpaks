@@ -5,6 +5,7 @@ import { FPMOptions, OptionsModal } from "./OptionsModal"
 import { Backend } from "../../Utils/Backend"
 import { FlatpakMetadata } from "../../Utils/Flatpak"
 import { FlatpakCard } from "./FlatpakCard"
+import { BrowsePageContainer, PackageListContainer, RefreshButton } from "./BrowsePage.css"
 
 export const BrowsePage: VFC = () => {
   const [browseReady,   setBrowseReady]   = useState<boolean>(false)
@@ -46,15 +47,15 @@ export const BrowsePage: VFC = () => {
 
   return (
     <Focusable
-      style={{display: "flex", justifyContent: "center", minHeight: "100%"}}
+      style={BrowsePageContainer}
       onOptionsButton={()=>{showModal(<OptionsModal selectedOptions={selectedOptions} setSelectedOptions={setSelectedOptions} />, findSP())}}
       onOptionsActionDescription="Options"
       onSecondaryButton={()=>Backend.ProcessQueue()}
       onSecondaryActionDescription="Apply">
       { browseReady
       ? <Focusable
-        style={{ display: "flex", flexDirection: "column", maxHeight: "100%", minWidth: "100%", overflow: "scroll" }}>
-        <DialogButton style={{margin: "2px", maxWidth: "99.5%", borderRadius: "7px"}} onClick={()=>refreshBrowse()}><FaRedoAlt /></DialogButton>
+        style={PackageListContainer}>
+        <DialogButton style={RefreshButton} onClick={()=>refreshBrowse()}><FaRedoAlt /></DialogButton>
         {packageList
           /*  Filter out packages with no description
               primarily because there are few, if any, relevant packages that people would install
