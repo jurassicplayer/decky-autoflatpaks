@@ -27,15 +27,15 @@ export const QAMPanel: VFC = () => {
   //#endregion
 
   //#region Variables
-  const [checkOnBootEnabled, setCheckOnBootEnabled] = useState<boolean>(Settings.checkOnBootEnabled);
-  const [unattendedUpgradesEnabled, setUnattendedUpgradesEnabled] = useState<boolean>(Settings.unattendedUpgradesEnabled);
-  const [interval, setIntervalTime] = useState<number>(Settings.updateInterval);
-  var splitTime = splitMinutes(interval);
+  const [QAMReady, setQAMReady] = useState<boolean>(false)
+  const [appState, setAppState] = useState<number>(Backend.getAppState())
+  var splitTime = splitMinutes(Settings.updateInterval);
   const [dayDuration, setDayDuration] = useState<number>(splitTime.d);
   const [hourDuration, setHourDuration] = useState<number>(splitTime.h);
   const [minuteDuration, setMinuteDuration] = useState<number>(splitTime.m);
-  const [appState, setAppState] = useState<number>(Backend.getAppState())
-  const [QAMReady, setQAMReady] = useState<boolean>(false)
+  const [checkOnBootEnabled, setCheckOnBootEnabled] = useState<boolean>(Settings.checkOnBootEnabled);
+  const [unattendedUpgradesEnabled, setUnattendedUpgradesEnabled] = useState<boolean>(Settings.unattendedUpgradesEnabled);
+  const [interval, setIntervalTime] = useState<number>(Settings.updateInterval);
   const [queueProgress, setQueueProgress] = useState<{[key: string]: any}>({
     currentItem: Backend.getQueue()[0],
     queueProgress: Backend.getQueueProgress(),
@@ -107,7 +107,9 @@ export const QAMPanel: VFC = () => {
     Backend.eventBus.removeEventListener('AppStateChange', onAppStateChange)
     console.log("QAM Panel unloaded")
   }, [])
-  useEffect(() => { setIntervalTime((dayDuration * 24 * 60)+(hourDuration * 60)+minuteDuration) }, [dayDuration, hourDuration, minuteDuration])
+  useEffect(() => {
+    if (!QAMReady) return
+    setIntervalTime((dayDuration * 24 * 60)+(hourDuration * 60)+minuteDuration) }, [dayDuration, hourDuration, minuteDuration])
   useEffect(() => {
     if (!QAMReady) return
     if (Settings.checkOnBootEnabled != checkOnBootEnabled) Settings.checkOnBootEnabled = checkOnBootEnabled;
