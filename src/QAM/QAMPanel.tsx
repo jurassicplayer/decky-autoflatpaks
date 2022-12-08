@@ -35,6 +35,7 @@ export const QAMPanel: VFC = () => {
   const [hourDuration, setHourDuration] = useState<number>(splitTime.h);
   const [minuteDuration, setMinuteDuration] = useState<number>(splitTime.m);
   const [appState, setAppState] = useState<number>(Backend.getAppState())
+  const [QAMReady, setQAMReady] = useState<boolean>(false)
   const [queueProgress, setQueueProgress] = useState<{[key: string]: any}>({
     currentItem: Backend.getQueue()[0],
     queueProgress: Backend.getQueueProgress(),
@@ -43,9 +44,6 @@ export const QAMPanel: VFC = () => {
   //#endregion
 
   //#region Input Functions
-  const onTestProcess = async () => {
-    Backend.long_process()
-  }
   const onOpenFlatpakManager = async () => {
     Router.CloseSideMenus()
     Router.Navigate("/flatpak-manager")
@@ -101,6 +99,7 @@ export const QAMPanel: VFC = () => {
     Backend.eventBus.addEventListener('QueueProgress', onQueueProgress)
     Backend.eventBus.addEventListener('QueueCompletion', onQueueCompletion)
     Backend.eventBus.addEventListener('AppStateChange', onAppStateChange)
+    setQAMReady(true)
   }, [])
   useEffect(() => () => {
     Backend.eventBus.removeEventListener('QueueProgress', onQueueProgress)
@@ -110,6 +109,7 @@ export const QAMPanel: VFC = () => {
   }, [])
   useEffect(() => { setIntervalTime((dayDuration * 24 * 60)+(hourDuration * 60)+minuteDuration) }, [dayDuration, hourDuration, minuteDuration])
   useEffect(() => {
+    if (!QAMReady) return
     if (Settings.checkOnBootEnabled != checkOnBootEnabled) Settings.checkOnBootEnabled = checkOnBootEnabled;
     if (Settings.unattendedUpgradesEnabled != unattendedUpgradesEnabled) Settings.unattendedUpgradesEnabled = unattendedUpgradesEnabled;
     if (Settings.updateInterval != interval) Settings.updateInterval = interval;
@@ -144,7 +144,7 @@ export const QAMPanel: VFC = () => {
       <PanelSectionRow>
         <Focusable style={{ display: "flex" }} flow-children="horizontal">
           <DialogButton style={FlatpakManagerButtons} onClick={onOpenFlatpakManager}><FaBoxOpen /></DialogButton>
-          <DialogButton style={FlatpakManagerButtons} disabled={appState != appStates.idle} onSecondaryButton={onTestProcess} onClick={onCheckForUpdates}><FaRedoAlt /></DialogButton>
+          <DialogButton style={FlatpakManagerButtons} disabled={appState != appStates.idle} onClick={onCheckForUpdates}><FaRedoAlt /></DialogButton>
           <DialogButton style={FlatpakManagerButtons} disabled={appState != appStates.idle} onClick={onUpdateAllPackages}><FaDownload /></DialogButton>
         </Focusable>
       </PanelSectionRow>
