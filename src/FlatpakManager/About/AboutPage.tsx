@@ -19,6 +19,7 @@ export const AboutPage: VFC = () => {
       <ul>
         <li>Fix settings instantly being saved on QAM panel open</li>
         <li>Fix the bugginess of touch navigation in the flatpak manager</li>
+        <li>Add options for since-time, until-time, reverse order to logging</li>
         <li>Flathub API integration (?)</li>
         <li>Add to Steam (?)</li>
         <li>Remove minutes option</li>
