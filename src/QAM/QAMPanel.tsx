@@ -15,6 +15,7 @@ import { Settings } from "../Utils/Settings"
 import { appStates, Backend } from "../Utils/Backend"
 import { SteamUtils } from "../Utils/SteamUtils"
 import { FlatpakManagerButtons } from "./QAMPanel.css"
+import { StatusBar } from "./StatusBar"
 
 export const QAMPanel: VFC = () => {
   //#region Helper Functions
@@ -36,11 +37,6 @@ export const QAMPanel: VFC = () => {
   const [checkOnBootEnabled, setCheckOnBootEnabled] = useState<boolean>(Settings.checkOnBootEnabled);
   const [unattendedUpgradesEnabled, setUnattendedUpgradesEnabled] = useState<boolean>(Settings.unattendedUpgradesEnabled);
   const [interval, setIntervalTime] = useState<number>(Settings.updateInterval);
-  const [queueProgress, setQueueProgress] = useState<{[key: string]: any}>({
-    currentItem: Backend.getQueue()[0],
-    queueProgress: Backend.getQueueProgress(),
-    queueLength: Backend.getQueueLength()
-  })
   //#endregion
 
   //#region Input Functions
@@ -61,24 +57,6 @@ export const QAMPanel: VFC = () => {
     SteamUtils.notify('AutoFlatpaks', 'Updated all packages')
   }
 
-  const onQueueProgress = ((e: CustomEvent) => {
-    if (!e.detail.queueLength) return
-    console.log('Event (QueueProgress): ', e.detail)
-    setQueueProgress({
-      currentItem: e.detail.queueItem,
-      queueProgress: Number(e.detail.queueProgress),
-      queueLength: Number(e.detail.queueLength)
-    })
-  }) as EventListener
-  const onQueueCompletion = ((e: CustomEvent) => {
-    if (!e.detail.queueLength) return
-    console.log('Event (QueueCompletion): ', e.detail)
-    setQueueProgress({
-      currentItem: undefined,
-      queueProgress: undefined,
-      queueLength: undefined
-    })
-  }) as EventListener
   const onAppStateChange = ((e: CustomEvent) => {
     if (!e.detail.state) return
     console.log('Event (AppState): QAM Panel')
@@ -96,14 +74,10 @@ export const QAMPanel: VFC = () => {
   useEffect(() => {
     console.log("QAM Panel loaded")
     // Register listener
-    Backend.eventBus.addEventListener('QueueProgress', onQueueProgress)
-    Backend.eventBus.addEventListener('QueueCompletion', onQueueCompletion)
     Backend.eventBus.addEventListener('AppStateChange', onAppStateChange)
     setQAMReady(true)
   }, [])
   useEffect(() => () => {
-    Backend.eventBus.removeEventListener('QueueProgress', onQueueProgress)
-    Backend.eventBus.removeEventListener('QueueCompletion', onQueueCompletion)
     Backend.eventBus.removeEventListener('AppStateChange', onAppStateChange)
     console.log("QAM Panel unloaded")
   }, [])
@@ -118,31 +92,11 @@ export const QAMPanel: VFC = () => {
     Settings.saveToLocalStorage();
   }, [checkOnBootEnabled, unattendedUpgradesEnabled, interval]);
   //#endregion
-
-  //#region Dynamic Layout
-  const StatusBar = () => {
-    let StatusText = ""
-    let bgColor = "#0b6f4c"
-    if (appState == appStates.checkingForUpdates) {
-      StatusText = "Checking for updates..."
-    } else if (appState == appStates.processingQueue) {
-      StatusText = "Processing queue..."
-      if (queueProgress.currentItem && queueProgress.queueLength && queueProgress.queueProgress)
-        StatusText = `(${queueProgress.queueProgress}/${queueProgress.queueLength}) ${queueProgress.currentItem.action} ${queueProgress.currentItem.packageRef}...`
-      bgColor = "#7a0a0a"
-    }
-    return (
-      <PanelSectionRow>
-        <div style={{ backgroundColor: bgColor, color: "#FFFFFF", fontSize: "13px", overflow: "hidden", whiteSpace: "nowrap"}}>{StatusText}</div>
-      </PanelSectionRow>
-    )
-  }
-  //#endregion
   
   //#region Layout
   return (
     <PanelSection>
-      {appState != appStates.idle ? <StatusBar /> : null}
+      <StatusBar />
       <PanelSectionRow>
         <Focusable style={{ display: "flex" }} flow-children="horizontal">
           <DialogButton style={FlatpakManagerButtons} onClick={onOpenFlatpakManager}><FaBoxOpen /></DialogButton>
