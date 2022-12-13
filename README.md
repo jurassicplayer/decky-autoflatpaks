@@ -53,6 +53,10 @@ For manual installation, you will need to use the terminal a little and a keyboa
   - Masked packages will NOT be upgraded when automatically upgrading
 - Use package manager to Install/Uninstal/Upgrade individual packages
   - Masked packages CAN be upgraded manually within the package manager
+#### Logger Page
+- Shows list of recent installations/uninstallations/upgrades
+- This relies on journalctl's entries which by default will erase older entries (conditions unknown)
+- Filtering/Sorting entries probably won't be implemented due to the above journalctl behaviour unless the gap is significant enough
 
 ## Functionality
 - The default package manager view are all installed apps sorted from A to Z
