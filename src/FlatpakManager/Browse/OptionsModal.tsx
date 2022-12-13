@@ -1,5 +1,6 @@
-import { Focusable, Dropdown, ModalRoot, staticClasses, TextField } from 'decky-frontend-lib'
+import { Focusable, Dropdown, staticClasses, TextField } from 'decky-frontend-lib'
 import { useState } from 'react'
+import { FallbackModal } from '../../InputControls/FallbakModal'
 import { DropdownContainer, OptionRowContainer, OptionRowLabel } from "./OptionsModal.css"
 
 export interface FPMOptions {
@@ -28,7 +29,8 @@ export const OptionsModal = (props: {selectedOptions: FPMOptions, setSelectedOpt
   }
 
   return (
-    <ModalRoot bAllowFullSize={false}
+    <FallbackModal
+      bAllowFullSize={false}
       closeModal={()=>{
         updateSelectedOptions({filterSearch: search})
         if (props.closeModal) { props.closeModal() }
@@ -99,6 +101,6 @@ export const OptionsModal = (props: {selectedOptions: FPMOptions, setSelectedOpt
           ]} /></Focusable>
         </div>
       </Focusable>
-    </ModalRoot>
+    </FallbackModal>
   )
 }
