@@ -1,4 +1,4 @@
-import { ToastData, findModuleChild, Module } from "decky-frontend-lib"
+import { findModuleChild, Module } from "decky-frontend-lib"
 import { Backend } from "./Backend";
 import { Settings } from "./Settings";
 
@@ -16,7 +16,12 @@ const findModule = (property: string) => {
     }
   })
 }
+const NavSoundMap = findModule("ToastMisc");
+//#endregion
 
+
+//#region Deprecate when notification changes hit stable
+import { ToastData } from "decky-frontend-lib"
 const audioModule = findModuleChild((m: Module) => {
   if (typeof m !== "object") return undefined;
   for (let prop in m) {
@@ -39,20 +44,33 @@ const settingsStore = findModuleChild((m: Module) => {
     }
   }
 })
-
-//const AudioParent = findModule("GamepadUIAudio");
-const NavSoundMap = findModule("ToastMisc");
-const NotificationStore = findModule("BIsUserInGame")
-//#endregion
-
 interface ToastDataExtended extends ToastData {
   etype?: number
   sound?: number
   showToast?: boolean
   playSound?: boolean
 }
+const NotificationStore = findModule("BIsUserInGame")
+//#endregion
 
 export class SteamUtils {
+  //#region Deprecate when notification changes hit stable
+  static async notify(title: string, message: string, showToast?: boolean, playSound?: boolean, sound?: number, duration?: number) {
+    //@ts-ignore
+    let versionInfo: string = DeckyPluginLoader?.deckyState?._versionInfo?.current
+    if (!versionInfo) {
+      this.notifyOld(title, message, showToast, playSound, duration)
+      throw new Error('Unable to get decky-loader version')
+    }
+    let vInfo = versionInfo.split('v')[1].split('-')[0].split('.').map(number => Number(number))
+    if (vInfo[0] <= 2 && vInfo[1] <= 4 && vInfo[3] < 5) {
+      this.notifyOld(title, message, showToast, playSound, duration)
+    } else {
+      this.notifyPlus(title, message, showToast, playSound, sound, duration)
+    }
+  }
+  //#endregion
+
   //#region Notification Wrapper
   static async notifyPlus(title: string, message: string, showToast?: boolean, playSound?: boolean, sound?: number, duration?: number) {
     if (sound === undefined ) sound = NavSoundMap?.ToastMisc // Not important, could pass the actual number instead (6)
@@ -67,10 +85,10 @@ export class SteamUtils {
       showToast: showToast
     }
     Backend.getServer().toaster.toast(toastData)
-    console.log("Sending toast via new toaster")
   }
-  // Configurable notification wrapper
-  static async notify(title: string, message: string, showToast?: boolean, playSound?: boolean, duration?: number) {
+
+  //#region Deprecate when notification changes hit stable
+  static async notifyOld(title: string, message: string, showToast?: boolean, playSound?: boolean, duration?: number) {
     let soundfx = NavSoundMap?.ToastMisc // Not important, could pass the actual number instead (6)
     if (playSound === undefined ) playSound = Settings.playSound
     if (showToast === undefined ) showToast = Settings.showToast
@@ -85,10 +103,6 @@ export class SteamUtils {
     }
     this.toast(toastData)
   }
-  //#endregion
-
-
-  //#region Toast Re-reimplementation
   // Until decky-frontend-lib has customizable notification sfx, try to keep it mostly drop-in replaceable 
   static async toast(toast: ToastDataExtended) {
     let toastData = {
