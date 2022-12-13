@@ -18,6 +18,7 @@ export const AboutPage: VFC = () => {
       </ul>
       <ul>
         <li>Test and fix bugginess with update all button and desyncing package list</li>
+        <li>Fix hard refresh being re-fire-able while creating new package list</li>
         <li>Fix the bugginess of touch navigation in the flatpak manager</li>
         <li>Add options for since-time, until-time, reverse order to logging</li>
         <li>Flathub API integration (?)</li>
