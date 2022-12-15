@@ -19,6 +19,7 @@ export enum appStates {
   failedInitialize,
   idle,
   checkingForUpdates,
+  buildingPackageList,
   processingQueue
 } 
 
@@ -138,8 +139,9 @@ export class Backend {
   //#endregion
 
   //#region Flatpak getInfo interactions
-  static async getPackageList(localOnly?: boolean): Promise<FlatpakMetadata[]> {
-    console.log('Creating package list')
+  static async getPackageList(localOnly?: boolean): Promise<FlatpakMetadata[] | undefined> {
+    if (this.getAppState() == appStates.buildingPackageList) return undefined
+    this.setAppState(appStates.buildingPackageList)
     var output: FlatpakMetadata[] = []
     await Promise.all([this.getRemotePackageList(), this.getRemotePackageList(true), this.getLocalPackageList(), this.getMaskList()]).then((value: [RemoteFlatpakMetadata[], RemoteFlatpakMetadata[], LocalFlatpakMetadata[], string[]]) => {
       var rpl = value[0] || []
@@ -182,6 +184,7 @@ export class Backend {
       console.log('PL (LPL+U+RPL+MPL): ', output)
     })
     this.setPL(output)
+    this.setAppState(appStates.idle)
     return output as FlatpakMetadata[]
   }
   static async getLocalPackageList(): Promise<LocalFlatpakMetadata[]> {

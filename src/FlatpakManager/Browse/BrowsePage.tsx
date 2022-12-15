@@ -26,7 +26,11 @@ export const BrowsePage: VFC = () => {
       setTimeout(() => setBrowseReady(true), 50)
     } else {
       console.log('Hard Refresh')
-      await Backend.getPackageList().then((packageList) => {setPackageList(packageList)}).then(() => setBrowseReady(true))
+      await Backend.getPackageList().then((packageList) => {
+        if (packageList == undefined) return
+        setPackageList(packageList)
+        setBrowseReady(true)
+      })
     }
   }
   const onQueueCompletion = ((e: CustomEvent) => {
