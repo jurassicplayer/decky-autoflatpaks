@@ -44,8 +44,12 @@ class Plugin:
         logging.info(f'STDERR: {stderr}')
         return {'returncode': proc.returncode, 'stdout': stdout, 'stderr': stderr}
     
+    async def getSpaceRemaining(self):
+        logging.info('Received request for space remaining')
+        return await self.pyexec_subprocess(self, 'df -P /home/deck/.var/app') # FIXME: Change to non-hardcoded file path
+
     async def getPackageHistory(self):
-        logging.info(f'Received request for package history')
+        logging.info('Received request for package history')
         # Returns json objects with most recent on top
         proc = await self.pyexec_subprocess(self, 'journalctl $(which flatpak) -t flatpak -o json -r --output-fields=MESSAGE')
         history_list = []
@@ -55,7 +59,6 @@ class Plugin:
             history_list.append(json.loads(line))
         proc.update({'output': history_list})
         return proc
-
 
     async def getUpdatePackageList(self):
         logging.info('Received request for list of available updates')
@@ -206,3 +209,11 @@ class Plugin:
     async def UpdatePackage(self, pkgref):
         logging.info(f'Received request to update package: {pkgref}')
         return await self.pyexec_subprocess(self, f'flatpak update --noninteractive {pkgref}')
+    async def UnInstallUnused(self):
+        logging.info('Received request to uninstall unused packages')
+        return await self.pyexec_subprocess(self, 'flatpak uninstall --unused --noninteractive')
+    async def FlatpakRepair(self, dryrun = True):
+        cmd = 'flatpak repair'
+        if dryrun: cmd += ' --dry-run'
+        logging.info('Received request to repair flatpak installation')
+        return await self.pyexec_subprocess(self, cmd)
