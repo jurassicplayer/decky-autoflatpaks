@@ -17,21 +17,20 @@ export const AboutPage: VFC = () => {
         <li>List of things I intend to add</li>
       </ul>
       <ul>
-        <li>Test and fix bugginess with update all button and desyncing package list</li>
-        <li>Fix hard refresh being re-fire-able while creating new package list</li>
+        <li>Add remaining space check</li>
+        <li>Add check if package running</li>
+        <li>Flatpak detailed info button</li>
+        <li>Test and fix any bugginess with update all button and desyncing package list</li>
         <li>Fix the bugginess of touch navigation in the flatpak manager</li>
         <li>Flathub API integration (?)</li>
         <li>Add to Steam (?)</li>
         <li>Remove minutes option</li>
-        <li>Flatpak detailed info button</li>
         <li>Filter Search refinement (?)</li>
         <li>Filter Mask refinement (?)</li>
-        <li>Add remaining space check</li>
-        <li>Add check if package running</li>
-        <li>Split progress/status bar into separate component</li>
         <li>Add debugging information</li>
         <li>Add advanced page functionality</li>
         <li>Add aggressive filtering with toggle-able option in advanced page</li>
+        <li>Revise settings backend to reduce calls to python backend</li>
       </ul>
     </div>
   )
