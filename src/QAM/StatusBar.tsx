@@ -65,7 +65,7 @@ export const StatusBar = () => {
         appState == appStates.checkingForUpdates
         ? StatusBarCSS.CheckForUpdates
         : appState == appStates.processingQueue
-          ? StatusBarCSS.processingQueue
+          ? StatusBarCSS.ProcessingQueue
           : StatusBarCSS.Default
         }>{StatusText}</div>
       : null }
