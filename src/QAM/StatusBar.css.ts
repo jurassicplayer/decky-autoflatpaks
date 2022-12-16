@@ -9,7 +9,7 @@ const StatusBarBase: CSSProperties = {
 
 export const StatusBarCSS: {[key: string]: CSSProperties} = {
   Default: {
-    ...StatusBarBase
+    display: "none"
   },
   CheckForUpdates: {
     ...StatusBarBase,
