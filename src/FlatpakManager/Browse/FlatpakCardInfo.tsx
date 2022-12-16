@@ -1,12 +1,28 @@
-import { Focusable } from "decky-frontend-lib"
+import { DialogButton, Focusable, showModal } from "decky-frontend-lib"
 import { useEffect, useState, VFC } from "react"
 import { FaDownload, FaTrashAlt, FaSyncAlt, FaEye, FaEyeSlash } from "react-icons/fa"
 import { ToggleButton } from "../../InputControls/ToggleButton"
-import { Card } from "./FlatpakCard.css"
 import { appStates, Backend, queueData } from "../../Utils/Backend"
 import { FlatpakMetadata } from "../../Utils/Flatpak"
+import { CardButton, CardInfo } from "./FlatpakCardInfo.css"
+import { FallbackModal } from "../../InputControls/FallbakModal"
 
-export const FlatpakCardInfo: VFC<{data: FlatpakMetadata}> = (props) => {
+
+export const FlatpakInfoModal: VFC<{data: FlatpakMetadata, closeModal?: CallableFunction}> = (props) => {
+  return (
+    <FallbackModal
+      bAllowFullSize={false}
+      closeModal={()=>{ if (props.closeModal) props.closeModal() }}>
+      <Focusable>
+        <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}><div>Name: {props.data.name}</div><div>Installed Size: {props.data.installed_size}</div></div>
+        <div>Reference: {props.data.ref}</div>
+        <div>Description: {props.data.description}</div>
+      </Focusable>
+    </FallbackModal>
+  )
+}
+
+export const FlatpakCardInfo: VFC<{data: FlatpakMetadata, focus: boolean}> = (props) => {
   const [packageInfo, setPackageInfo] = useState<FlatpakMetadata>(props.data)
   const [appState, setAppState] = useState<number>(Backend.getAppState())
   const [maskToggled, setMaskToggled] = useState<boolean>(false)
@@ -53,18 +69,18 @@ export const FlatpakCardInfo: VFC<{data: FlatpakMetadata}> = (props) => {
   }, [])
 
   return (
-    <Focusable style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", minWidth: "100%" }}>
-      <div className="FlatpakInfo"
-        style={{ display: "flex", flexDirection: "column", overflow: "scroll" }}
-        flow-children="vertical">
+    <Focusable style={CardInfo.container}>
+      <DialogButton
+        style={props.focus ? CardInfo.focus : CardInfo.blur}
+        onClick={() => {showModal(<FlatpakInfoModal data={props.data} />)}}>
         <div>{packageInfo.name}</div>
         <div>{packageInfo.description}</div>
-      </div>
+      </DialogButton>
       <Focusable
         style={{ display: "inline-flex" }}
         flow-children="horizontal">
         <ToggleButton
-          toggledCSS={Card.maskToggled}
+          toggledCSS={CardButton.maskToggled}
           disabled={appState != appStates.idle}
           value={maskToggled}
           onOKActionDescription={maskToggled ? 'Dequeue' : 'Queue' }
@@ -79,7 +95,7 @@ export const FlatpakCardInfo: VFC<{data: FlatpakMetadata}> = (props) => {
         </ToggleButton>
         { packageInfo.updateable
         ? <ToggleButton
-            toggledCSS={Card.installToggled}
+            toggledCSS={CardButton.installToggled}
             disabled={installToggled || appState != appStates.idle}
             value={updateToggled}
             onOKActionDescription={updateToggled ? 'Dequeue' : 'Queue' }
@@ -93,7 +109,7 @@ export const FlatpakCardInfo: VFC<{data: FlatpakMetadata}> = (props) => {
             <FaSyncAlt />
           </ToggleButton>
         : null }
-        <ToggleButton toggledCSS={packageInfo.installed ? Card.uninstallToggled : Card.installToggled}
+        <ToggleButton toggledCSS={packageInfo.installed ? CardButton.uninstallToggled : CardButton.installToggled}
           disabled={updateToggled || appState != appStates.idle}
           value={installToggled}
           onOKActionDescription={installToggled ? 'Dequeue' : 'Queue' }

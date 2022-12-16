@@ -26,7 +26,7 @@ export const FlatpakCard: VFC<{data: FlatpakMetadata}> = (props) => {
       onFocus={()=>setFocus(true)}
       onBlur={()=>setFocus(false)}>
       {inView
-      ? <FlatpakCardInfo data={props.data} />
+      ? <FlatpakCardInfo data={props.data} focus={focus} />
       : null }
     </div>
   )
