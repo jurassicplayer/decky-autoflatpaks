@@ -10,6 +10,8 @@ A plugin to manage, notify, and automatically update flatpaks on your steamdeck 
   ![OptionsMenu](./assets/thumbnail03.png)
   ![QueueExec01](./assets/thumbnail04.png)
   ![QueueExec02](./assets/thumbnail05.png)
+  ![PackageHistory](./assets/thumbnail06.png)
+  ![FlatpakInfo](./assets/thumbnail07.png)
   https://streamable.com/j4lh5y
 </details>
 
