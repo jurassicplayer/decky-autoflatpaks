@@ -48,6 +48,7 @@ For manual installation, you will need to use the terminal a little and a keyboa
 - Adjust notifications to your preference: Toast & Sound, Toast Only, Sound Only, or No notifications
 ### Package Manager
 #### Browse Page
+- Select a package to bring up a small modal with some extra information.
 - Filter list by text, package type (app/runtime), status (installed, uninstalled, masked, queued, updateable), masked/unmasked, and sort by pressing the Y button and setting the desired options
 - Add all actions (install/uninstall/mask/etc.) to the queue by pressing A on the highlighted intended action button
 - Start performing queued actions by pressing the X button and wait (or do whatever)
