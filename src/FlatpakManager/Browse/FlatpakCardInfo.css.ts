@@ -35,28 +35,28 @@ const CardButtonBase = {
 }
 
 export const CardButton: {[key: string]: CSSProperties} = {
-maskToggled: {
-  ...CardButtonBase,
-  backgroundColor: "#9c8f40"
-},
-mask: {
-  ...CardButtonBase
-},
-install: {
-  ...CardButtonBase
-},
-installToggled: {
-  ...CardButtonBase,
-  backgroundColor: "#296829"
-},
-uninstall: {
-  ...CardButtonBase
-},
-uninstallToggled: {
-  ...CardButtonBase,
-  backgroundColor: "#5f1919"
-},
-update: {
-  ...CardButtonBase
-}
+  maskToggled: {
+    ...CardButtonBase,
+    backgroundColor: "#9c8f40"
+  },
+  mask: {
+    ...CardButtonBase
+  },
+  install: {
+    ...CardButtonBase
+  },
+  installToggled: {
+    ...CardButtonBase,
+    backgroundColor: "#296829"
+  },
+  uninstall: {
+    ...CardButtonBase
+  },
+  uninstallToggled: {
+    ...CardButtonBase,
+    backgroundColor: "#5f1919"
+  },
+  update: {
+    ...CardButtonBase
+  }
 }
