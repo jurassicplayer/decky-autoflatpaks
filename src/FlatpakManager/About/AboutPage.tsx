@@ -19,7 +19,6 @@ export const AboutPage: VFC = () => {
       <ul>
         <li>Add remaining space check</li>
         <li>Add check if package running</li>
-        <li>Flatpak detailed info button</li>
         <li>Test and fix any bugginess with update all button and desyncing package list</li>
         <li>Fix the bugginess of touch navigation in the flatpak manager</li>
         <li>Flathub API integration (?)</li>
