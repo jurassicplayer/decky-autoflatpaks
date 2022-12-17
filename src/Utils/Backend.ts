@@ -23,6 +23,14 @@ export enum appStates {
   processingQueue
 } 
 
+interface BatteryState {
+  bHasBattery: boolean,
+  bShutdownRequested: boolean,
+  eACState: number,
+  flLevel: number,
+  nSecondsRemaining: number,
+}
+
 export class Backend {
   private static serverAPI: ServerAPI
   private static packageList: FlatpakMetadata[]
@@ -33,6 +41,8 @@ export class Backend {
     initialized : boolean
     state: number
   }
+  private static pseudoBatteryState: BatteryState
+  private static intervalID: NodeJS.Timer
   public static eventBus: EventTarget
 
   //#region Backend class interactions
@@ -48,6 +58,19 @@ export class Backend {
     this.queue = []
     this.queueLength = 0
     this.queueProgress = 0
+    
+    this.intervalID = setInterval(()=>{
+      // @ts-ignore
+      let currentState = window.SystemPowerStore.batteryState
+      if (currentState != this.pseudoBatteryState) this.setBatteryStateChange(currentState)
+    }, 1000)
+  }
+  static onDismount() {
+    clearInterval(this.intervalID)
+  }
+  static setBatteryStateChange(batteryState: BatteryState) {
+    this.pseudoBatteryState = batteryState
+    this.eventBus.dispatchEvent(new CustomEvent('BatteryStateChange', {detail: {batteryState: this.pseudoBatteryState}}))
   }
   static setServer(server: ServerAPI) { this.serverAPI = server }
   static getServer() { return this.serverAPI }

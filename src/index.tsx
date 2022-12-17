@@ -42,18 +42,13 @@ const UpdateAllPackages = async (success?: boolean) => {
   return false
 }
 
-export default definePlugin((serverApi: ServerAPI) => {
-  Backend.initBackend(serverApi)
-  serverApi.routerHook.addRoute("/flatpak-manager", FlatpakManager)
-  initPlugin()
-
-  // interval check loop
-  const batteryStateRegistration = SteamClient.System.RegisterForBatteryStateChanges(async ()=> {
+const IntervalCheck = ((e: CustomEvent) => {
+  (async () => {
     if (!Backend.getAppInitialized()) return
-    var currentTime = new Date()
+    let currentTime = new Date()
     if (!((currentTime.getTime() - Settings.lastCheckTimestamp.getTime())/1000/60 > Settings.updateInterval)) return
     // Time to check for updates
-    var package_count = await Backend.getPackageCount()
+    let package_count = await Backend.getPackageCount()
     Settings.lastCheckTimestamp = currentTime
     await Settings.saveLastCheckTimestamp()
     if (!package_count) return
@@ -63,7 +58,14 @@ export default definePlugin((serverApi: ServerAPI) => {
     } else {
       SteamUtils.notify('AutoFlatpaks', `${package_count} updates available`)
     }
-  })
+  })()
+}) as EventListener
+
+export default definePlugin((serverApi: ServerAPI) => {
+  Backend.initBackend(serverApi)
+  serverApi.routerHook.addRoute("/flatpak-manager", FlatpakManager)
+  initPlugin()
+  Backend.eventBus.addEventListener('BatteryStateChange', IntervalCheck)
 
   return {
     title: <div className={staticClasses.Title}>AutoFlatpaks</div>,
@@ -71,7 +73,8 @@ export default definePlugin((serverApi: ServerAPI) => {
     icon: <FaBox />,
     onDismount: () => {
       serverApi.routerHook.removeRoute('/flatpak-manager')
-      batteryStateRegistration.unregister()
+      Backend.eventBus.removeEventListener('BatteryStateChange', IntervalCheck)
+      Backend.onDismount()
     }
-  };
-});
+  }
+})
