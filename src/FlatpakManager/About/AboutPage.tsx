@@ -17,6 +17,8 @@ export const AboutPage: VFC = () => {
         <li>List of things I intend to add</li>
       </ul>
       <ul>
+        <li>In-depth evaluation of found updates and update all button</li>
+        <li>A How-To page with functionality explained in bite-sized chunks</li>
         <li>Add remaining space check</li>
         <li>Add check if package running</li>
         <li>Test and fix any bugginess with update all button and desyncing package list</li>
