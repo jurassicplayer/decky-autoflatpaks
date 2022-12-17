@@ -31,8 +31,8 @@ const checkOnBoot = () => {
   }
 }
 
-const UpdateAllPackages = async (success?: boolean) => {
-  if (success === undefined) success = await Backend.UpdateAllPackages()
+const UpdateAllPackages = async () => {
+  let success = await Backend.UpdateAllPackages()
   if (success) {
     SteamUtils.notify('AutoFlatpaks', 'Updated all packages')
     return true
