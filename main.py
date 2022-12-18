@@ -59,6 +59,27 @@ class Plugin:
             history_list.append(json.loads(line))
         proc.update({'output': history_list})
         return proc
+    
+    async def getUnusedPackageList(self):
+        logging.info('Received request for list of unused packages')
+        proc = await self.pyexec_subprocess(self, 'flatpak remove --unused')
+
+        package_list = []
+        lines = proc['stdout'].split('\n')
+        for line in lines:
+            if not line: continue
+            package_match = re.match(r'(?:|\s)(?:\d+.)\s+(?P<application>[^\s,]+?)\s+(?P<branch>.*?)\s+(?P<op>i|u|r)', line)
+            if not package_match:
+                logging.info(f'Failed to parse: "{line}"')
+                continue
+            package = {
+                'application':      package_match['application'],
+                'branch':           package_match['branch'],
+                'op':               package_match['op']
+            }
+            package_list.append(package)
+        proc.update({'output': package_list})
+        return proc
 
     async def getUpdatePackageList(self):
         logging.info('Received request for list of available updates')
@@ -69,7 +90,7 @@ class Plugin:
         lines = proc['stdout'].split('\n')
         for line in lines:
             if not line: continue
-            package_match = re.match(r'(|\s)(?:\d+.)\s+(?P<application>[^\s,]+?)\s+(?P<branch>.*?)\s+(?P<op>(i|u|r))\s+(?P<remote>[^\s]+?)\s+<\s+(?P<download_size>((\d+(\.\d+)?)|(\.\d+)).(bytes|kB|MB|GB|TB|PB))(\s\((?P<partial>partial)\)|)', line)
+            package_match = re.match(r'(|\s)(?:\d+.)\s+(?P<application>[^\s,]+?)\s+(?P<branch>.*?)\s+(?P<op>i|u|r)\s+(?P<remote>[^\s]+?)\s+<\s+(?P<download_size>((\d+(\.\d+)?)|(\.\d+)).(bytes|kB|MB|GB|TB|PB))(\s\((?P<partial>partial)\)|)', line)
             if not package_match:
                 logging.info(f'Failed to parse: "{line}"')
                 continue
@@ -208,10 +229,7 @@ class Plugin:
         return await self.pyexec_subprocess(self, f'flatpak uninstall --noninteractive {pkgref}')
     async def UpdatePackage(self, pkgref):
         logging.info(f'Received request to update package: {pkgref}')
-        return await self.pyexec_subprocess(self, f'flatpak update --noninteractive {pkgref}')
-    async def UnInstallUnused(self):
-        logging.info('Received request to uninstall unused packages')
-        return await self.pyexec_subprocess(self, 'flatpak uninstall --unused --noninteractive')
+        return await self.pyexec_subprocess(self, f'flatpak install --noninteractive --no-auto-pin --or-update {pkgref}')
     async def FlatpakRepair(self, dryrun = True):
         cmd = 'flatpak repair'
         if dryrun: cmd += ' --dry-run'
