@@ -82,6 +82,7 @@ export const AboutPage: VFC = () => {
           </ul>
           <ul>
             <li>Test and fix any bugginess with update all button and desyncing package list</li>
+            <li>Remove Unused Packages, add --no-related flag (?) to manually keep track of deps when uninstalling, otherwise number of modified packages is a lie (removing org.kde.Platform also removes org.kde.Platform.Locale, but org.kde.Platform.Locale is still in the queue)</li>
             <li>A How-To page with functionality explained in bite-sized chunks</li>
             <li>Add remaining space check</li>
             <li>Add check if package running</li>
