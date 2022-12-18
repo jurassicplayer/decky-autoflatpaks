@@ -33,16 +33,39 @@ const checkOnBoot = () => {
 
 const UpdateAllPackages = async () => {
   let success = await Backend.UpdateAllPackages()
-  if (success) {
-    SteamUtils.notify('AutoFlatpaks', 'Updated all packages')
-    return true
+  if (!success) {
+    console.log('Failed to auto-update all packages, retrying in 5 seconds...')
+    setTimeout(UpdateAllPackages, 5000)
   }
-  console.log('Failed to auto-update all packages, retrying in 5 seconds...')
-  setTimeout(UpdateAllPackages, 5000)
-  return false
 }
 
-const IntervalCheck = ((e: CustomEvent) => {
+const onQueueCompletion = ((e: CustomEvent) => {
+  let queueRetCode: {action: string, retcode: boolean}[] = e.detail.queueRetCode
+  let successes = 0
+  queueRetCode.map(item => {
+    if (item.retcode) successes += 1
+  })
+  let notificationText = `${successes}/${queueRetCode.length} packages modified`
+  // let installs = 0
+  // let updates = 0
+  // let removals = 0
+  // let queueLength = 0
+  // for (let item of queueRetCode) {
+  //   if (['install', 'update', 'uninstall'].includes(item.action)) queueLength += 1
+  //   if (item.action == 'install' && item.retcode) installs += 1
+  //   if (item.action == 'update' && item.retcode) updates += 1
+  //   if (item.action == 'uninstall' && item.retcode) removals += 1
+  // }
+  // if (!installs && !updates && !removals) return
+  // let notificationText = ''
+  // if (installs) notificationText += `Installed: ${installs} `
+  // if (updates) notificationText += `Updated: ${updates} `
+  // if (removals) notificationText += `Removed: ${removals} `
+  // notificationText += `out of ${queueLength} packages`
+  SteamUtils.notify('AutoFlatpaks', notificationText)
+}) as EventListener
+
+const IntervalCheck = (() => {
   (async () => {
     if (!Backend.getAppInitialized()) return
     let currentTime = new Date()
@@ -66,6 +89,7 @@ export default definePlugin((serverApi: ServerAPI) => {
   serverApi.routerHook.addRoute("/flatpak-manager", FlatpakManager)
   initPlugin()
   Backend.eventBus.addEventListener('BatteryStateChange', IntervalCheck)
+  Backend.eventBus.addEventListener('QueueCompletion', onQueueCompletion)
 
   return {
     title: <div className={staticClasses.Title}>AutoFlatpaks</div>,
@@ -74,6 +98,7 @@ export default definePlugin((serverApi: ServerAPI) => {
     onDismount: () => {
       serverApi.routerHook.removeRoute('/flatpak-manager')
       Backend.eventBus.removeEventListener('BatteryStateChange', IntervalCheck)
+      Backend.eventBus.removeEventListener('QueueCompletion', onQueueCompletion)
       Backend.onDismount()
     }
   }
