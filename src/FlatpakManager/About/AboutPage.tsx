@@ -36,7 +36,7 @@ export const AboutPage: VFC = () => {
         noFocusRing={true}
         ref={scrollView}>
         <div>
-          <h3>Browse Page Navigation</h3>
+          <h3 style={{margin: "0px"}}>Browse Page Navigation</h3>
           <p>
             The browse page houses a filter-able list of packages with button toggles and a single refresh button at the top. Each package row can be interacted with in a couple of ways:
             <ul>
