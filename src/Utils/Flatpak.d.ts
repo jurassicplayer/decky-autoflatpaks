@@ -37,6 +37,12 @@ export interface FlatpakUpdate {
   partial:        boolean
 }
 
+export interface FlatpakUnused {
+  application:    string
+  branch:         string
+  op:             string
+}
+
 export interface LocalFlatpakMetadata {
   name: string
   application: string

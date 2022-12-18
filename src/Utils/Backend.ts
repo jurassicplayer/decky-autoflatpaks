@@ -1,5 +1,5 @@
 import { ServerAPI } from "decky-frontend-lib"
-import { FlatpakMetadata, FlatpakUpdate, LocalFlatpakMetadata, RemoteFlatpakMetadata } from "./Flatpak"
+import { FlatpakMetadata, FlatpakUnused, FlatpakUpdate, LocalFlatpakMetadata, RemoteFlatpakMetadata } from "./Flatpak"
 import { JournalEntry } from "./History"
 
 export interface queueData {
@@ -140,7 +140,9 @@ export class Backend {
     this.setAppState(appStates.processingQueue)
     let returncode = true
     this.setQueueLength()
+    let queueCopy = this.getQueue()
     let queueLength = this.getQueueLength()
+    let queueRetCode = []
     for (var item of this.queue) {
       console.log("Processing Queue Item: ", item)
       let retcode = true
@@ -152,10 +154,11 @@ export class Backend {
       if (item.action == 'install')   { retcode = await this.InstallPackage(item.packageRef) }
       if (item.action == 'uninstall') { retcode = await this.UnInstallPackage(item.packageRef) }
       if (item.action == 'update')    { retcode = await this.UpdatePackage(item.packageRef) }
-      if (!retcode) returncode = false 
+      if (!retcode) returncode = false
+      queueRetCode.push({action: item.action, retcode: retcode})
       await this.dequeueAction(item, true)
     }
-    if (queueLength) this.eventBus.dispatchEvent(new CustomEvent('QueueCompletion', {detail: {queueLength: queueLength}}))
+    if (queueLength) this.eventBus.dispatchEvent(new CustomEvent('QueueCompletion', {detail: {queue: queueCopy, queueLength: queueLength, queueRetCode: queueRetCode}}))
     this.setAppState(appStates.idle)
     return returncode
   }
@@ -222,6 +225,10 @@ export class Backend {
     var proc = await this.bridge("getMaskList")
     return proc.output as string[]
   }
+  static async getUnusedPackageList(): Promise<FlatpakUnused[]> {
+    var proc = await this.bridge("getUnusedPackageList")
+    return proc.output as FlatpakUnused[]
+  }
   static async getUpdatePackageList(): Promise<FlatpakUpdate[]> {
     this.setAppState(appStates.checkingForUpdates)
     var proc = await this.bridge("getUpdatePackageList")
@@ -277,19 +284,35 @@ export class Backend {
   }
   static async UpdateAllPackages() {
     if (this.getAppState() != appStates.idle) return false
+    let returncode = await this.UpdateOrUnusedPackages(this.getUpdatePackageList())
+    return returncode
+  }
+  //#endregion
+
+  //#region Advanced Functions
+  static async RemoveUnusedPackages() {
+    if (this.getAppState() != appStates.idle) return false
+    let returncode = await this.UpdateOrUnusedPackages(this.getUnusedPackageList())
+    return returncode
+  }
+  static async UpdateOrUnusedPackages(promise: Promise<FlatpakUpdate[] | FlatpakUnused[]>) {
     var returncode = true
-    var upl: FlatpakUpdate[] = []
-    var lpl: LocalFlatpakMetadata[] = []
-    await Promise.all([this.getUpdatePackageList(), this.getLocalPackageList()]).then((value: [FlatpakUpdate[], LocalFlatpakMetadata[]]) => {
-      upl = value[0]
-      lpl = value[1]
-    })
+    let upl: FlatpakUpdate[] | FlatpakUnused[] = await promise
     if (!upl.length) return undefined
+    if (!this.packageList.length) await this.getPackageList()
+    let rpl: FlatpakMetadata[] = this.packageList
     let liveFPMQueue = [...this.queue]
     if (liveFPMQueue) this.setQueue([])
     for (let uplitem of upl) {
-      var idx = lpl.findIndex(lplitem => lplitem.application == uplitem.application && lplitem.branch == uplitem.branch && lplitem.origin == uplitem.remote)
-      this.queueAction({action: 'update', packageRef: lpl[idx].ref})
+      var idx = rpl.findIndex(rplitem => rplitem.application == uplitem.application && rplitem.branch == uplitem.branch && (('remote' in uplitem && rplitem.origin == uplitem.remote) || !('remote' in uplitem)))
+      var pkgAction = ''
+      if (['i', 'u'].includes(uplitem.op)) { pkgAction = 'update'}
+      if (uplitem.op == 'r') { pkgAction = 'uninstall' }
+      if (!pkgAction) {
+        console.log(`[${rpl[idx].ref}] Unknown op: ${uplitem.op}`)
+        continue
+      }
+      this.queueAction({action: pkgAction, packageRef: rpl[idx].ref})
     }
     returncode = await this.ProcessQueue()
     if (liveFPMQueue) this.setQueue(liveFPMQueue)
