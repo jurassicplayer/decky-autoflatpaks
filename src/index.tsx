@@ -46,6 +46,7 @@ const onQueueCompletion = ((e: CustomEvent) => {
     if (item.retcode) successes += 1
   })
   let notificationText = `${successes}/${queueRetCode.length} packages modified`
+  // -- More detailed notification, but takes provides maybe TOO much information at once
   // let installs = 0
   // let updates = 0
   // let removals = 0
