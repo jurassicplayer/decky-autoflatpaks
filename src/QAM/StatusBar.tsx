@@ -50,10 +50,16 @@ export const StatusBar = () => {
   })
 
   let StatusText = ""
+  let CSS = StatusBarCSS.Default
   if (appState == appStates.checkingForUpdates) {
     StatusText = "Checking for updates..."
+    CSS = StatusBarCSS.CheckForUpdates
+  } else if (appState == appStates.buildingPackageList) {
+    StatusText = "Updating package list..."
+    CSS = StatusBarCSS.CheckForUpdates
   } else if (appState == appStates.processingQueue) {
     StatusText = "Processing queue..."
+    CSS = StatusBarCSS.ProcessingQueue
     if (queueProgress.currentItem && queueProgress.queueLength && queueProgress.queueProgress)
       StatusText = `(${queueProgress.queueProgress}/${queueProgress.queueLength}) ${queueProgress.currentItem.action} ${queueProgress.currentItem.packageRef}...`
   }
@@ -61,13 +67,7 @@ export const StatusBar = () => {
 
     <PanelSectionRow>
       { appState != appStates.idle 
-      ? <div style={
-        appState == appStates.checkingForUpdates
-        ? StatusBarCSS.CheckForUpdates
-        : appState == appStates.processingQueue
-          ? StatusBarCSS.ProcessingQueue
-          : StatusBarCSS.Default
-        }>{StatusText}</div>
+      ? <div style={CSS}>{StatusText}</div>
       : null }
     </PanelSectionRow>
   )
