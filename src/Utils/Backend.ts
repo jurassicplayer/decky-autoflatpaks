@@ -1,18 +1,8 @@
 import { ServerAPI } from "decky-frontend-lib"
 import { FlatpakMetadata, FlatpakUnused, FlatpakUpdate, LocalFlatpakMetadata, RemoteFlatpakMetadata } from "./Flatpak"
 import { JournalEntry } from "./History"
-
-export interface queueData {
-  action: string
-  packageRef: string
-}
-
-interface cliOutput {
-  output?: any
-  returncode?: number
-  stdout?: string
-  stderr?: string
-}
+import { queueData, BatteryState, cliOutput } from "./Backend.d"
+import { eventGenerator } from "./Events"
 
 export enum appStates {
   initializing,
@@ -22,14 +12,6 @@ export enum appStates {
   buildingPackageList,
   processingQueue
 } 
-
-interface BatteryState {
-  bHasBattery: boolean,
-  bShutdownRequested: boolean,
-  eACState: number,
-  flLevel: number,
-  nSecondsRemaining: number,
-}
 
 export class Backend {
   private static serverAPI: ServerAPI
@@ -70,38 +52,38 @@ export class Backend {
   }
   static setBatteryStateChange(batteryState: BatteryState) {
     this.pseudoBatteryState = batteryState
-    this.eventBus.dispatchEvent(new CustomEvent('BatteryStateChange', {detail: {batteryState: this.pseudoBatteryState}}))
+    this.eventBus.dispatchEvent(eventGenerator.BatteryStateChange(this.pseudoBatteryState))
   }
   static setServer(server: ServerAPI) { this.serverAPI = server }
   static getServer() { return this.serverAPI }
   static setAppState(state: appStates) {
     this.appState.state = state
-    this.eventBus.dispatchEvent(new CustomEvent('AppStateChange', {detail: {state: this.appState.state}}))
+    this.eventBus.dispatchEvent(eventGenerator.AppStateChange(this.appState.state))
   }
   static getAppState() { return this.appState.state }
   static getPL() { return this.packageList }
-  static setPL(packageList: FlatpakMetadata[]) { // #REMOVE
+  static setPL(packageList: FlatpakMetadata[]) {
     this.packageList = packageList
-    this.eventBus.dispatchEvent(new CustomEvent('PackageListChange', {detail: {packageList: this.packageList}}))
+    this.eventBus.dispatchEvent(eventGenerator.PackageListChange(this.packageList))
   }
   static setPLPackage(pkgref: string, metadata: any) {
     console.log('Updating single package info in packagelist for: ', pkgref)
-    var idx = this.packageList.findIndex(plitem => plitem.ref == pkgref)
+    let idx = this.packageList.findIndex(plitem => plitem.ref == pkgref)
     this.packageList[idx] = {...this.packageList[idx], ...metadata}
-    this.eventBus.dispatchEvent(new CustomEvent(pkgref, {detail: {packageInfo: this.packageList[idx]}}))
+    this.eventBus.dispatchEvent(eventGenerator.PackageChange(this.packageList[idx]))
   }
   static getQueue() { return this.queue }
   static setQueue(queue: queueData[]) { this.queue = queue }
   static getQueueLength() { return this.queueLength }
   static setQueueLength() { this.queueLength = Backend.getQueue().length}
   static getQueueProgress() { return (this.queueLength - this.queueProgress + 1) } // Offset by one to show current number instead of previous
-  static setQueueProgress(currentQueueLength: number) { this.queueProgress = currentQueueLength}
+  static setQueueProgress(currentQueueLength: number) { this.queueProgress = currentQueueLength }
   static setAppInitialized(state: boolean) {this.appState.initialized = state}
   static getAppInitialized() { return this.appState.initialized}
 
   static async bridge(functionName: string, namedArgs?: any) {
     namedArgs = (namedArgs) ? namedArgs : {}
-    var output = await this.serverAPI.callPluginMethod(functionName, namedArgs)
+    let output = await this.serverAPI.callPluginMethod(functionName, namedArgs)
     console.debug('[AutoFlatpaks] bridge - ', functionName,': ', output)
     return output.result as cliOutput
   }
@@ -109,15 +91,15 @@ export class Backend {
 
   //#region Settings interactions
   static async getSetting(key: string, defaults: any) {
-    var proc = await this.bridge("settings_getSetting", {key, defaults})
+    let proc = await this.bridge("settings_getSetting", {key, defaults})
     return proc.output
   }
   static async setSetting(key: string, value: any) {
-    var proc = await this.bridge("settings_setSetting", {key, value})
+    let proc = await this.bridge("settings_setSetting", {key, value})
     return proc.output
   }
   static async commitSettings() {
-    var proc = await this.bridge("settings_commit")
+    let proc = await this.bridge("settings_commit")
     return proc.output
   }
   //#endregion
@@ -143,22 +125,23 @@ export class Backend {
     let queueCopy = this.getQueue()
     let queueLength = this.getQueueLength()
     let queueRetCode = []
-    for (var item of this.queue) {
+    for (let item of this.queue) {
       console.log("Processing Queue Item: ", item)
       let retcode = true
       this.setQueueProgress(this.queue.length)
-      this.eventBus.dispatchEvent(new CustomEvent('QueueProgress', {detail: {queueItem: item, queueLength: queueLength, queueProgress: this.getQueueProgress()}}))
+      this.eventBus.dispatchEvent(eventGenerator.QueueProgress(item, queueLength, this.getQueueProgress()))
       // Run await action: mask/unmask, install/uninstall, update
       if (item.action == 'mask')      { retcode = await this.MaskPackage(item.packageRef) }
       if (item.action == 'unmask')    { retcode = await this.UnMaskPackage(item.packageRef) }
       if (item.action == 'install')   { retcode = await this.InstallPackage(item.packageRef) }
-      if (item.action == 'uninstall') { retcode = await this.UnInstallPackage(item.packageRef) }
+      if (item.action == 'uninstall' && item.extraParameters?.removeUnused) { retcode = await this.UnInstallPackage(item.packageRef, item.extraParameters.removeUnused) }
+      else if (item.action == 'uninstall') { retcode = await this.UnInstallPackage(item.packageRef) }
       if (item.action == 'update')    { retcode = await this.UpdatePackage(item.packageRef) }
       if (!retcode) returncode = false
       queueRetCode.push({action: item.action, retcode: retcode})
       await this.dequeueAction(item, true)
     }
-    if (queueLength) this.eventBus.dispatchEvent(new CustomEvent('QueueCompletion', {detail: {queue: queueCopy, queueLength: queueLength, queueRetCode: queueRetCode}}))
+    if (queueLength) this.eventBus.dispatchEvent(eventGenerator.QueueCompletion(queueCopy, queueLength, queueRetCode))
     this.setAppState(appStates.idle)
     return returncode
   }
@@ -168,24 +151,24 @@ export class Backend {
   static async getPackageList(localOnly?: boolean): Promise<FlatpakMetadata[] | undefined> {
     if (this.getAppState() == appStates.buildingPackageList) return undefined
     this.setAppState(appStates.buildingPackageList)
-    var output: FlatpakMetadata[] = []
+    let output: FlatpakMetadata[] = []
     await Promise.all([this.getRemotePackageList(), this.getRemotePackageList(true), this.getLocalPackageList(), this.getMaskList()]).then((value: [RemoteFlatpakMetadata[], RemoteFlatpakMetadata[], LocalFlatpakMetadata[], string[]]) => {
-      var rpl = value[0] || []
-      var upl = value[1] || []
-      var lpl = value[2]
-      var mpl = value[3]
+      let rpl = value[0] || []
+      let upl = value[1] || []
+      let lpl = value[2]
+      let mpl = value[3]
       // Add local packages & updateable data to list
       output = lpl.map(lplitem => {
-        var default_metadata = {
+        let default_metadata = {
           installed: true,
           updateable: false,
           masked: false
         }
         
-        var idx = upl.findIndex(uplitem => uplitem.ref == lplitem.ref)
+        let idx = upl.findIndex(uplitem => uplitem.ref == lplitem.ref)
         if (idx < 0) return {...lplitem, ...default_metadata}
-        var uplitem = upl[idx]
-        var upl_metadata = {
+        let uplitem = upl[idx]
+        let upl_metadata = {
           commit:         uplitem.commit,
           download_size:  uplitem.download_size,
           updateable:     (uplitem.commit != lplitem.active) ? true : false
@@ -196,7 +179,7 @@ export class Backend {
 
       // Add remote packages not in list
       if (!localOnly && rpl) {
-        var rplitems = rpl.filter((rplitem) => !lpl.map((lplitem) => lplitem.ref).includes(rplitem.ref))
+        let rplitems = rpl.filter((rplitem) => !lpl.map((lplitem) => lplitem.ref).includes(rplitem.ref))
         for (let rplitem of rplitems) { output.push({ ...rplitem, installed: false, updateable: false, masked: false }) }
         console.log('PL (LPL+U+RPL): ', output)
       }
@@ -214,42 +197,42 @@ export class Backend {
     return output as FlatpakMetadata[]
   }
   static async getLocalPackageList(): Promise<LocalFlatpakMetadata[]> {
-    var proc = await this.bridge("getLocalPackageList")
+    let proc = await this.bridge("getLocalPackageList")
     return proc.output as LocalFlatpakMetadata[]
   }
   static async getRemotePackageList(updateOnly?: boolean): Promise<RemoteFlatpakMetadata[]> {
-    var proc = await this.bridge("getRemotePackageList", {updateOnly: updateOnly})
+    let proc = await this.bridge("getRemotePackageList", {updateOnly: updateOnly})
     return proc.output as RemoteFlatpakMetadata[]
   }
   static async getMaskList(): Promise<string[]> {
-    var proc = await this.bridge("getMaskList")
+    let proc = await this.bridge("getMaskList")
     return proc.output as string[]
   }
   static async getUnusedPackageList(): Promise<FlatpakUnused[]> {
-    var proc = await this.bridge("getUnusedPackageList")
+    let proc = await this.bridge("getUnusedPackageList")
     return proc.output as FlatpakUnused[]
   }
   static async getUpdatePackageList(): Promise<FlatpakUpdate[]> {
     this.setAppState(appStates.checkingForUpdates)
-    var proc = await this.bridge("getUpdatePackageList")
+    let proc = await this.bridge("getUpdatePackageList")
     this.setAppState(appStates.idle)
     return proc.output as FlatpakUpdate[]
   }
   static async getPackageCount() {
-    var packages = await this.getUpdatePackageList()
+    let packages = await this.getUpdatePackageList()
     if (!packages) return undefined
-    var package_count = packages.length
+    let package_count = packages.length
     return package_count
   }
   static async getPackageHistory(): Promise<JournalEntry[]> {
-    var proc = await this.bridge("getPackageHistory")
+    let proc = await this.bridge("getPackageHistory")
     return proc.output as JournalEntry[]
   }
   //#endregion
 
   //#region Flatpak Action interactions
   static async MaskPackage(pkgref: string) {
-    var proc = await this.bridge("MaskPackage", {pkgref: pkgref})
+    let proc = await this.bridge("MaskPackage", {pkgref: pkgref})
     if (proc.returncode != 0) return false
     this.setPLPackage(pkgref, {masked: true})
     // Update child package masked information
@@ -257,7 +240,7 @@ export class Backend {
     return true
   }
   static async UnMaskPackage(pkgref: string) {
-    var proc = await this.bridge("UnMaskPackage", {pkgref: pkgref})
+    let proc = await this.bridge("UnMaskPackage", {pkgref: pkgref})
     if (proc.returncode != 0) return false
     this.setPLPackage(pkgref, {masked: false})
     // Update child package masked information
@@ -265,19 +248,19 @@ export class Backend {
     return true
   }
   static async InstallPackage(pkgref: string) {
-    var proc = await this.bridge("InstallPackage", {pkgref: pkgref})
+    let proc = await this.bridge("InstallPackage", {pkgref: pkgref})
     if (proc.returncode != 0) return false
     this.setPLPackage(pkgref, {installed: true})
     return true
   }
-  static async UnInstallPackage(pkgref: string) {
-    var proc = await this.bridge("UnInstallPackage", {pkgref: pkgref})
+  static async UnInstallPackage(pkgref: string, removeUnused: boolean = false) {
+    let proc = await this.bridge("UnInstallPackage", {pkgref: pkgref, removeUnused: removeUnused})
     if (proc.returncode != 0) return false
     this.setPLPackage(pkgref, {installed: false})
     return true
   }
   static async UpdatePackage(pkgref: string) {
-    var proc = await this.bridge("UpdatePackage", {pkgref: pkgref})
+    let proc = await this.bridge("UpdatePackage", {pkgref: pkgref})
     if (proc.returncode != 0) return false
     this.setPLPackage(pkgref, {updateable: false})
     return true
@@ -296,7 +279,7 @@ export class Backend {
     return returncode
   }
   static async UpdateOrUnusedPackages(promise: Promise<FlatpakUpdate[] | FlatpakUnused[]>) {
-    var returncode = true
+    let returncode = true
     let upl: FlatpakUpdate[] | FlatpakUnused[] = await promise
     if (!upl.length) return undefined
     if (!this.packageList.length) await this.getPackageList()
@@ -304,15 +287,19 @@ export class Backend {
     let liveFPMQueue = [...this.queue]
     if (liveFPMQueue) this.setQueue([])
     for (let uplitem of upl) {
-      var idx = rpl.findIndex(rplitem => rplitem.application == uplitem.application && rplitem.branch == uplitem.branch && (('remote' in uplitem && rplitem.origin == uplitem.remote) || !('remote' in uplitem)))
-      var pkgAction = ''
+      let idx = rpl.findIndex(rplitem => rplitem.application == uplitem.application && rplitem.branch == uplitem.branch && (('remote' in uplitem && rplitem.origin == uplitem.remote) || !('remote' in uplitem)))
+      let pkgAction = ''
+      let extraParameters = {}
       if (['i', 'u'].includes(uplitem.op)) { pkgAction = 'update'}
-      if (uplitem.op == 'r') { pkgAction = 'uninstall' }
+      if (uplitem.op == 'r') {
+        pkgAction = 'uninstall'
+        extraParameters['removeUnused'] = true
+      }
       if (!pkgAction) {
         console.log(`[${rpl[idx].ref}] Unknown op: ${uplitem.op}`)
         continue
       }
-      this.queueAction({action: pkgAction, packageRef: rpl[idx].ref})
+      this.queueAction({action: pkgAction, packageRef: rpl[idx].ref, extraParameters: extraParameters})
     }
     returncode = await this.ProcessQueue()
     if (liveFPMQueue) this.setQueue(liveFPMQueue)
