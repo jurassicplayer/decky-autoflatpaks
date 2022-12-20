@@ -81,12 +81,13 @@ export const AboutPage: VFC = () => {
             <li>List of things I intend to add</li>
           </ul>
           <ul>
-            <li>List unused packages (modal maybe?)</li>
+            <li>List unused packages (modal with list and remove unused button)</li>
             <li>Test and fix any bugginess with update all button and desyncing package list</li>
             <li>A How-To page with functionality explained in bite-sized chunks</li>
             <li>Add remaining space check</li>
             <li>Filter Search refinement (regex, fuzzy?)</li>
             <li>Add aggressive filtering with toggle-able option in advanced page</li>
+            <li>Toggle-able FPM tabs (Logger, Advanced, About) option in advanced page</li>
             <li>Add advanced page functionality</li>
             <li>Add check if package running (?)</li>
             <li>Flathub API integration (?)</li>
