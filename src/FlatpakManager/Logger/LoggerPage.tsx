@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, VFC } from "react"
 import { Focusable, SteamSpinner } from "decky-frontend-lib"
 import { Backend } from "../../Utils/Backend"
+import { eventTypes } from "../../Utils/Events"
 import { JournalEntry } from "../../Utils/History"
 import { ScrollPanel } from "../../InputControls/ScrollPanel"
 import { LogEntry } from "./LogEntry"
@@ -18,9 +19,12 @@ export const LoggerPage: VFC = () => {
   useEffect(() => {
     console.log('Logs page loaded')
     refreshHistory()
-    Backend.eventBus.addEventListener('QueueProgress', refreshHistory)
+    Backend.eventBus.addEventListener(eventTypes.QueueProgress, refreshHistory)
   }, [])
-  useEffect(() => () => { console.log('Logs page unloaded') }, [])
+  useEffect(() => () => {
+    console.log('Logs page unloaded')
+    Backend.eventBus.removeEventListener(eventTypes.QueueProgress, refreshHistory)
+  }, [])
 
   return (
     <ScrollPanel
