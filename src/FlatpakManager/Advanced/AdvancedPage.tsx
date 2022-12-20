@@ -1,15 +1,27 @@
 import { DialogButton, Focusable } from "decky-frontend-lib"
-import { VFC } from "react"
-import { Backend } from "../../Utils/Backend"
+import { useEffect, useState, VFC } from "react"
+import { appStates, Backend } from "../../Utils/Backend"
+import { eventTypes } from "../../Utils/Events"
 
 const onRemoveUnusedPackages = () => {
   Backend.RemoveUnusedPackages()
 }
 
 export const AdvancedPage: VFC = () => {
+  const [appState, setAppState] = useState<number>(Backend.getAppState())
+  const onAppStateChange = ((e: CustomEvent) => {
+    if (!e.detail.state) return
+    setAppState(e.detail.state)
+  }) as EventListener
+  useEffect(() => { Backend.eventBus.addEventListener(eventTypes.AppStateChange, onAppStateChange) }, [])
+  useEffect(() => () => { Backend.eventBus.removeEventListener(eventTypes.AppStateChange, onAppStateChange) }, [])
   return (
     <div>
-      <Focusable><DialogButton onClick={() => onRemoveUnusedPackages()}>Remove Unused Packages</DialogButton></Focusable>
+      <Focusable>
+        <DialogButton
+          disabled={appState != appStates.idle}
+          onClick={() => onRemoveUnusedPackages()}>Remove Unused Packages</DialogButton>
+      </Focusable>
       <h2>Work In Progress</h2>
       <p>
         This is a tentative area that will be a place for advanced functions that hopefully won't need to be used.
