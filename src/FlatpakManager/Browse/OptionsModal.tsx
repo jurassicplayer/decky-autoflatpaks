@@ -14,25 +14,32 @@ export interface FPMOptions {
 export const OptionsModal = (props: {selectedOptions: FPMOptions, setSelectedOptions: CallableFunction, closeModal?: CallableFunction}) => {
   const [search, setSearch] = useState<string>(props.selectedOptions.filterSearch)
   const [currentOptions, setCurrentOptions] = useState<FPMOptions>(props.selectedOptions)
-  const updateSelectedOptions = (options: {filterSearch?: string, filterType?: string, filterStatus?: string, filterMask?: string, sortOrder?: string}) => {
+  const updateSelectedOptions = (options: {filterType?: string, filterStatus?: string, filterMask?: string, sortOrder?: string}) => {
     let newOptions = {
       ...currentOptions,
     }
-    if (typeof options.filterSearch == 'string') newOptions = {...newOptions, filterSearch:  options.filterSearch}
+    if (search != currentOptions.filterSearch) newOptions = {...newOptions, filterSearch: search}
     if (options.filterType)   newOptions = {...newOptions, filterType:    options.filterType}
     if (options.filterStatus) newOptions = {...newOptions, filterStatus:  options.filterStatus}
     if (options.filterMask)   newOptions = {...newOptions, filterMask:    options.filterMask}
     if (options.sortOrder)    newOptions = {...newOptions, sortOrder:     options.sortOrder}
-    console.log('Setting new options: ', newOptions)
-    setCurrentOptions(newOptions)
-    props.setSelectedOptions(newOptions)
+    if (newOptions.filterSearch != currentOptions.filterSearch
+      || newOptions.filterType != currentOptions.filterType
+      || newOptions.filterStatus != currentOptions.filterStatus
+      || newOptions.filterMask != currentOptions.filterMask
+      || newOptions.sortOrder != currentOptions.sortOrder
+      ) {
+        console.log('Setting new options: ', newOptions)
+        setCurrentOptions(newOptions)
+        props.setSelectedOptions(newOptions)
+      }
   }
 
   return (
     <FallbackModal
       bAllowFullSize={false}
       closeModal={()=>{
-        updateSelectedOptions({filterSearch: search})
+        updateSelectedOptions({})
         if (props.closeModal) { props.closeModal() }
       }}>
       <Focusable>
