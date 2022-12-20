@@ -82,6 +82,8 @@ export const AboutPage: VFC = () => {
           </ul>
           <ul>
             <li>List unused packages (modal with list and remove unused button)</li>
+            <li>List of masks from flatpak mask</li>
+            <li>List of pins from flatpak pin</li>
             <li>Test and fix any bugginess with update all button and desyncing package list</li>
             <li>A How-To page with functionality explained in bite-sized chunks</li>
             <li>Add remaining space check</li>
