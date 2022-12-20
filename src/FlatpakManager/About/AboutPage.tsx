@@ -91,6 +91,7 @@ export const AboutPage: VFC = () => {
             <li>Add aggressive filtering with toggle-able option in advanced page</li>
             <li>Toggle-able FPM tabs (Logger, Advanced, About) option in advanced page</li>
             <li>Add advanced page functionality</li>
+            <li>Backend persistent browse filter/sort options (?)</li>
             <li>Add check if package running (?)</li>
             <li>Flathub API integration (?)</li>
             <li>Add to Steam (?)</li>
