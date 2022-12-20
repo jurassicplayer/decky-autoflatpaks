@@ -224,9 +224,11 @@ class Plugin:
     async def InstallPackage(self, pkgref):
         logging.info(f'Received request to install package: {pkgref}')
         return await self.pyexec_subprocess(self, f'flatpak install --noninteractive {pkgref}')
-    async def UnInstallPackage(self, pkgref):
+    async def UnInstallPackage(self, pkgref, removeUnused = False):
         logging.info(f'Received request to uninstall package: {pkgref}')
-        return await self.pyexec_subprocess(self, f'flatpak uninstall --noninteractive {pkgref}')
+        cmd = f'flatpak uninstall --noninteractive'
+        if removeUnused: cmd += ' --no-related' # Add --no-related for when using RemoveUnusedPackages function
+        return await self.pyexec_subprocess(self, '{} {}'.format(cmd, pkgref))
     async def UpdatePackage(self, pkgref):
         logging.info(f'Received request to update package: {pkgref}')
         return await self.pyexec_subprocess(self, f'flatpak install --noninteractive --no-auto-pin --or-update {pkgref}')
