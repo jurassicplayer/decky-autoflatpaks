@@ -16,6 +16,7 @@ import { appStates, Backend } from "../Utils/Backend"
 import { SteamUtils } from "../Utils/SteamUtils"
 import { FlatpakManagerButtons } from "./QAMPanel.css"
 import { StatusBar } from "./StatusBar"
+import { eventTypes } from "../Utils/Events"
 
 export const QAMPanel: VFC = () => {
   //#region Helper Functions
@@ -74,11 +75,11 @@ export const QAMPanel: VFC = () => {
   useEffect(() => {
     console.log("QAM Panel loaded")
     // Register listener
-    Backend.eventBus.addEventListener('AppStateChange', onAppStateChange)
+    Backend.eventBus.addEventListener(eventTypes.AppStateChange, onAppStateChange)
     setQAMReady(true)
   }, [])
   useEffect(() => () => {
-    Backend.eventBus.removeEventListener('AppStateChange', onAppStateChange)
+    Backend.eventBus.removeEventListener(eventTypes.AppStateChange, onAppStateChange)
     console.log("QAM Panel unloaded")
   }, [])
   useEffect(() => {

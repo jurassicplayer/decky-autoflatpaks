@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { PanelSectionRow } from "decky-frontend-lib"
 import { appStates, Backend } from "../Utils/Backend"
 import { StatusBarCSS } from "./StatusBar.css"
+import { eventTypes } from "../Utils/Events"
 
 export const StatusBar = () => {
   const onQueueProgress = ((e: CustomEvent) => {
@@ -31,14 +32,14 @@ export const StatusBar = () => {
   useEffect(() => {
     console.log("Status bar loaded")
     // Register listener
-    Backend.eventBus.addEventListener('QueueProgress', onQueueProgress)
-    Backend.eventBus.addEventListener('QueueCompletion', onQueueCompletion)
-    Backend.eventBus.addEventListener('AppStateChange', onAppStateChange)
+    Backend.eventBus.addEventListener(eventTypes.QueueProgress, onQueueProgress)
+    Backend.eventBus.addEventListener(eventTypes.QueueCompletion, onQueueCompletion)
+    Backend.eventBus.addEventListener(eventTypes.AppStateChange, onAppStateChange)
   }, [])
   useEffect(() => () => {
-    Backend.eventBus.removeEventListener('QueueProgress', onQueueProgress)
-    Backend.eventBus.removeEventListener('QueueCompletion', onQueueCompletion)
-    Backend.eventBus.removeEventListener('AppStateChange', onAppStateChange)
+    Backend.eventBus.removeEventListener(eventTypes.QueueProgress, onQueueProgress)
+    Backend.eventBus.removeEventListener(eventTypes.QueueCompletion, onQueueCompletion)
+    Backend.eventBus.removeEventListener(eventTypes.AppStateChange, onAppStateChange)
     console.log("Status bar unloaded")
   }, [])
 

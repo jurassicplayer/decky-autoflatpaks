@@ -2,10 +2,12 @@ import { DialogButton, Focusable, showModal } from "decky-frontend-lib"
 import { useEffect, useState, VFC } from "react"
 import { FaDownload, FaTrashAlt, FaSyncAlt, FaEye, FaEyeSlash } from "react-icons/fa"
 import { ToggleButton } from "../../InputControls/ToggleButton"
-import { appStates, Backend, queueData } from "../../Utils/Backend"
+import { appStates, Backend } from "../../Utils/Backend"
+import { queueData } from "../../Utils/Backend.d"
 import { FlatpakMetadata } from "../../Utils/Flatpak"
 import { CardButton, CardInfo } from "./FlatpakCardInfo.css"
 import { FallbackModal } from "../../InputControls/FallbakModal"
+import { eventTypes } from "../../Utils/Events"
 
 
 export const FlatpakInfoModal: VFC<{data: FlatpakMetadata, closeModal?: CallableFunction}> = (props) => {
@@ -59,12 +61,12 @@ export const FlatpakCardInfo: VFC<{data: FlatpakMetadata, focus: boolean}> = (pr
     console.log("Card info loaded: ", packageInfo.ref)
     // Register listeners
     Backend.eventBus.addEventListener(packageInfo.ref, onPackageInfoChange)
-    Backend.eventBus.addEventListener('AppStateChange', onAppStateChange)
+    Backend.eventBus.addEventListener(eventTypes.AppStateChange, onAppStateChange)
   }, [])
   useEffect(() => () => {
     // Unregister listeners
     Backend.eventBus.removeEventListener(packageInfo.ref, onPackageInfoChange)
-    Backend.eventBus.removeEventListener('AppStateChange', onAppStateChange)
+    Backend.eventBus.removeEventListener(eventTypes.AppStateChange, onAppStateChange)
     console.log("Card info unloaded: ", packageInfo.ref)
   }, [])
 

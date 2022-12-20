@@ -8,6 +8,7 @@ import { FlatpakManager } from "./FlatpakManager/FlatpakManager"
 import { QAMPanel } from "./QAM/QAMPanel"
 import { Settings } from "./Utils/Settings"
 import { appStates, Backend } from "./Utils/Backend"
+import { eventTypes } from "./Utils/Events"
 import { SteamUtils } from "./Utils/SteamUtils"
 
 const initPlugin = async () => {
@@ -89,8 +90,8 @@ export default definePlugin((serverApi: ServerAPI) => {
   Backend.initBackend(serverApi)
   serverApi.routerHook.addRoute("/flatpak-manager", FlatpakManager)
   initPlugin()
-  Backend.eventBus.addEventListener('BatteryStateChange', IntervalCheck)
-  Backend.eventBus.addEventListener('QueueCompletion', onQueueCompletion)
+  Backend.eventBus.addEventListener(eventTypes.BatteryStateChange, IntervalCheck)
+  Backend.eventBus.addEventListener(eventTypes.QueueCompletion, onQueueCompletion)
 
   return {
     title: <div className={staticClasses.Title}>AutoFlatpaks</div>,
@@ -98,8 +99,8 @@ export default definePlugin((serverApi: ServerAPI) => {
     icon: <FaBox />,
     onDismount: () => {
       serverApi.routerHook.removeRoute('/flatpak-manager')
-      Backend.eventBus.removeEventListener('BatteryStateChange', IntervalCheck)
-      Backend.eventBus.removeEventListener('QueueCompletion', onQueueCompletion)
+      Backend.eventBus.removeEventListener(eventTypes.BatteryStateChange, IntervalCheck)
+      Backend.eventBus.removeEventListener(eventTypes.QueueCompletion, onQueueCompletion)
       Backend.onDismount()
     }
   }

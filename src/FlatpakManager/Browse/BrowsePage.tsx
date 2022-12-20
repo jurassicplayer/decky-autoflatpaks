@@ -6,6 +6,7 @@ import { Backend } from "../../Utils/Backend"
 import { FlatpakMetadata } from "../../Utils/Flatpak"
 import { FlatpakCard } from "./FlatpakCard"
 import { BrowsePageContainer, PackageListContainer, RefreshButton } from "./BrowsePage.css"
+import { eventTypes } from "../../Utils/Events"
 
 export const BrowsePage: VFC = () => {
   const [browseReady,   setBrowseReady]   = useState<boolean>(false)
@@ -40,12 +41,12 @@ export const BrowsePage: VFC = () => {
 
   useEffect(() => {
     console.log("Browse loaded")
-    Backend.eventBus.addEventListener('QueueCompletion', onQueueCompletion)
+    Backend.eventBus.addEventListener(eventTypes.QueueCompletion, onQueueCompletion)
     refreshBrowse(Backend.getPL().length > 0)
   },[])
   useEffect(() => { if (browseReady) {refreshBrowse(true)} }, [selectedOptions])
   useEffect(() => () => {
-    Backend.eventBus.removeEventListener('QueueCompletion', onQueueCompletion)
+    Backend.eventBus.removeEventListener(eventTypes.QueueCompletion, onQueueCompletion)
     console.log("Browse unloaded")
   }, [])
 
