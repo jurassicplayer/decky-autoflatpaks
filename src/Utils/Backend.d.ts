@@ -8,9 +8,9 @@ export interface queueData {
 
 export interface cliOutput {
   output?: any
-  returncode?: number
-  stdout?: string
-  stderr?: string
+  returncode: number
+  stdout: string
+  stderr: string
 }
 
 export interface BatteryState {

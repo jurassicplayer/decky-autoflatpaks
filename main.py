@@ -22,16 +22,16 @@ parentPackageOverrides = {
 class Plugin:
     async def settings_read(self):
         output = settings.read()
-        return {'output': output}
+        return {'output': output, 'returncode': 0, 'stdout': '', 'stderr': ''}
     async def settings_commit(self):
         output = settings.commit()
-        return {'output': output}
+        return {'output': output, 'returncode': 0, 'stdout': '', 'stderr': ''}
     async def settings_getSetting(self, key: str, defaults):
         output = settings.getSetting(key, defaults)
-        return {'output': output}
+        return {'output': output, 'returncode': 0, 'stdout': '', 'stderr': ''}
     async def settings_setSetting(self, key: str, value):
         output = settings.setSetting(key, value)
-        return {'output': output}
+        return {'output': output, 'returncode': 0, 'stdout': '', 'stderr': ''}
 
     async def pyexec_subprocess(self, cmd:str, input:str=''):
         logging.info(f'Calling python subprocess: "{cmd}"')
@@ -167,14 +167,16 @@ class Plugin:
         return proc
 
     async def getLocalPackageList(self):
-        LocalPackageList = []
         LPLRuntime      = (await self.pullLocalPackageList(self, packageType="runtime"))
         LPLApplication  = (await self.pullLocalPackageList(self, packageType="app"))
-        LocalPackageList += LPLRuntime['output'] + LPLApplication['output']
-        return {'output': LocalPackageList}
+        LocalPackageList = LPLRuntime['output'] + LPLApplication['output']
+        returncode = LPLRuntime['returncode'] | LPLApplication['returncode']
+        stdout = "{}\n{}".format(LPLRuntime['stdout'], LPLApplication['stdout'])
+        stderr = "{}\n{}".format(LPLRuntime['stderr'], LPLApplication['stderr'])
+        return {'output': LocalPackageList, 'returncode': returncode, 'stdout': stdout, 'stderr': stderr}
 
     async def pullLocalPackageList(self, packageType=""):
-        loggingInfo = 'Received request for list of all local packages'
+        loggingInfo = 'Received request for list of all local packages' # should always be calling with a packageType to populate packagetype in dict
         cmd = 'flatpak list -a --columns=name:f,installation:f,description:f,size:f,version:f,active:f,branch:f,ref:f,origin:f,application:f,runtime:f,arch:f,options:f,latest:f'
         if packageType == "runtime":
             loggingInfo = 'Received request for list of local runtime packages'
