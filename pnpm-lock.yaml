@@ -8,7 +8,7 @@ specifiers:
   '@rollup/plugin-typescript': ^8.5.0
   '@types/react': 16.14.0
   '@types/webpack': ^5.28.0
-  decky-frontend-lib: ^3.18.4
+  decky-frontend-lib: ^3.18.5
   pnpm: ^7.14.2
   react-icons: ^4.6.0
   react-intersection-observer: ^9.4.1
@@ -19,7 +19,7 @@ specifiers:
   typescript: ^4.8.4
 
 dependencies:
-  decky-frontend-lib: 3.18.4
+  decky-frontend-lib: 3.18.5
   react-icons: 4.6.0
   react-intersection-observer: 9.4.1
 
@@ -422,8 +422,8 @@ packages:
     resolution: {integrity: sha512-uX1KG+x9h5hIJsaKR9xHUeUraxf8IODOwq9JLNPq6BwB04a/xgpq3rcx47l5BZu5zBPlgD342tdke3Hom/nJRA==}
     dev: true
 
-  /decky-frontend-lib/3.18.4:
-    resolution: {integrity: sha512-i3TAe3RJtT1TK0rJgW9Ek5jxMWZRCYLDvqHDylGVieUvuyI7c8X+cogz30pP4cqeGOaA1d/MxBEbhlpD3JhVvg==}
+  /decky-frontend-lib/3.18.5:
+    resolution: {integrity: sha512-CTIJs61La17spws5IzAbLbZ/Bqe+gYgnO6xOrolK1QZh7ZbZeoQ67dtnI0zqRMMC10J8H7jPdqmQnwGN10/bzw==}
     dev: false
 
   /deepmerge/4.2.2:
