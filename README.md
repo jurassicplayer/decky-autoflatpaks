@@ -43,6 +43,7 @@ For manual installation, you will need to use the terminal a little and a keyboa
 
 ## Usage
 ### Quick Access Menu
+- Open package manager, manually check for updates, and manually install all package updates
 - Set the update interval to the desired interval using the arrows
 - Check/Uncheck whether to check for updates on boot and upgrading without user interaction
 - Adjust notifications to your preference: Toast & Sound, Toast Only, Sound Only, or No notifications
@@ -60,6 +61,8 @@ For manual installation, you will need to use the terminal a little and a keyboa
 - Shows list of recent installations/uninstallations/upgrades
 - This relies on journalctl's entries which by default will erase older entries (conditions unknown)
 - Filtering/Sorting entries probably won't be implemented due to the above journalctl behaviour unless the gap is significant enough
+#### Advanced Page
+- List and remove unused packages
 
 ## Functionality
 - The default package manager view are all installed apps sorted from A to Z
