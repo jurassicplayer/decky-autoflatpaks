@@ -281,7 +281,7 @@ export class Backend {
   static async UpdateOrUnusedPackages(promise: Promise<FlatpakUpdate[] | FlatpakUnused[]>) {
     let returncode = true
     let upl: FlatpakUpdate[] | FlatpakUnused[] = await promise
-    if (!upl.length) return undefined
+    if (!upl.length) return returncode
     if (!this.packageList.length) await this.getPackageList()
     let rpl: FlatpakMetadata[] = this.packageList
     let liveFPMQueue = [...this.queue]
