@@ -39,12 +39,10 @@ class Plugin:
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
             stdin=asyncio.subprocess.PIPE)
-        stdout, stderr = await asyncio.wait_for(proc.communicate(input.encode()), timeout=20)
+        stdout, stderr = await asyncio.wait_for(proc.communicate(input.encode()), timeout=60) #timeout in seconds
         stdout = stdout.decode()
         stderr = stderr.decode()
-        logging.info(f'Returncode: {proc.returncode}')
-        logging.info(f'STDOUT: {stdout}')
-        logging.info(f'STDERR: {stderr}')
+        logging.info(f'Returncode: {proc.returncode}\nSTDOUT: {stdout[:300]}\nSTDERR: {stderr[:300]}')
         return {'returncode': proc.returncode, 'stdout': stdout, 'stderr': stderr}
     
     async def getSpaceRemaining(self):
@@ -160,7 +158,10 @@ class Plugin:
             if package['options'] and 'eol=' in package['options']: continue # Remove end of life packages from list
             if not package['description']: package['description'] = package['application']
             if package['application'] and (package['application'].endswith('.Debug') or package['application'].endswith('.Locale') or package['application'].endswith('.Sources')):
-                package['parent'] = '{}/{}/{}'.format(package['application'].rsplit('.', 1)[0], package['arch'], package['branch'])
+                childPackage = package['application'].rsplit('.', 1)[0]
+                package['parent'] = '{}/{}/{}'.format(childPackage, package['arch'], package['branch'])
+                # Parent package overrides for the oddballs that don't have the same package name between the two
+                if childPackage in parentPackageOverrides: package['parent'] = '{}/{}/{}'.format(parentPackageOverrides[childPackage], package['arch'], package['branch'])
             package_list.append(package)
         proc.update({'output': package_list})
         return proc
@@ -213,7 +214,10 @@ class Plugin:
             }
             if not package['description']: package['description'] = package['application']
             if package['application'] and (package['application'].endswith('.Debug') or package['application'].endswith('.Locale') or package['application'].endswith('.Sources')):
-                package['parent'] = '{}/{}/{}'.format(package['application'].rsplit('.', 1)[0], package['arch'], package['branch'])
+                childPackage = package['application'].rsplit('.', 1)[0]
+                package['parent'] = '{}/{}/{}'.format(childPackage, package['arch'], package['branch'])
+                # Parent package overrides for the oddballs that don't have the same package name between the two
+                if childPackage in parentPackageOverrides: package['parent'] = '{}/{}/{}'.format(parentPackageOverrides[childPackage], package['arch'], package['branch'])
             package_list.append(package)
         proc.update({'output': package_list})
         return proc
