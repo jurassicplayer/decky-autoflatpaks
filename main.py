@@ -39,7 +39,7 @@ class Plugin:
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
             stdin=asyncio.subprocess.PIPE)
-        stdout, stderr = await asyncio.wait_for(proc.communicate(input.encode()), timeout=60) #timeout in seconds
+        stdout, stderr = await proc.communicate(input.encode())
         stdout = stdout.decode()
         stderr = stderr.decode()
         logging.info(f'Returncode: {proc.returncode}\nSTDOUT: {stdout[:300]}\nSTDERR: {stderr[:300]}')
