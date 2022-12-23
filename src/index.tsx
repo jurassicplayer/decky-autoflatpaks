@@ -36,8 +36,9 @@ const checkOnBoot = () => {
 const UpdateAllPackages = async () => {
   let success = await Backend.UpdateAllPackages()
   if (!success) {
-    console.log('Failed to auto-update all packages, retrying in 5 seconds...')
-    setTimeout(UpdateAllPackages, 5000)
+    console.log('Failed to auto-update all packages') // , retrying in 5 seconds...')
+    // Cleaning up setTimeout requires setting a variable and then calling clearTimeout(timeoutID)
+    // setTimeout(UpdateAllPackages, 5000)
   }
 }
 
@@ -51,29 +52,13 @@ const onQueueCompletion = ((e: CustomEvent) => {
   })
   let notificationText = `${successes}/${queueRetCode.length} packages modified`
   if (failures.length > 0) console.log(failures)
-  // -- More detailed notification, but takes provides maybe TOO much information at once
-  // let installs = 0
-  // let updates = 0
-  // let removals = 0
-  // let queueLength = 0
-  // for (let item of queueRetCode) {
-  //   if (['install', 'update', 'uninstall'].includes(item.action)) queueLength += 1
-  //   if (item.action == 'install' && item.retcode) installs += 1
-  //   if (item.action == 'update' && item.retcode) updates += 1
-  //   if (item.action == 'uninstall' && item.retcode) removals += 1
-  // }
-  // if (!installs && !updates && !removals) return
-  // let notificationText = ''
-  // if (installs) notificationText += `Installed: ${installs} `
-  // if (updates) notificationText += `Updated: ${updates} `
-  // if (removals) notificationText += `Removed: ${removals} `
-  // notificationText += `out of ${queueLength} packages`
   SteamUtils.notify('AutoFlatpaks', notificationText)
 }) as EventListener
 
 const IntervalCheck = (() => {
   (async () => {
     if (!Backend.getAppInitialized()) return
+    // check if network connected
     let currentTime = new Date()
     if (!((currentTime.getTime() - Settings.lastCheckTimestamp.getTime())/1000/60 > Settings.updateInterval)) return
     // Time to check for updates
