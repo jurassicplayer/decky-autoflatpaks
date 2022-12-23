@@ -92,6 +92,7 @@ export const AboutPage: VFC = () => {
             <li>List of changes pulled from GH (x)</li>
           </ul>
           <ul>
+            <li>Add check for network connectivity before continuing intervalcheck</li>
             <li>Fix being unable to escape (non-focusable)scrollview/nested focusable</li>
             <li>Automatically refocus scrollview to nested focusable on down arrow for logger and about pages</li>
             <li>Revise wording on QAM information, looks awful</li>
