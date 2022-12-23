@@ -15,6 +15,9 @@ from helpers import get_home_path, get_homebrew_path, get_user
 settings = SettingsManager(name="autoflatpaks", settings_directory='{}{}settings'.format(get_homebrew_path(get_home_path(get_user())), os.sep))
 settings.read()
 
+parentPackageOverrides = {
+    'org.DolphinEmu.dolphin_emu' : 'org.DolphinEmu.dolphin-emu'
+}
 
 class Plugin:
     async def settings_read(self):
