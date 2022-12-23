@@ -105,8 +105,7 @@
             "group": "test",
             "dependsOn": [
                 "buildall",
-                "deployall",
-                "restartdecky"
+                "deployall"
             ],
             "problemMatcher": []
         },
