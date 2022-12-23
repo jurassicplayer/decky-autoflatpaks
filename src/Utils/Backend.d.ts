@@ -6,6 +6,11 @@ export interface queueData {
   }
 }
 
+export interface queueRetCode {
+  queueData: queueData
+  retcode: boolean
+}
+
 export interface cliOutput {
   output?: any
   returncode: number

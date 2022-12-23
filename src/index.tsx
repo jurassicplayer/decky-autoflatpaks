@@ -10,6 +10,7 @@ import { Settings } from "./Utils/Settings"
 import { appStates, Backend } from "./Utils/Backend"
 import { eventTypes } from "./Utils/Events"
 import { SteamUtils } from "./Utils/SteamUtils"
+import { queueRetCode } from "./Utils/Backend.d";
 
 const initPlugin = async () => {
   var settings = await Settings.loadFromLocalStorage()
@@ -41,12 +42,15 @@ const UpdateAllPackages = async () => {
 }
 
 const onQueueCompletion = ((e: CustomEvent) => {
-  let queueRetCode: {action: string, retcode: boolean}[] = e.detail.queueRetCode
+  let queueRetCode: queueRetCode[] = e.detail.queueRetCode
   let successes = 0
+  let failures: queueRetCode[] = []
   queueRetCode.map(item => {
     if (item.retcode) successes += 1
+    else failures.push(item)
   })
   let notificationText = `${successes}/${queueRetCode.length} packages modified`
+  if (failures.length > 0) console.log(failures)
   // -- More detailed notification, but takes provides maybe TOO much information at once
   // let installs = 0
   // let updates = 0

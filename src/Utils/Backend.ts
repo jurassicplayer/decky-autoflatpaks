@@ -138,7 +138,7 @@ export class Backend {
       else if (item.action == 'uninstall') { retcode = await this.UnInstallPackage(item.packageRef) }
       if (item.action == 'update')    { retcode = await this.UpdatePackage(item.packageRef) }
       if (!retcode) returncode = false
-      queueRetCode.push({action: item.action, retcode: retcode})
+      queueRetCode.push({queueData: item, retcode: retcode})
       await this.dequeueAction(item, true)
     }
     if (queueLength) this.eventBus.dispatchEvent(eventGenerator.QueueCompletion(queueCopy, queueLength, queueRetCode))

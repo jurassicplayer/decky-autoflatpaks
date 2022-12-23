@@ -1,4 +1,4 @@
-import { BatteryState, queueData } from "./Backend.d"
+import { BatteryState, queueData, queueRetCode } from "./Backend.d"
 import { FlatpakMetadata } from "./Flatpak"
 export const eventTypes = {
   BatteryStateChange: 'BatteryStateChange',
@@ -24,7 +24,7 @@ export class eventGenerator {
   public static QueueProgress(queueItem: queueData, queueLength: number, queueProgress: number) {
     return new CustomEvent(eventTypes.QueueProgress, {detail: {queueItem: queueItem, queueLength: queueLength, queueProgress: queueProgress}})
   }
-  public static QueueCompletion(queue: queueData[], queueLength: number, queueRetCode: any) {
+  public static QueueCompletion(queue: queueData[], queueLength: number, queueRetCode: queueRetCode[]) {
     return new CustomEvent(eventTypes.QueueCompletion, {detail: {queue: queue, queueLength: queueLength, queueRetCode: queueRetCode}})
   }
 }
