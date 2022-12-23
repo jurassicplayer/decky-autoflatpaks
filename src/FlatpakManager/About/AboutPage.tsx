@@ -93,6 +93,8 @@ export const AboutPage: VFC = () => {
           </ul>
           <ul>
             <li>Fix being unable to escape (non-focusable)scrollview/nested focusable</li>
+            <li>Automatically refocus scrollview to nested focusable on down arrow for logger and about pages</li>
+            <li>Revise wording on QAM information, looks awful</li>
             <li>Move logger into Advanced tab (?)</li>
             <li>Test and fix any bugginess with update all button and desyncing package list</li>
             <li>A How-To page with functionality explained in bite-sized chunks</li>
