@@ -25,8 +25,8 @@ export const AboutPage: VFC = () => {
   return (
     <ScrollPanel
       style={AboutScrollPanel}
-      focusable={false}
-      noFocusRing={true}
+      focusable={true}
+      noFocusRing={false}
       onClick={()=> {scrollView.current?.focus()}}
       onOKButton={()=> {scrollView.current?.focus()}}>
       <Focusable
@@ -66,6 +66,17 @@ export const AboutPage: VFC = () => {
           <p>
             Masking packages will prevent AutoFlatpaks from automatically updating/notifying about updates for the masked package as well as some of the dependencies (locale/debug packages). This allows users to keep a specific package version of applications without negatively impacting the user experience while auto-updating other packages and the masks WILL CARRY OVER to Discover as well.
           </p>
+          <h3>QAM Navigation</h3>
+          <p>
+            The QAM panel menu houses the settings for notifications and automatic updates available for flatpaks and consists of 5 main elements:
+            <ul>
+              <li>An auto-hiding status bar showing app state, such as queue progress, checking for updates, and other actions.</li>
+              <li>A quick access button bar for opening the package manager, checking for updates, and manually updating all packages</li>
+              <li>Settings for the interval of time to wait between automatic package checks</li>
+              <li>Settings for enabling package checks on boot and automatically installing all available package updates</li>
+              <li>Settings for notifications, allowing for Toast Only, Sound Only, Toast+Sound, or No Notification</li>
+            </ul> 
+          </p>
 
           <h2>Work In Progress</h2>
           <p>
@@ -75,30 +86,31 @@ export const AboutPage: VFC = () => {
             This area will be a place to see information about the project including:<br />
           </p>
           <ul>
-            <li>List of changes pulled from GH (?)</li>
             <li>List of changes hard-coded</li>
             <li>List of things I intend to fix</li>
             <li>List of things I intend to add</li>
+            <li>List of changes pulled from GH (x)</li>
           </ul>
           <ul>
-            <li>List unused packages (modal with list and remove unused button)</li>
-            <li>List of masks from flatpak mask</li>
-            <li>List of pins from flatpak pin</li>
+            <li>Fix being unable to escape (non-focusable)scrollview/nested focusable</li>
+            <li>Move logger into Advanced tab (?)</li>
             <li>Test and fix any bugginess with update all button and desyncing package list</li>
             <li>A How-To page with functionality explained in bite-sized chunks</li>
             <li>Add remaining space check</li>
             <li>Filter Search refinement (regex, fuzzy?)</li>
             <li>Add aggressive filtering with toggle-able option in advanced page</li>
-            <li>Toggle-able FPM tabs (Logger, Advanced, About) option in advanced page</li>
+            <li>Toggle-able FPM tabs (Logger, Advanced, About) option in advanced page (?)</li>
             <li>Add advanced page functionality</li>
             <li>Backend persistent browse filter/sort options (?)</li>
             <li>Add check if package running (?)</li>
             <li>Flathub API integration (?)</li>
             <li>Add to Steam (?)</li>
             <li>Remove minutes option</li>
-            <li>Filter Mask refinement (?)</li>
+            <li>Filter advanced mask refinement (?)</li>
             <li>Add debugging information</li>
             <li>Revise settings backend to reduce calls to python backend</li>
+            <li>List of masks from flatpak mask (x)</li>
+            <li>List of pins from flatpak pin (x)</li>
           </ul>
         </div>
       </Focusable>
