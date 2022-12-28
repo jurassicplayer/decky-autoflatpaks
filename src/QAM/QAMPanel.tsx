@@ -51,11 +51,9 @@ export const QAMPanel: VFC = () => {
       SteamUtils.notify('AutoFlatpaks', `${package_count} updates available`)
   }
   const onUpdateAllPackages = async () => {
-    var output = await Backend.UpdateAllPackages()
+    await Backend.UpdateAllPackages()
     Settings.lastCheckTimestamp = new Date()
     await Settings.saveLastCheckTimestamp()
-    if (output != undefined)
-    SteamUtils.notify('AutoFlatpaks', 'Updated all packages')
   }
 
   const onAppStateChange = ((e: CustomEvent) => {
