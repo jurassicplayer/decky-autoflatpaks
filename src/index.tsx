@@ -8,7 +8,7 @@ import { FlatpakManager } from "./FlatpakManager/FlatpakManager"
 import { QAMPanel } from "./QAM/QAMPanel"
 import { Settings } from "./Utils/Settings"
 import { appStates, Backend } from "./Utils/Backend"
-import { eventTypes } from "./Utils/Events"
+import { events } from "./Utils/Events"
 import { SteamUtils } from "./Utils/SteamUtils"
 import { queueRetCode } from "./Utils/Backend.d";
 
@@ -42,8 +42,8 @@ const UpdateAllPackages = async () => {
   }
 }
 
-const onQueueCompletion = ((e: CustomEvent) => {
-  let queueRetCode: queueRetCode[] = e.detail.queueRetCode
+const onQueueCompletion = (e: Event) => {
+  let queueRetCode = (e as events.QueueCompletionEvent).queueRetCode
   let successes = 0
   let failures: queueRetCode[] = []
   queueRetCode.map(item => {
@@ -53,34 +53,31 @@ const onQueueCompletion = ((e: CustomEvent) => {
   let notificationText = `${successes}/${queueRetCode.length} packages modified`
   if (failures.length > 0) console.log(failures)
   SteamUtils.notify('AutoFlatpaks', notificationText)
-}) as EventListener
-
-const IntervalCheck = (() => {
-  (async () => {
-    if (!Backend.getAppInitialized()) return
-    // check if network connected
-    let currentTime = new Date()
-    if (!((currentTime.getTime() - Settings.lastCheckTimestamp.getTime())/1000/60 > Settings.updateInterval)) return
-    // Time to check for updates
-    let package_count = await Backend.getPackageCount()
-    Settings.lastCheckTimestamp = currentTime
-    await Settings.saveLastCheckTimestamp()
-    if (!package_count) return
-    if (Settings.unattendedUpgradesEnabled) {
-      SteamUtils.notify('AutoFlatpaks', `Updating ${package_count} packages...`)
-      UpdateAllPackages()
-    } else {
-      SteamUtils.notify('AutoFlatpaks', `${package_count} updates available`)
-    }
-  })()
-}) as EventListener
+}
+const IntervalCheck = async () => {
+  if (!Backend.getAppInitialized()) return
+  // check if network connected
+  let currentTime = new Date()
+  if (!((currentTime.getTime() - Settings.lastCheckTimestamp.getTime())/1000/60 > Settings.updateInterval)) return
+  // Time to check for updates
+  let package_count = await Backend.getPackageCount()
+  Settings.lastCheckTimestamp = currentTime
+  await Settings.saveLastCheckTimestamp()
+  if (!package_count) return
+  if (Settings.unattendedUpgradesEnabled) {
+    SteamUtils.notify('AutoFlatpaks', `Updating ${package_count} packages...`)
+    UpdateAllPackages()
+  } else {
+    SteamUtils.notify('AutoFlatpaks', `${package_count} updates available`)
+  }
+}
 
 export default definePlugin((serverApi: ServerAPI) => {
   Backend.initBackend(serverApi)
   serverApi.routerHook.addRoute("/flatpak-manager", FlatpakManager)
   initPlugin()
-  Backend.eventBus.addEventListener(eventTypes.BatteryStateChange, IntervalCheck)
-  Backend.eventBus.addEventListener(eventTypes.QueueCompletion, onQueueCompletion)
+  Backend.eventBus.addEventListener(events.BatteryStateEvent.eType, IntervalCheck)
+  Backend.eventBus.addEventListener(events.QueueCompletionEvent.eType, onQueueCompletion)
 
   return {
     title: <div className={staticClasses.Title}>AutoFlatpaks</div>,
@@ -88,8 +85,8 @@ export default definePlugin((serverApi: ServerAPI) => {
     icon: <FaBox />,
     onDismount: () => {
       serverApi.routerHook.removeRoute('/flatpak-manager')
-      Backend.eventBus.removeEventListener(eventTypes.BatteryStateChange, IntervalCheck)
-      Backend.eventBus.removeEventListener(eventTypes.QueueCompletion, onQueueCompletion)
+      Backend.eventBus.removeEventListener(events.BatteryStateEvent.eType, IntervalCheck)
+      Backend.eventBus.removeEventListener(events.QueueCompletionEvent.eType, onQueueCompletion)
       Backend.onDismount()
     }
   }

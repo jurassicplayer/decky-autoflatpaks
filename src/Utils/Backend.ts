@@ -2,7 +2,7 @@ import { ServerAPI } from "decky-frontend-lib"
 import { FlatpakMetadata, FlatpakUnused, FlatpakUpdate, LocalFlatpakMetadata, RemoteFlatpakMetadata } from "./Flatpak"
 import { JournalEntry } from "./History"
 import { queueData, BatteryState, cliOutput } from "./Backend.d"
-import { eventGenerator } from "./Events"
+import { events } from "./Events"
 
 export enum appStates {
   initializing,
@@ -52,25 +52,25 @@ export class Backend {
   }
   static setBatteryStateChange(batteryState: BatteryState) {
     this.pseudoBatteryState = batteryState
-    this.eventBus.dispatchEvent(eventGenerator.BatteryStateChange(this.pseudoBatteryState))
+    this.eventBus.dispatchEvent(new events.BatteryStateEvent(this.pseudoBatteryState))
   }
   static setServer(server: ServerAPI) { this.serverAPI = server }
   static getServer() { return this.serverAPI }
   static setAppState(state: appStates) {
     this.appState.state = state
-    this.eventBus.dispatchEvent(eventGenerator.AppStateChange(this.appState.state))
+    this.eventBus.dispatchEvent(new events.AppStateEvent(this.appState.state))
   }
   static getAppState() { return this.appState.state }
   static getPL() { return this.packageList }
   static setPL(packageList: FlatpakMetadata[]) {
     this.packageList = packageList
-    this.eventBus.dispatchEvent(eventGenerator.PackageListChange(this.packageList))
+    this.eventBus.dispatchEvent(new events.PackageListEvent(this.packageList))
   }
   static setPLPackage(pkgref: string, metadata: any) {
     console.log('Updating single package info in packagelist for: ', pkgref)
     let idx = this.packageList.findIndex(plitem => plitem.ref == pkgref)
     this.packageList[idx] = {...this.packageList[idx], ...metadata}
-    this.eventBus.dispatchEvent(eventGenerator.PackageChange(this.packageList[idx]))
+    this.eventBus.dispatchEvent(new events.PackageInfoEvent(this.packageList[idx]))
   }
   static getQueue() { return this.queue }
   static setQueue(queue: queueData[]) { this.queue = queue }
@@ -129,7 +129,7 @@ export class Backend {
       console.log("Processing Queue Item: ", item)
       let retcode = true
       this.setQueueProgress(this.queue.length)
-      this.eventBus.dispatchEvent(eventGenerator.QueueProgress(item, queueLength, this.getQueueProgress()))
+      this.eventBus.dispatchEvent(new events.QueueProgressEvent(item, queueLength, this.getQueueProgress()))
       // Run await action: mask/unmask, install/uninstall, update
       if (item.action == 'mask')      { retcode = await this.MaskPackage(item.packageRef) }
       if (item.action == 'unmask')    { retcode = await this.UnMaskPackage(item.packageRef) }
@@ -141,7 +141,7 @@ export class Backend {
       queueRetCode.push({queueData: item, retcode: retcode})
       await this.dequeueAction(item, true)
     }
-    if (queueLength) this.eventBus.dispatchEvent(eventGenerator.QueueCompletion(queueCopy, queueLength, queueRetCode))
+    if (queueLength) this.eventBus.dispatchEvent(new events.QueueCompletionEvent(queueCopy, queueLength, queueRetCode))
     this.setAppState(appStates.idle)
     return returncode
   }

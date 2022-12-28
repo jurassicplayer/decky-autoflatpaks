@@ -6,7 +6,7 @@ import { Backend } from "../../Utils/Backend"
 import { FlatpakMetadata } from "../../Utils/Flatpak"
 import { FlatpakCard } from "./FlatpakCard"
 import { BrowsePageContainer, PackageListContainer, RefreshButton } from "./BrowsePage.css"
-import { eventTypes } from "../../Utils/Events"
+import { events } from "../../Utils/Events"
 
 export const BrowsePage: VFC = () => {
   const [browseReady,   setBrowseReady]   = useState<boolean>(false)
@@ -34,21 +34,14 @@ export const BrowsePage: VFC = () => {
       })
     }
   }
-  const onQueueCompletion = ((e: CustomEvent) => {
-    if (!e.detail.queueLength) return
-    refreshBrowse(true)
-  }) as EventListener
+  const onQueueCompletion = () => { refreshBrowse(true) }
 
   useEffect(() => {
-    console.log("Browse loaded")
-    Backend.eventBus.addEventListener(eventTypes.QueueCompletion, onQueueCompletion)
+    Backend.eventBus.addEventListener(events.QueueCompletionEvent.eType, onQueueCompletion)
     refreshBrowse(Backend.getPL().length > 0)
   },[])
   useEffect(() => { if (browseReady) {refreshBrowse(true)} }, [selectedOptions])
-  useEffect(() => () => {
-    Backend.eventBus.removeEventListener(eventTypes.QueueCompletion, onQueueCompletion)
-    console.log("Browse unloaded")
-  }, [])
+  useEffect(() => () => { Backend.eventBus.removeEventListener(events.QueueCompletionEvent.eType, onQueueCompletion) }, [])
 
   return (
     <Focusable

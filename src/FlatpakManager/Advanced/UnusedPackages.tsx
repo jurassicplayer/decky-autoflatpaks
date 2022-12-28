@@ -1,7 +1,7 @@
 import { DialogButton, Focusable } from "decky-frontend-lib"
 import { CSSProperties, useEffect, useRef, useState } from "react"
 import { appStates, Backend } from "../../Utils/Backend"
-import { eventTypes } from "../../Utils/Events"
+import { events } from "../../Utils/Events"
 import { FallbackModal } from "../../InputControls/FallbakModal"
 import { FlatpakUnused } from "../../Utils/Flatpak"
 import { ScrollPanel } from "../../InputControls/ScrollPanel"
@@ -33,11 +33,8 @@ export const UnusedPackagesModal = (props: {closeModal?: CallableFunction}) => {
   const [scrollViewReady, setScrollViewReady] = useState<boolean>(false)
   const [unusedPackageList, setUnusedPackageList] = useState<FlatpakUnused[]>([])
   const [appState, setAppState] = useState<number>(Backend.getAppState())
-  const onAppStateChange = ((e: CustomEvent) => {
-    if (!e.detail.state) return
-    setAppState(e.detail.state)
-  }) as EventListener
-  const onQueueCompletion = (() => getUnusedPackageList()) as EventListener
+  const onAppStateChange = (e: Event) => { setAppState((e as events.AppStateEvent).appState) }
+  const onQueueCompletion = () => getUnusedPackageList()
   const getUnusedPackageList = async () => {
     setScrollViewReady(false)
     let unusedPackageList = await Backend.getUnusedPackageList()
@@ -45,13 +42,13 @@ export const UnusedPackagesModal = (props: {closeModal?: CallableFunction}) => {
     setScrollViewReady(true)
   }
   useEffect(() => {
-    Backend.eventBus.addEventListener(eventTypes.AppStateChange, onAppStateChange)
-    Backend.eventBus.addEventListener(eventTypes.QueueCompletion, onQueueCompletion)
+    Backend.eventBus.addEventListener(events.AppStateEvent.eType, onAppStateChange)
+    Backend.eventBus.addEventListener(events.QueueCompletionEvent.eType, onQueueCompletion)
     getUnusedPackageList()
   }, [])
   useEffect(() => () => {
-    Backend.eventBus.removeEventListener(eventTypes.AppStateChange, onAppStateChange)
-    Backend.eventBus.addEventListener(eventTypes.QueueCompletion, onQueueCompletion)
+    Backend.eventBus.removeEventListener(events.AppStateEvent.eType, onAppStateChange)
+    Backend.eventBus.removeEventListener(events.QueueCompletionEvent.eType, onQueueCompletion)
   }, [])
   
   return (

@@ -1,30 +1,61 @@
 import { BatteryState, queueData, queueRetCode } from "./Backend.d"
 import { FlatpakMetadata } from "./Flatpak"
-export const eventTypes = {
-  BatteryStateChange: 'BatteryStateChange',
-  AppStateChange: 'AppStateChange',
-  PackageListChange: 'PackageListChange',
-  QueueProgress: 'QueueProgress',
-  QueueCompletion: 'QueueCompletion'
-}
-
-export class eventGenerator {
-  public static BatteryStateChange(batteryState: BatteryState) {
-    return new CustomEvent(eventTypes.BatteryStateChange, {detail: {batteryState: batteryState}})
+export namespace events {
+  export class AppStateEvent extends Event {
+    public static eType: string = 'AppStateEvent'
+    public appState: number
+    constructor(appState: number, eventInitDict?: EventInit) {
+      super(AppStateEvent.eType, eventInitDict)
+      this.appState = appState
+    }
   }
-  public static AppStateChange(state: number) {
-    return new CustomEvent(eventTypes.AppStateChange, {detail: {state: state}})
+  export class BatteryStateEvent extends Event {
+    public static eType: string = 'BatteryStateEvent'
+    public batteryState: BatteryState
+    constructor(batteryState: BatteryState, eventInitDict?: EventInit) {
+      super(BatteryStateEvent.eType, eventInitDict)
+      this.batteryState = batteryState
+    }
   }
-  public static PackageListChange(packageList: FlatpakMetadata[]) {
-    return new CustomEvent(eventTypes.PackageListChange, {detail: {packageList: packageList}})
+  export class PackageListEvent extends Event {
+    public static eType: string = 'PackageListEvent'
+    public packageList: FlatpakMetadata[]
+    constructor(packageList: FlatpakMetadata[], eventInitDict?: EventInit) {
+      super(PackageListEvent.eType, eventInitDict)
+      this.packageList = packageList
+    }
   }
-  public static PackageChange(packageInfo: FlatpakMetadata) {
-    return new CustomEvent(packageInfo.ref, {detail: {packageInfo: packageInfo}})
+  export class PackageInfoEvent extends Event {
+    public eType: string
+    public packageInfo: FlatpakMetadata
+    constructor(packageInfo: FlatpakMetadata, eventInitDict?: EventInit) {
+      super(packageInfo.ref, eventInitDict)
+      this.eType = packageInfo.ref
+      this.packageInfo = packageInfo
+    }
   }
-  public static QueueProgress(queueItem: queueData, queueLength: number, queueProgress: number) {
-    return new CustomEvent(eventTypes.QueueProgress, {detail: {queueItem: queueItem, queueLength: queueLength, queueProgress: queueProgress}})
+  export class QueueProgressEvent extends Event {
+    public static eType: string = 'QueueProgressEvent'
+    public queueItem: queueData
+    public queueLength: number
+    public queueProgress: number
+    constructor(queueItem: queueData, queueLength: number, queueProgress: number, eventInitDict?: EventInit) {
+      super(QueueProgressEvent.eType, eventInitDict)
+      this.queueItem = queueItem
+      this.queueLength = queueLength
+      this.queueProgress = queueProgress
+    }
   }
-  public static QueueCompletion(queue: queueData[], queueLength: number, queueRetCode: queueRetCode[]) {
-    return new CustomEvent(eventTypes.QueueCompletion, {detail: {queue: queue, queueLength: queueLength, queueRetCode: queueRetCode}})
+  export class QueueCompletionEvent extends Event {
+    public static eType: string = 'QueueCompletionEvent'
+    public queue: queueData[]
+    public queueLength: number
+    public queueRetCode: queueRetCode[]
+    constructor(queue: queueData[], queueLength: number, queueRetCode: queueRetCode[], eventInitDict?: EventInit) {
+      super(QueueCompletionEvent.eType, eventInitDict)
+      this.queue = queue
+      this.queueLength = queueLength
+      this.queueRetCode = queueRetCode
+    }
   }
 }

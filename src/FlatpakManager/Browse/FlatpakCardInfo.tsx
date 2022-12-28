@@ -7,7 +7,7 @@ import { queueData } from "../../Utils/Backend.d"
 import { FlatpakMetadata } from "../../Utils/Flatpak"
 import { CardButton, CardInfo } from "./FlatpakCardInfo.css"
 import { FallbackModal } from "../../InputControls/FallbakModal"
-import { eventTypes } from "../../Utils/Events"
+import { events } from "../../Utils/Events"
 
 
 export const FlatpakInfoModal: VFC<{data: FlatpakMetadata, closeModal?: CallableFunction}> = (props) => {
@@ -36,17 +36,11 @@ export const FlatpakCardInfo: VFC<{data: FlatpakMetadata, focus: boolean}> = (pr
     setUpdateToggled(Backend.getQueue().filter(item => item.packageRef == packageInfo.ref && (item.action.includes('update') || item.action.includes('update'))).length > 0 || false)
     setInstallToggled(Backend.getQueue().filter(item => item.packageRef == packageInfo.ref && (item.action.includes('install') || item.action.includes('uninstall'))).length > 0 || false)
   }
-  const onPackageInfoChange = ((e: CustomEvent) => {
-    if (!e.detail.packageInfo) return
-    console.log('Event (', packageInfo.ref,'): ', e.detail.packageInfo)
-    setPackageInfo(e.detail.packageInfo)
+  const onPackageInfoChange = (e: Event) => {
+    setPackageInfo((e as events.PackageInfoEvent).packageInfo)
     resetToggles()
-  }) as EventListener
-  const onAppStateChange = ((e: CustomEvent) => {
-    if (!e.detail.state) return
-    console.log('Event (AppState): ', packageInfo.ref)
-    setAppState(e.detail.state)
-  }) as EventListener
+  }
+  const onAppStateChange = (e: Event) => { setAppState((e as events.AppStateEvent).appState) }
 
   const queueActions: {[key: string]: queueData} = {
     mask:       { action: 'mask', packageRef: packageInfo.ref },
@@ -58,16 +52,14 @@ export const FlatpakCardInfo: VFC<{data: FlatpakMetadata, focus: boolean}> = (pr
 
   useEffect(() => {
     resetToggles()
-    console.log("Card info loaded: ", packageInfo.ref)
     // Register listeners
     Backend.eventBus.addEventListener(packageInfo.ref, onPackageInfoChange)
-    Backend.eventBus.addEventListener(eventTypes.AppStateChange, onAppStateChange)
+    Backend.eventBus.addEventListener(events.AppStateEvent.eType, onAppStateChange)
   }, [])
   useEffect(() => () => {
     // Unregister listeners
     Backend.eventBus.removeEventListener(packageInfo.ref, onPackageInfoChange)
-    Backend.eventBus.removeEventListener(eventTypes.AppStateChange, onAppStateChange)
-    console.log("Card info unloaded: ", packageInfo.ref)
+    Backend.eventBus.removeEventListener(events.AppStateEvent.eType, onAppStateChange)
   }, [])
 
   return (

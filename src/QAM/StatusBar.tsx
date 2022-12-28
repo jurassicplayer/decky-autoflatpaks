@@ -2,45 +2,36 @@ import { useEffect, useState } from "react"
 import { PanelSectionRow } from "decky-frontend-lib"
 import { appStates, Backend } from "../Utils/Backend"
 import { StatusBarCSS } from "./StatusBar.css"
-import { eventTypes } from "../Utils/Events"
+import { events } from "../Utils/Events"
 
 export const StatusBar = () => {
-  const onQueueProgress = ((e: CustomEvent) => {
-    if (!e.detail.queueLength) return
-    console.log('Event (QueueProgress): ', e.detail)
+  const onQueueProgress = (e: Event) => {
+    let event = e as events.QueueProgressEvent
     setQueueProgress({
-      currentItem: e.detail.queueItem,
-      queueProgress: Number(e.detail.queueProgress),
-      queueLength: Number(e.detail.queueLength)
+      currentItem: event.queueItem,
+      queueProgress: event.queueProgress,
+      queueLength: event.queueLength
     })
-  }) as EventListener
-  const onQueueCompletion = ((e: CustomEvent) => {
-    if (!e.detail.queueLength) return
-    console.log('Event (QueueCompletion): ', e.detail)
+  }
+  const onQueueCompletion = () => {
     setQueueProgress({
       currentItem: undefined,
       queueProgress: undefined,
       queueLength: undefined
     })
-  }) as EventListener
-  const onAppStateChange = ((e: CustomEvent) => {
-    if (!e.detail.state) return
-    console.log('Event (AppState): Status bar')
-    setAppState(e.detail.state)
-  }) as EventListener
+  }
+  const onAppStateChange = (e: Event) => { setAppState((e as events.AppStateEvent).appState) }
 
   useEffect(() => {
-    console.log("Status bar loaded")
     // Register listener
-    Backend.eventBus.addEventListener(eventTypes.QueueProgress, onQueueProgress)
-    Backend.eventBus.addEventListener(eventTypes.QueueCompletion, onQueueCompletion)
-    Backend.eventBus.addEventListener(eventTypes.AppStateChange, onAppStateChange)
+    Backend.eventBus.addEventListener(events.QueueProgressEvent.eType, onQueueProgress)
+    Backend.eventBus.addEventListener(events.QueueCompletionEvent.eType, onQueueCompletion)
+    Backend.eventBus.addEventListener(events.AppStateEvent.eType, onAppStateChange)
   }, [])
   useEffect(() => () => {
-    Backend.eventBus.removeEventListener(eventTypes.QueueProgress, onQueueProgress)
-    Backend.eventBus.removeEventListener(eventTypes.QueueCompletion, onQueueCompletion)
-    Backend.eventBus.removeEventListener(eventTypes.AppStateChange, onAppStateChange)
-    console.log("Status bar unloaded")
+    Backend.eventBus.removeEventListener(events.QueueProgressEvent.eType, onQueueProgress)
+    Backend.eventBus.removeEventListener(events.QueueCompletionEvent.eType, onQueueCompletion)
+    Backend.eventBus.removeEventListener(events.AppStateEvent.eType, onAppStateChange)
   }, [])
 
   const [appState, setAppState] = useState<number>(Backend.getAppState())

@@ -16,7 +16,7 @@ import { appStates, Backend } from "../Utils/Backend"
 import { SteamUtils } from "../Utils/SteamUtils"
 import { FlatpakManagerButtons } from "./QAMPanel.css"
 import { StatusBar } from "./StatusBar"
-import { eventTypes } from "../Utils/Events"
+import { events } from "../Utils/Events"
 
 export const QAMPanel: VFC = () => {
   //#region Helper Functions
@@ -56,11 +56,7 @@ export const QAMPanel: VFC = () => {
     await Settings.saveLastCheckTimestamp()
   }
 
-  const onAppStateChange = ((e: CustomEvent) => {
-    if (!e.detail.state) return
-    console.log('Event (AppState): QAM Panel')
-    setAppState(e.detail.state)
-  }) as EventListener
+  const onAppStateChange = (e: Event) => { setAppState((e as events.AppStateEvent).appState) }
   const onDaySpinnerUp   = () => { setDayDuration(dayDuration+1) }
   const onDaySpinnerDown = () => { if (dayDuration) setDayDuration(dayDuration-1) }
   const onHrsSpinnerUp   = () => { if (hourDuration < 24) setHourDuration(hourDuration+1) }
@@ -73,12 +69,11 @@ export const QAMPanel: VFC = () => {
   useEffect(() => {
     console.log("QAM Panel loaded")
     // Register listener
-    Backend.eventBus.addEventListener(eventTypes.AppStateChange, onAppStateChange)
+    Backend.eventBus.addEventListener(events.AppStateEvent.eType, onAppStateChange)
     setQAMReady(true)
   }, [])
   useEffect(() => () => {
-    Backend.eventBus.removeEventListener(eventTypes.AppStateChange, onAppStateChange)
-    console.log("QAM Panel unloaded")
+    Backend.eventBus.removeEventListener(events.AppStateEvent.eType, onAppStateChange)
   }, [])
   useEffect(() => {
     if (!QAMReady) return
