@@ -22,11 +22,11 @@ export const BrowsePage: VFC = () => {
   const refreshBrowse = async (softRefresh?: boolean) => {
     setBrowseReady(false)
     if (softRefresh) {
-      console.debug('Soft Refresh')
+      console.debug('[AutoFlatpaks] Soft Refresh')
       setPackageList(Backend.getPL())
       setTimeout(() => setBrowseReady(true), 50)
     } else {
-      console.debug('Hard Refresh')
+      console.debug('[AutoFlatpaks] Hard Refresh')
       await Backend.getPackageList().then((packageList) => {
         if (packageList == undefined) return
         setPackageList(packageList)
@@ -97,7 +97,7 @@ export const BrowsePage: VFC = () => {
               }
               var aBytes = Number(aSize[0]) * sizeRatio[aSize[1]]
               var bBytes = Number(bSize[0]) * sizeRatio[bSize[1]]
-              if (isNaN(aBytes) || isNaN(bBytes)) console.warn('Failed size conversion: ', aSize, bSize)
+              if (isNaN(aBytes) || isNaN(bBytes)) console.warn('[AutoFlatpaks] Failed size conversion: ', aSize, bSize)
               if (selectedOptions.sortOrder == 'ssmall') {
                 return aBytes - bBytes
               }
