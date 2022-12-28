@@ -71,9 +71,13 @@ export const UnusedPackagesModal = (props: {closeModal?: CallableFunction}) => {
         <ScrollPanel
           style={UnusedListScrollPanel}
           focusable={true}
+          autoFocus={true}
           noFocusRing={!scrollViewReady}
-          onClick={()=> {scrollView.current?.focus()}}
-          onOKButton={()=> {scrollView.current?.focus()}}>
+          onClick={()=> scrollView.current?.focus()}
+          onOKButton={()=> scrollView.current?.focus()}
+          onButtonDown={(e: CustomEvent)=> {
+            if (e.detail.button == 10) scrollView.current?.focus()
+          }}>
           { scrollViewReady
           ? <Focusable
               style={{

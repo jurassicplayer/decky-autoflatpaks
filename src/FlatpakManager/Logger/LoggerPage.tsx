@@ -8,7 +8,7 @@ import { LogEntry } from "./LogEntry"
 import { HistoryLogContainer, HistoryReadyScrollPanel, HistoryNotReadyScrollPanel } from "./LoggerPage.css"
 
 export const LoggerPage: VFC = () => {
-  const historyLogView = useRef<HTMLDivElement>(null)
+  const scrollView = useRef<HTMLDivElement>(null)
   const [history, setHistory] = useState<JournalEntry[]>([])
   const [historyReady, setHistoryReady] = useState<boolean>(false)
   const refreshHistory = () => {
@@ -30,15 +30,19 @@ export const LoggerPage: VFC = () => {
     <ScrollPanel
       style={historyReady ? HistoryReadyScrollPanel : HistoryNotReadyScrollPanel}
       focusable={true}
+      autoFocus={true}
       noFocusRing={false}
-      onClick={()=> {historyLogView.current?.focus()}}
-      onOKButton={()=> {historyLogView.current?.focus()}}>
+      onClick={()=> scrollView.current?.focus()}
+      onOKButton={()=> scrollView.current?.focus()}
+      onButtonDown={(e: CustomEvent)=> {
+        if (e.detail.button == 10) scrollView.current?.focus()
+      }}>
       <Focusable
         style={HistoryLogContainer}
         // @ts-ignore
         focusableIfNoChildren={true}
         noFocusRing={true}
-        ref={historyLogView}>
+        ref={scrollView}>
         { historyReady
         ? history
           .filter((entry) => entry.MESSAGE.includes('system:'))
