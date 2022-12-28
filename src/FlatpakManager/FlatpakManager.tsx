@@ -1,5 +1,5 @@
 import { Focusable, Tabs } from "decky-frontend-lib"
-import { VFC, useEffect, useState } from "react"
+import { VFC, useState } from "react"
 import { AboutPage } from "./About/AboutPage"
 import { AdvancedPage } from "./Advanced/AdvancedPage"
 import { BrowsePage } from "./Browse/BrowsePage"
@@ -7,10 +7,6 @@ import { LoggerPage } from "./Logger/LoggerPage"
 
 export const FlatpakManager: VFC = () => {
   const [currentTabRoute, setCurrentTabRoute] = useState<string>("browser")
-  
-  useEffect(() => {
-    console.log("On component loaded")
-  },[])
 
   return (
     <Focusable style={{minWidth: "100%", minHeight: "100%"}}>

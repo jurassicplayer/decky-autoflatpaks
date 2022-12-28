@@ -1,4 +1,4 @@
-import { useEffect, useState, VFC } from "react"
+import { useState, VFC } from "react"
 import { useInView } from "react-intersection-observer"
 import { Card } from "./FlatpakCard.css"
 import { FlatpakMetadata } from "../../Utils/Flatpak"
@@ -12,12 +12,12 @@ export const FlatpakCard: VFC<{data: FlatpakMetadata}> = (props) => {
   })
   const [focus, setFocus] = useState<boolean>(false)
   
-  useEffect(() => {
-    console.log("Card loaded: ", props.data.ref)
-  }, [])
-  useEffect(() => () => {
-    console.log("Card unloaded: ", props.data.ref)
-  }, [])
+  // useEffect(() => {
+  //   console.log("Card loaded: ", props.data.ref)
+  // }, [])
+  // useEffect(() => () => {
+  //   console.log("Card unloaded: ", props.data.ref)
+  // }, [])
 
   return (
     <div

@@ -18,7 +18,7 @@ export class Settings {
         else if (this[key] instanceof Date) this[key] = new Date((await Backend.getSetting(key, this[key])).toString())
       } catch (error) {
         returncode = false
-        console.log('Failed to load setting: ', key)
+        console.debug('[AutoFlatpaks] Failed to load setting: ', key)
       }
     }
     return returncode

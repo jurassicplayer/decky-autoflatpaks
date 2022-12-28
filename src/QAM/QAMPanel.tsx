@@ -67,7 +67,6 @@ export const QAMPanel: VFC = () => {
 
   //#region Effects
   useEffect(() => {
-    console.log("QAM Panel loaded")
     // Register listener
     Backend.eventBus.addEventListener(events.AppStateEvent.eType, onAppStateChange)
     setQAMReady(true)

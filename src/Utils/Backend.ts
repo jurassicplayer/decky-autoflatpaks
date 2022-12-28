@@ -67,7 +67,6 @@ export class Backend {
     this.eventBus.dispatchEvent(new events.PackageListEvent(this.packageList))
   }
   static setPLPackage(pkgref: string, metadata: any) {
-    console.log('Updating single package info in packagelist for: ', pkgref)
     let idx = this.packageList.findIndex(plitem => plitem.ref == pkgref)
     this.packageList[idx] = {...this.packageList[idx], ...metadata}
     this.eventBus.dispatchEvent(new events.PackageInfoEvent(this.packageList[idx]))
@@ -108,13 +107,11 @@ export class Backend {
   static async queueAction(queueData: queueData): Promise<boolean> {
     if (this.getAppState() != appStates.idle) return false
     this.queue.push(queueData)
-    console.log("queueAction: ", queueData, this.queue)
     return true
   }
   static async dequeueAction(queueData: queueData, processQueue?: boolean): Promise<boolean> {
     if (this.getAppState() != appStates.idle && !processQueue) return false
     this.queue = this.queue.filter(item => !(item.action == queueData.action && item.packageRef == queueData.packageRef))
-    console.log("dequeueAction: ", queueData, this.queue)
     return true
   }
   static async ProcessQueue(): Promise<boolean> {
@@ -126,7 +123,7 @@ export class Backend {
     let queueLength = this.getQueueLength()
     let queueRetCode = []
     for (let item of this.queue) {
-      console.log("Processing Queue Item: ", item)
+      console.debug("[AutoFlatpaks] Processing Queue Item: ", item)
       let retcode = true
       this.setQueueProgress(this.queue.length)
       this.eventBus.dispatchEvent(new events.QueueProgressEvent(item, queueLength, this.getQueueProgress()))
@@ -141,7 +138,10 @@ export class Backend {
       queueRetCode.push({queueData: item, retcode: retcode})
       await this.dequeueAction(item, true)
     }
-    if (queueLength) this.eventBus.dispatchEvent(new events.QueueCompletionEvent(queueCopy, queueLength, queueRetCode))
+    if (queueLength) {
+      this.eventBus.dispatchEvent(new events.QueueCompletionEvent(queueCopy, queueLength, queueRetCode))
+      console.debug("[AutoFlatpaks] Queue Complete: ", queueRetCode)
+    }
     this.setAppState(appStates.idle)
     return returncode
   }
@@ -175,13 +175,13 @@ export class Backend {
         }
         return {...lplitem, ...default_metadata, ...upl_metadata}
       })
-      console.log('PL (LPL+U): ', output)
+      //console.log('PL (LPL+U): ', output)
 
       // Add remote packages not in list
       if (!localOnly && rpl) {
         let rplitems = rpl.filter((rplitem) => !lpl.map((lplitem) => lplitem.ref).includes(rplitem.ref))
         for (let rplitem of rplitems) { output.push({ ...rplitem, installed: false, updateable: false, masked: false }) }
-        console.log('PL (LPL+U+RPL): ', output)
+        //console.log('PL (LPL+U+RPL): ', output)
       }
       
       // Add mask data to list
@@ -190,7 +190,7 @@ export class Backend {
         if (item.parent && mpl.includes(item.parent)) {item.parentMasked = true}
         return item
       })
-      console.log('PL (LPL+U+RPL+MPL): ', output)
+      //console.log('PL (LPL+U+RPL+MPL): ', output)
     })
     this.setPL(output)
     this.setAppState(appStates.idle)
@@ -296,7 +296,7 @@ export class Backend {
         extraParameters['removeUnused'] = true
       }
       if (!pkgAction) {
-        console.log(`[${rpl[idx].ref}] Unknown op: ${uplitem.op}`)
+        console.debug(`[AutoFlatpaks] ${rpl[idx].ref} Unknown op: ${uplitem.op}`)
         continue
       }
       this.queueAction({action: pkgAction, packageRef: rpl[idx].ref, extraParameters: extraParameters})

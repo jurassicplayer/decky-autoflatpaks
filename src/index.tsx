@@ -36,7 +36,7 @@ const checkOnBoot = () => {
 const UpdateAllPackages = async () => {
   let success = await Backend.UpdateAllPackages()
   if (!success) {
-    console.log('Failed to auto-update all packages') // , retrying in 5 seconds...')
+    // console.warn('[AutoFlatpaks] Failed to auto-update all packages') // , retrying in 5 seconds...')
     // Cleaning up setTimeout requires setting a variable and then calling clearTimeout(timeoutID)
     // setTimeout(UpdateAllPackages, 5000)
   }
@@ -51,7 +51,7 @@ const onQueueCompletion = (e: Event) => {
     else failures.push(item)
   })
   let notificationText = `${successes}/${queueRetCode.length} packages modified`
-  if (failures.length > 0) console.log(failures)
+  if (failures.length > 0) console.warn('[AutoFlatpaks] Failed:', failures)
   SteamUtils.notify('AutoFlatpaks', notificationText)
 }
 const IntervalCheck = async () => {

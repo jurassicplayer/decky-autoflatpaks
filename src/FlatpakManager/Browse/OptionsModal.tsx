@@ -29,7 +29,6 @@ export const OptionsModal = (props: {selectedOptions: FPMOptions, setSelectedOpt
       || newOptions.filterMask != currentOptions.filterMask
       || newOptions.sortOrder != currentOptions.sortOrder
       ) {
-        console.log('Setting new options: ', newOptions)
         setCurrentOptions(newOptions)
         props.setSelectedOptions(newOptions)
       }

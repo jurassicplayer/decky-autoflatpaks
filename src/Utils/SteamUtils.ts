@@ -120,7 +120,7 @@ export class SteamUtils {
     if (toast.showToast === undefined) toast.showToast = true
     // Check for system notification settings
     if ((settingsStore.settings.bDisableAllToasts && !toast.critical) || (settingsStore.settings.bDisableToastsInGame && !toast.critical && NotificationStore.BIsUserInGame())) {
-      console.log("[AutoFlatpaks] Disable/hide non-critical turned on, skipping notification")
+      console.debug("[AutoFlatpaks] Disable/hide non-critical turned on, skipping notification")
       return
     }
     if(toast.playSound) audioModule.PlayNavSound(toast.sound)
