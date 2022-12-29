@@ -97,6 +97,7 @@ export const AboutPage: VFC = () => {
             <li>Highlight package and then change tabs has odd visual glitching</li>
             <li>Persist highlighted button while scrolling package list</li>
             <li>Add check for network connectivity before continuing intervalcheck</li>
+            <li>Show number of updateable packages in status bar (?)</li>
             <li>Revise wording on QAM information, looks awful</li>
             <li>Add remaining space check</li>
             <li>Move logger into Advanced tab (?)</li>
