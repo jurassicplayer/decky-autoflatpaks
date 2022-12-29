@@ -91,11 +91,11 @@ export const AboutPage: VFC = () => {
           </p>
           <ul>
             <li>List of changes hard-coded</li>
-            <li>List of things I intend to fix</li>
-            <li>List of things I intend to add</li>
-            <li>List of changes pulled from GH (x)</li>
+            <li>List of things I intend to fix/add/remove</li>
           </ul>
           <ul>
+            <li>Highlight package and then change tabs has odd visual glitching</li>
+            <li>Persist highlighted button while scrolling package list</li>
             <li>Add check for network connectivity before continuing intervalcheck</li>
             <li>Revise wording on QAM information, looks awful</li>
             <li>Add remaining space check</li>
@@ -111,6 +111,7 @@ export const AboutPage: VFC = () => {
             <li>Add check if package running (? Doesn't seem to cause problems when some are running)</li>
             <li>Fix being unable to escape (non-focusable)scrollview/nested focusable (?)</li>
             <li>Filter advanced mask refinement (?)</li>
+            <li>Rename Options to list options or something (x?)</li>
             <li>Flathub API integration (x)</li>
             <li>List of masks from flatpak mask (x)</li>
             <li>List of pins from flatpak pin (x)</li>
