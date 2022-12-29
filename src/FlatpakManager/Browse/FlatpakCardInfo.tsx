@@ -66,7 +66,8 @@ export const FlatpakCardInfo: VFC<{data: FlatpakMetadata, focus: boolean}> = (pr
     <Focusable style={CardInfo.container}>
       <DialogButton
         style={props.focus ? CardInfo.focus : CardInfo.blur}
-        onClick={() => {showModal(<FlatpakInfoModal data={props.data} />)}}>
+        onOKActionDescription='PkgInfo'
+        onClick={() => showModal(<FlatpakInfoModal data={props.data} />)}>
         <div>{packageInfo.name}</div>
         <div>{packageInfo.description}</div>
       </DialogButton>
@@ -77,7 +78,7 @@ export const FlatpakCardInfo: VFC<{data: FlatpakMetadata, focus: boolean}> = (pr
           toggledCSS={CardButton.maskToggled}
           disabled={appState != appStates.idle}
           value={maskToggled}
-          onOKActionDescription={maskToggled ? 'Dequeue' : 'Queue' }
+          onOKActionDescription={maskToggled ? 'Dequeue' : 'Enqueue' }
           onClick={()=>{
             if (appState != appStates.idle) return
             setMaskToggled(!maskToggled)
@@ -92,7 +93,7 @@ export const FlatpakCardInfo: VFC<{data: FlatpakMetadata, focus: boolean}> = (pr
             toggledCSS={CardButton.installToggled}
             disabled={installToggled || appState != appStates.idle}
             value={updateToggled}
-            onOKActionDescription={updateToggled ? 'Dequeue' : 'Queue' }
+            onOKActionDescription={updateToggled ? 'Dequeue' : 'Enqueue' }
             onClick={()=>{
               if (appState != appStates.idle) return
               setUpdateToggled(!updateToggled)
@@ -106,7 +107,7 @@ export const FlatpakCardInfo: VFC<{data: FlatpakMetadata, focus: boolean}> = (pr
         <ToggleButton toggledCSS={packageInfo.installed ? CardButton.uninstallToggled : CardButton.installToggled}
           disabled={updateToggled || appState != appStates.idle}
           value={installToggled}
-          onOKActionDescription={installToggled ? 'Dequeue' : 'Queue' }
+          onOKActionDescription={installToggled ? 'Dequeue' : 'Enqueue' }
           onClick={()=>{
             if (appState != appStates.idle) return
             setInstallToggled(!installToggled)

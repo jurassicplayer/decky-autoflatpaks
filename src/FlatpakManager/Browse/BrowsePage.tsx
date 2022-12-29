@@ -49,7 +49,7 @@ export const BrowsePage: VFC = () => {
       onOptionsButton={()=>{showModal(<OptionsModal selectedOptions={selectedOptions} setSelectedOptions={setSelectedOptions} />, findSP())}}
       onOptionsActionDescription="Options"
       onSecondaryButton={()=>Backend.ProcessQueue()}
-      onSecondaryActionDescription="Apply">
+      onSecondaryActionDescription="Apply Queue">
       { browseReady
       ? <Focusable
         style={PackageListContainer}>

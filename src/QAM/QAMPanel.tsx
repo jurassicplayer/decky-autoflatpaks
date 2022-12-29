@@ -92,9 +92,20 @@ export const QAMPanel: VFC = () => {
       <StatusBar />
       <PanelSectionRow>
         <Focusable style={{ display: "flex" }} flow-children="horizontal">
-          <DialogButton style={FlatpakManagerButtons} onClick={onOpenFlatpakManager}><FaBoxOpen /></DialogButton>
-          <DialogButton style={FlatpakManagerButtons} disabled={appState != appStates.idle} onClick={onCheckForUpdates}><FaRedoAlt /></DialogButton>
-          <DialogButton style={FlatpakManagerButtons} disabled={appState != appStates.idle} onClick={onUpdateAllPackages}><FaDownload /></DialogButton>
+          <DialogButton
+            style={FlatpakManagerButtons}
+            onClick={onOpenFlatpakManager}
+            onOKActionDescription='Manage Packages'><FaBoxOpen /></DialogButton>
+          <DialogButton
+            style={FlatpakManagerButtons}
+            disabled={appState != appStates.idle}
+            onClick={onCheckForUpdates}
+            onOKActionDescription='Check Updates&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'><FaRedoAlt /></DialogButton>
+          <DialogButton
+            style={FlatpakManagerButtons}
+            disabled={appState != appStates.idle}
+            onClick={onUpdateAllPackages}
+            onOKActionDescription='Update Packages&nbsp;&nbsp;'><FaDownload /></DialogButton>
         </Focusable>
       </PanelSectionRow>
 
