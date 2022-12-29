@@ -27,7 +27,7 @@ export const AboutPage: VFC = () => {
       style={AboutScrollPanel}
       focusable={true}
       autoFocus={true}
-      noFocusRing={false}
+      noFocusRing={true}
       onClick={()=> scrollView.current?.focus()}
       onOKButton={()=> scrollView.current?.focus()}
       onButtonDown={(e: CustomEvent)=> {
