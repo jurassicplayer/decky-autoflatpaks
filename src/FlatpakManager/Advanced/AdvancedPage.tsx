@@ -4,7 +4,7 @@ import { UnusedPackagesModal } from "./UnusedPackages"
 
 export const AdvancedPage: VFC = () => {
   return (
-    <div>
+    <Focusable>
       <Focusable>
         <DialogButton
           onClick={() => {showModal(<UnusedPackagesModal/>, findSP(), {popupHeight: 100})}}>List Unused Packages</DialogButton>
@@ -19,6 +19,6 @@ export const AdvancedPage: VFC = () => {
         <li>Toggle for aggressive filtering for app (BaseApp, BaseExtension) (?)</li>
         <li>Permissions Manager (GameMode integrated Flatseal maybe?)</li>
       </ul>
-    </div>
+    </Focusable>
   )
 }

@@ -26,7 +26,7 @@ export const LoggerPage: VFC = () => {
     <ScrollPanel
       style={historyReady ? HistoryReadyScrollPanel : HistoryNotReadyScrollPanel}
       focusable={true}
-      autoFocus={true}
+      autoFocus={false}
       noFocusRing={true}
       onClick={()=> scrollView.current?.focus()}
       onOKButton={()=> scrollView.current?.focus()}

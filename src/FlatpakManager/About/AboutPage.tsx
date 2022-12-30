@@ -26,7 +26,7 @@ export const AboutPage: VFC = () => {
     <ScrollPanel
       style={AboutScrollPanel}
       focusable={true}
-      autoFocus={true}
+      autoFocus={false}
       noFocusRing={true}
       onClick={()=> scrollView.current?.focus()}
       onOKButton={()=> scrollView.current?.focus()}
@@ -94,7 +94,7 @@ export const AboutPage: VFC = () => {
             <li>List of things I intend to fix/add/remove</li>
           </ul>
           <ul>
-            <li>Highlight package and then change tabs has odd visual glitching</li>
+            <li>Highlight package and then change tabs has odd visual glitching, only on going right, something to do with focus?</li>
             <li>Persist highlighted button while scrolling package list</li>
             <li>Add check for network connectivity before continuing intervalcheck</li>
             <li>Show number of updateable packages in status bar (?)</li>
