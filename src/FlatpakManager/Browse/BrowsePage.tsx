@@ -53,7 +53,7 @@ export const BrowsePage: VFC = () => {
       { browseReady
       ? <Focusable
         style={PackageListContainer}>
-        <DialogButton style={RefreshButton} onClick={()=>refreshBrowse()}><FaRedoAlt /></DialogButton>
+        <DialogButton style={RefreshButton} onOKActionDescription="Refresh" onClick={()=>refreshBrowse()}><FaRedoAlt /></DialogButton>
         {packageList
           /*  Filter out packages with no description
               primarily because there are few, if any, relevant packages that people would install
