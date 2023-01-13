@@ -96,7 +96,8 @@ export const AboutPage: VFC = () => {
           <ul>
             <li>Highlight package and then change tabs has odd visual glitching, only on going right, something to do with focus?</li>
             <li>Persist highlighted button while scrolling package list</li>
-            <li>Add check for network connectivity before continuing intervalcheck</li>
+            <li>Custom flatpak install path: https://github.com/flatpak/flatpak/issues/1224#issuecomment-348665064</li>
+            <li>Add check for network connectivity before continuing intervalcheck (?)</li>
             <li>Show number of updateable packages in status bar (?)</li>
             <li>Revise wording on QAM information, looks awful</li>
             <li>Add remaining space check</li>
