@@ -86,13 +86,8 @@ export const UnusedPackagesModal = (props: {closeModal?: CallableFunction}) => {
               // @ts-ignore
               focusableIfNoChildren={true}
               noFocusRing={true}
-              ref={scrollView}
-              onSecondaryButton={()=>{setScrollViewReady(!scrollView)}}>
-                { unusedPackageList.map((item) => {
-                  return (
-                    <div>{item.application} {item.branch}</div>
-                  )
-                })}
+              ref={scrollView}>
+              { unusedPackageList.map((item) => <div>{item.application} {item.branch}</div>) }
             </Focusable>
           : <div style={{height: "18em"}}>Searching for unused packages...</div>
           }
