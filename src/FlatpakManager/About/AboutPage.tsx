@@ -94,11 +94,11 @@ export const AboutPage: VFC = () => {
             <li>List of things I intend to fix/add/remove</li>
           </ul>
           <ul>
+            <li>Custom flatpak install path: Manage symlinked ~/.var/app</li>
             <li>Highlight package and then change tabs has odd visual glitching, only on going right, something to do with focus?</li>
             <li>Persist highlighted button while scrolling package list</li>
-            <li>Custom flatpak install path: https://github.com/flatpak/flatpak/issues/1224#issuecomment-348665064</li>
+            <li>Change CSS to be more friendly with CSSLoader themes instead of my own thing</li>
             <li>Add check for network connectivity before continuing intervalcheck (?)</li>
-            <li>Show number of updateable packages in status bar (?)</li>
             <li>Revise wording on QAM information, looks awful</li>
             <li>Add remaining space check</li>
             <li>Move logger into Advanced tab (?)</li>
