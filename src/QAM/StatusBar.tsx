@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react"
-import { PanelSectionRow } from "decky-frontend-lib"
+import { DialogButton, findSP, PanelSectionRow, showModal } from "decky-frontend-lib"
 import { appStates, Backend } from "../Utils/Backend"
 import { StatusBarCSS } from "./StatusBar.css"
 import { events } from "../Utils/Events"
+import { UpdateablePackagesModal } from "./UpdateablePackages"
 
 export const StatusBar = () => {
+  const onUpdateList = (e: Event) => {
+    let event = e as events.UpdateListEvent
+    setUpdateList(event.updateList)
+  }
   const onQueueProgress = (e: Event) => {
     let event = e as events.QueueProgressEvent
     setQueueProgress({
@@ -24,16 +29,20 @@ export const StatusBar = () => {
 
   useEffect(() => {
     // Register listener
+    Backend.eventBus.addEventListener(events.UpdateListEvent.eType, onUpdateList)
     Backend.eventBus.addEventListener(events.QueueProgressEvent.eType, onQueueProgress)
     Backend.eventBus.addEventListener(events.QueueCompletionEvent.eType, onQueueCompletion)
     Backend.eventBus.addEventListener(events.AppStateEvent.eType, onAppStateChange)
   }, [])
   useEffect(() => () => {
+    Backend.eventBus.removeEventListener(events.UpdateListEvent.eType, onUpdateList)
     Backend.eventBus.removeEventListener(events.QueueProgressEvent.eType, onQueueProgress)
     Backend.eventBus.removeEventListener(events.QueueCompletionEvent.eType, onQueueCompletion)
     Backend.eventBus.removeEventListener(events.AppStateEvent.eType, onAppStateChange)
   }, [])
 
+  const [updateList, setUpdateList] = useState<string[]>(Backend.getUpdateList())
+  const [hover, setHover] = useState<boolean>(false)
   const [appState, setAppState] = useState<number>(Backend.getAppState())
   const [queueProgress, setQueueProgress] = useState<{[key: string]: any}>({
     currentItem: Backend.getQueue()[0],
@@ -43,7 +52,11 @@ export const StatusBar = () => {
 
   let StatusText = ""
   let CSS = StatusBarCSS.Default
-  if (appState == appStates.checkingForUpdates) {
+  let ShowUpdateList = (appState == appStates.idle && updateList.length > 0)
+  if (ShowUpdateList) {
+    StatusText = `${updateList.length} update${updateList.length > 1 ? 's' : ''} available`
+    CSS = StatusBarCSS.CheckForUpdates
+  } else if (appState == appStates.checkingForUpdates) {
     StatusText = "Checking for updates..."
     CSS = StatusBarCSS.CheckForUpdates
   } else if (appState == appStates.buildingPackageList) {
@@ -56,10 +69,19 @@ export const StatusBar = () => {
       StatusText = `(${queueProgress.queueProgress}/${queueProgress.queueLength}) ${queueProgress.currentItem.action} ${queueProgress.currentItem.packageRef}...`
   }
   return (
-
     <PanelSectionRow>
-      { appState != appStates.idle 
-      ? <div style={CSS}>{StatusText}</div>
+      { appState != appStates.idle || (ShowUpdateList)
+      ? <div style={CSS}>
+          <DialogButton
+            onGamepadFocus={() => setHover(true)}
+            onGamepadBlur={() => setHover(false)}
+            onOKActionDescription="Updates"
+            onOKButton={() => {showModal(<UpdateablePackagesModal/>, findSP(), {popupHeight: 100})}}
+            style={hover ? StatusBarCSS.HiddenButtonHover : StatusBarCSS.HiddenButton }
+            disabled={!ShowUpdateList}>
+            {StatusText}
+          </DialogButton>
+        </div>
       : null }
     </PanelSectionRow>
   )
