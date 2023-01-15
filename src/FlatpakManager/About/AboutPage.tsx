@@ -94,6 +94,7 @@ export const AboutPage: VFC = () => {
             <li>List of things I intend to fix/add/remove</li>
           </ul>
           <ul>
+            <li>Add check if package running (not having flatpaks running while moving flatpak appdata sounds like a good idea)</li>
             <li>Custom flatpak install path: Manage symlinked ~/.var/app</li>
             <li>Highlight package and then change tabs has odd visual glitching, only on going right, something to do with focus?</li>
             <li>Persist highlighted button while scrolling package list</li>
@@ -110,7 +111,6 @@ export const AboutPage: VFC = () => {
             <li>Remove minutes option</li>
             <li>Revise settings backend to reduce calls to python backend</li>
             <li>Backend persistent browse filter/sort options (?)</li>
-            <li>Add check if package running (? Doesn't seem to cause problems when some are running)</li>
             <li>Fix being unable to escape (non-focusable)scrollview/nested focusable (?)</li>
             <li>Filter advanced mask refinement (?)</li>
             <li>Rename Options to list options or something (x?)</li>
