@@ -75,7 +75,7 @@ export class Backend {
   }
   static getUpdateList() { return this.updateList }
   static setUpdateList(updateList: FlatpakUpdate[] | FlatpakMetadata[]) {
-    if (updateList[0] == undefined) {
+    if (updateList.length == 0) {
       this.updateList = []
     } else if ('op' in updateList[0]) {
       this.updateList = (updateList as FlatpakUpdate[]).map((item) => item.application)
