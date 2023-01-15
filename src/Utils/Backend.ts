@@ -16,6 +16,7 @@ export enum appStates {
 export class Backend {
   private static serverAPI: ServerAPI
   private static packageList: FlatpakMetadata[]
+  private static updateList: string[]
   private static queue: queueData[]
   private static queueLength: number
   private static queueProgress: number
@@ -37,6 +38,7 @@ export class Backend {
     }
     this.eventBus = new EventTarget()
     this.packageList = []
+    this.updateList = []
     this.queue = []
     this.queueLength = 0
     this.queueProgress = 0
@@ -70,6 +72,17 @@ export class Backend {
     let idx = this.packageList.findIndex(plitem => plitem.ref == pkgref)
     this.packageList[idx] = {...this.packageList[idx], ...metadata}
     this.eventBus.dispatchEvent(new events.PackageInfoEvent(this.packageList[idx]))
+  }
+  static getUpdateList() { return this.updateList }
+  static setUpdateList(updateList: FlatpakUpdate[] | FlatpakMetadata[]) {
+    if (updateList[0] == undefined) {
+      this.updateList = []
+    } else if ('op' in updateList[0]) {
+      this.updateList = (updateList as FlatpakUpdate[]).map((item) => item.application)
+    } else if ('updateable' in updateList[0]) {
+      this.updateList = (updateList as FlatpakMetadata[]).filter(item => item.updateable && !item.masked && !item.parentMasked).map(item => item.application)
+    }
+    this.eventBus.dispatchEvent(new events.UpdateListEvent(this.updateList))
   }
   static getQueue() { return this.queue }
   static setQueue(queue: queueData[]) { this.queue = queue }
@@ -139,6 +152,7 @@ export class Backend {
       await this.dequeueAction(item, true)
     }
     if (queueLength) {
+      this.getUpdatePackageList(true)
       this.eventBus.dispatchEvent(new events.QueueCompletionEvent(queueCopy, queueLength, queueRetCode))
       console.debug("[AutoFlatpaks] Queue Complete: ", queueRetCode)
     }
@@ -193,6 +207,7 @@ export class Backend {
       //console.log('PL (LPL+U+RPL+MPL): ', output)
     })
     this.setPL(output)
+    this.setUpdateList(output)
     this.setAppState(appStates.idle)
     return output as FlatpakMetadata[]
   }
@@ -212,10 +227,11 @@ export class Backend {
     let proc = await this.bridge("getUnusedPackageList")
     return proc.output as FlatpakUnused[]
   }
-  static async getUpdatePackageList(): Promise<FlatpakUpdate[]> {
-    this.setAppState(appStates.checkingForUpdates)
+  static async getUpdatePackageList(internal?: boolean): Promise<FlatpakUpdate[]> {
+    if (!internal) this.setAppState(appStates.checkingForUpdates)
     let proc = await this.bridge("getUpdatePackageList")
-    this.setAppState(appStates.idle)
+    this.setUpdateList(proc.output)
+    if (!internal) this.setAppState(appStates.idle)
     return proc.output as FlatpakUpdate[]
   }
   static async getPackageCount() {
