@@ -34,6 +34,14 @@ export namespace events {
       this.packageInfo = packageInfo
     }
   }
+  export class UpdateListEvent extends Event {
+    public static eType: string = 'UpdateListEvent'
+    public updateList: string[]
+    constructor(updateList: string[], eventInitDict?: EventInit) {
+      super(UpdateListEvent.eType, eventInitDict)
+      this.updateList = updateList
+    }
+  }
   export class QueueProgressEvent extends Event {
     public static eType: string = 'QueueProgressEvent'
     public queueItem: queueData
