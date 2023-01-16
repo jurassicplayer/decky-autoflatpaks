@@ -61,7 +61,7 @@ export const BrowsePage: VFC = () => {
               wouldn't even be shown on flathub */
           //.filter(data => data.application.includes('.BaseApp'))
           //.filter(data => data.application.includes('.Debug'))
-          .filter(data => !data.options.includes('eol='))
+          .filter(data => data.options == undefined || !data.options.includes('eol='))
           .filter(data => {
             if (selectedOptions.filterSearch.length == 0) return true
             if (data.name.includes(selectedOptions.filterSearch) || data.description.includes(selectedOptions.filterSearch) || data.ref.includes(selectedOptions.filterSearch) || data.origin.includes(selectedOptions.filterSearch)) return true
