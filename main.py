@@ -9,8 +9,8 @@ logger.setLevel(logging.INFO) # can be changed to logging.DEBUG for debugging is
 import asyncio
 import json, os, re
 
-from settings import SettingsManager
-from helpers import get_home_path, get_homebrew_path, get_user
+from settings import SettingsManager # type: ignore
+from helpers import get_home_path, get_homebrew_path, get_user # type: ignore
 
 settings = SettingsManager(name="autoflatpaks", settings_directory='{}{}settings'.format(get_homebrew_path(get_home_path(get_user())), os.sep))
 settings.read()
@@ -47,12 +47,12 @@ class Plugin:
     
     async def getSpaceRemaining(self):
         logging.info('Received request for space remaining')
-        return await self.pyexec_subprocess(self, 'df -P /home/deck/.var/app') # FIXME: Change to non-hardcoded file path
+        return await self.pyexec_subprocess(self, 'df -P /home/deck/.var/app') # FIXME: Change to non-hardcoded file path # type: ignore
 
     async def getPackageHistory(self):
         logging.info('Received request for package history')
         # Returns json objects with most recent on top
-        proc = await self.pyexec_subprocess(self, 'journalctl $(which flatpak) -t flatpak -o json -r --output-fields=MESSAGE')
+        proc = await self.pyexec_subprocess(self, 'journalctl $(which flatpak) -t flatpak -o json -r --output-fields=MESSAGE') # type: ignore
         history_list = []
         lines = proc['stdout'].split('\n')
         for line in lines:
@@ -63,8 +63,7 @@ class Plugin:
     
     async def getUnusedPackageList(self):
         logging.info('Received request for list of unused packages')
-        proc = await self.pyexec_subprocess(self, 'flatpak remove --unused')
-
+        proc = await self.pyexec_subprocess(self, 'flatpak remove --unused') # type: ignore
         package_list = []
         lines = proc['stdout'].split('\n')
         for line in lines:
@@ -85,7 +84,7 @@ class Plugin:
     async def getUpdatePackageList(self):
         logging.info('Received request for list of available updates')
         cmd = 'flatpak update --no-deps'
-        proc = await self.pyexec_subprocess(self, cmd)
+        proc = await self.pyexec_subprocess(self, cmd) # type: ignore
         
         package_list = []
         lines = proc['stdout'].split('\n')
@@ -111,7 +110,7 @@ class Plugin:
 
     async def getMaskList(self):
         logging.info('Received request for list of masks')
-        proc = await self.pyexec_subprocess(self, 'flatpak mask')
+        proc = await self.pyexec_subprocess(self, 'flatpak mask') # type: ignore
 
         mask_list = []
         lines = proc['stdout'].split('\n')
@@ -127,7 +126,7 @@ class Plugin:
         logging.info('Received request for list of remote packages')
         cmd = 'flatpak remote-ls --columns=name:f,installed-size:f,description:f,download-size:f,version:f,commit:f,branch:f,ref:f,origin:f,application:f,runtime:f,arch:f,options:f'
         if updateOnly: cmd += ' -a --updates'
-        proc = await self.pyexec_subprocess(self, cmd)
+        proc = await self.pyexec_subprocess(self, cmd) # type: ignore
         if proc['returncode'] != 0: raise NotImplementedError
 
         lines = proc['stdout'].split('\n')
@@ -167,8 +166,8 @@ class Plugin:
         return proc
 
     async def getLocalPackageList(self):
-        LPLRuntime      = (await self.pullLocalPackageList(self, packageType="runtime"))
-        LPLApplication  = (await self.pullLocalPackageList(self, packageType="app"))
+        LPLRuntime      = (await self.pullLocalPackageList(self, packageType="runtime")) # type: ignore
+        LPLApplication  = (await self.pullLocalPackageList(self, packageType="app")) # type: ignore
         LocalPackageList = LPLRuntime['output'] + LPLApplication['output']
         returncode = LPLRuntime['returncode'] | LPLApplication['returncode']
         stdout = "{}\n{}".format(LPLRuntime['stdout'], LPLApplication['stdout'])
@@ -185,7 +184,7 @@ class Plugin:
             loggingInfo = 'Received request for list of local app packages'
             cmd+=" --app"
         logging.info(loggingInfo)
-        proc = await self.pyexec_subprocess(self, cmd)
+        proc = await self.pyexec_subprocess(self, cmd) # type: ignore
         if proc['returncode'] != 0: raise NotImplementedError
 
         lines = proc['stdout'].split('\n')
@@ -226,23 +225,23 @@ class Plugin:
 
     async def MaskPackage(self, pkgref):
         logging.info(f'Received request to mask package: {pkgref}')
-        return await self.pyexec_subprocess(self, f'flatpak mask {pkgref}')
+        return await self.pyexec_subprocess(self, f'flatpak mask {pkgref}') # type: ignore
     async def UnMaskPackage(self, pkgref):
         logging.info(f'Received request to unmask package: {pkgref}')
-        return await self.pyexec_subprocess(self, f'flatpak mask --remove {pkgref}')
+        return await self.pyexec_subprocess(self, f'flatpak mask --remove {pkgref}') # type: ignore
     async def InstallPackage(self, pkgref):
         logging.info(f'Received request to install package: {pkgref}')
-        return await self.pyexec_subprocess(self, f'flatpak install --noninteractive {pkgref}')
+        return await self.pyexec_subprocess(self, f'flatpak install --noninteractive {pkgref}') # type: ignore
     async def UnInstallPackage(self, pkgref, removeUnused = False):
         logging.info(f'Received request to uninstall package: {pkgref}')
         cmd = f'flatpak uninstall --noninteractive'
         if removeUnused: cmd += ' --no-related' # Add --no-related for when using RemoveUnusedPackages function
-        return await self.pyexec_subprocess(self, '{} {}'.format(cmd, pkgref))
+        return await self.pyexec_subprocess(self, '{} {}'.format(cmd, pkgref)) # type: ignore
     async def UpdatePackage(self, pkgref):
         logging.info(f'Received request to update package: {pkgref}')
-        return await self.pyexec_subprocess(self, f'flatpak install --noninteractive --no-auto-pin --or-update {pkgref}')
+        return await self.pyexec_subprocess(self, f'flatpak install --noninteractive --no-auto-pin --or-update {pkgref}') # type: ignore
     async def FlatpakRepair(self, dryrun = True):
         cmd = 'flatpak repair'
         if dryrun: cmd += ' --dry-run'
         logging.info('Received request to repair flatpak installation')
-        return await self.pyexec_subprocess(self, cmd)
+        return await self.pyexec_subprocess(self, cmd) # type: ignore
