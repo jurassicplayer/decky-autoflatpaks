@@ -273,7 +273,7 @@ class Plugin:
     async def UpdatePackage(self, pkgref):
         logging.info(f'Received request to update package: {pkgref}')
         return await self.pyexec_subprocess(self, f'flatpak install --noninteractive --no-auto-pin --or-update {pkgref}') # type: ignore
-    async def FlatpakRepair(self, dryrun = True):
+    async def RepairPackages(self, dryrun = True):
         cmd = 'flatpak repair'
         if dryrun: cmd += ' --dry-run'
         logging.info('Received request to repair flatpak installation')
