@@ -1,6 +1,6 @@
 import { DialogButton, Focusable, SteamSpinner, showModal, findSP } from "decky-frontend-lib"
 import { FaRedoAlt } from "react-icons/fa"
-import { VFC, useEffect, useState } from "react"
+import { VFC, useEffect, useState, useMemo } from "react"
 import { FPMOptions, OptionsModal } from "./OptionsModal"
 import { Backend } from "../../Utils/Backend"
 import { FlatpakMetadata } from "../../Utils/Flatpak"
@@ -34,8 +34,67 @@ export const BrowsePage: VFC = () => {
       })
     }
   }
-  const onQueueCompletion = () => { refreshBrowse(true) }
-
+  const onQueueCompletion = () => { } //refreshBrowse(true) }
+  const applyFilters = () => {
+    let filteredList = packageList
+      /*  Filter out packages that look unimportant? Aggressive filtering  */
+      //.filter(data => data.application.includes('.BaseApp'))
+      //.filter(data => data.application.includes('.BaseExtension'))
+      //.filter(data => data.application.includes('.Sources'))
+      //.filter(data => data.application.includes('.Debug'))
+      .filter(data => data.options == undefined || !data.options.includes('eol='))
+      .filter(data => {
+        if (selectedOptions.filterSearch.length == 0) return true
+        if (data.name.includes(selectedOptions.filterSearch) || data.description.includes(selectedOptions.filterSearch) || data.ref.includes(selectedOptions.filterSearch) || data.origin.includes(selectedOptions.filterSearch)) return true
+        return false
+      })
+      .filter(data => selectedOptions.filterType == 'all' || data.packagetype == selectedOptions.filterType)
+      .filter(data => selectedOptions.filterMask == 'all' || (selectedOptions.filterMask == 'masked' && (data.parentMasked || data.masked)) || (selectedOptions.filterMask == 'unmasked' && (!data.parentMasked && !data.masked)))
+      .filter(data => {
+        if (selectedOptions.filterStatus == 'all') return true
+        if (selectedOptions.filterStatus == 'installed' && data.installed) return true
+        if (selectedOptions.filterStatus == 'notinstalled' && !data.installed) return true
+        if (selectedOptions.filterStatus == 'updateable' && data.updateable) return true
+        if (selectedOptions.filterStatus == 'queued' && Backend.getQueue().map(item => item.packageRef).includes(data.ref)) return true
+        return false
+      })
+      .sort((a, b) => {
+        if (selectedOptions.sortOrder == 'z2a') return b.name.localeCompare(a.name)
+        if (selectedOptions.sortOrder == 'slarge' || selectedOptions.sortOrder == 'ssmall') {
+          var aSize = a.installed_size.split(" ")
+          var bSize = b.installed_size.split(" ")
+          if (selectedOptions.filterStatus == 'uninstalled') {
+            if (a.download_size && b.download_size) {
+              aSize = a.download_size.split(" ")
+              bSize = b.download_size.split(" ")
+            }
+          }
+          var sizeRatio = {
+            bytes: 1,
+            kB: 1024,             //kibibyte
+            MB: 1048576,          //mebibyte
+            GB: 1073741824,       //gibibyte
+            TB: 1099511627776,    //tebibyte
+            PB: 1125899906842624  //pebibyte
+          }
+          var aBytes = Number(aSize[0]) * sizeRatio[aSize[1]]
+          var bBytes = Number(bSize[0]) * sizeRatio[bSize[1]]
+          if (isNaN(aBytes) || isNaN(bBytes)) console.warn('[AutoFlatpaks] Failed size conversion: ', aSize, bSize)
+          if (selectedOptions.sortOrder == 'ssmall') {
+            return aBytes - bBytes
+          }
+          return bBytes - aBytes
+        }
+        // Default to a2z if no other sorting set
+        return a.name.localeCompare(b.name)
+      })
+      .map(data => {
+        return(<FlatpakCard data={data} />)
+      })
+    return filteredList
+  }
+  const memoizedPackageList = useMemo(() => applyFilters(), [packageList, selectedOptions.filterSearch, selectedOptions.filterType, selectedOptions.filterStatus, selectedOptions.filterMask, selectedOptions.sortOrder])
+  
   useEffect(() => {
     Backend.eventBus.addEventListener(events.QueueCompletionEvent.eType, onQueueCompletion)
     refreshBrowse(Backend.getPL().length > 0)
@@ -54,63 +113,7 @@ export const BrowsePage: VFC = () => {
       ? <Focusable
         style={PackageListContainer}>
         <DialogButton style={RefreshButton} onOKActionDescription="Refresh" onClick={()=>refreshBrowse()}><FaRedoAlt /></DialogButton>
-        {packageList
-          /*  Filter out packages with no description
-              primarily because there are few, if any, relevant packages that people would install
-              and don't have descriptions. This cuts out a lot of otherwise "duplicate" entries that
-              wouldn't even be shown on flathub */
-          //.filter(data => data.application.includes('.BaseApp'))
-          //.filter(data => data.application.includes('.Debug'))
-          .filter(data => data.options == undefined || !data.options.includes('eol='))
-          .filter(data => {
-            if (selectedOptions.filterSearch.length == 0) return true
-            if (data.name.includes(selectedOptions.filterSearch) || data.description.includes(selectedOptions.filterSearch) || data.ref.includes(selectedOptions.filterSearch) || data.origin.includes(selectedOptions.filterSearch)) return true
-            return false
-          })
-          .filter(data => selectedOptions.filterType == 'all' || data.packagetype == selectedOptions.filterType)
-          .filter(data => selectedOptions.filterMask == 'all' || (selectedOptions.filterMask == 'masked' && (data.parentMasked || data.masked)) || (selectedOptions.filterMask == 'unmasked' && (!data.parentMasked && !data.masked)))
-          .filter(data => {
-            if (selectedOptions.filterStatus == 'all') return true
-            if (selectedOptions.filterStatus == 'installed' && data.installed) return true
-            if (selectedOptions.filterStatus == 'notinstalled' && !data.installed) return true
-            if (selectedOptions.filterStatus == 'updateable' && data.updateable) return true
-            if (selectedOptions.filterStatus == 'queued' && Backend.getQueue().map(item => item.packageRef).includes(data.ref)) return true
-            return false
-          })
-          .sort((a, b) => {
-            if (selectedOptions.sortOrder == 'z2a') return b.name.localeCompare(a.name)
-            if (selectedOptions.sortOrder == 'slarge' || selectedOptions.sortOrder == 'ssmall') {
-              var aSize = a.installed_size.split(" ")
-              var bSize = b.installed_size.split(" ")
-              if (selectedOptions.filterStatus == 'uninstalled') {
-                if (a.download_size && b.download_size) {
-                  aSize = a.download_size.split(" ")
-                  bSize = b.download_size.split(" ")
-                }
-              }
-              var sizeRatio = {
-                bytes: 1,
-                kB: 1024,             //kibibyte
-                MB: 1048576,          //mebibyte
-                GB: 1073741824,       //gibibyte
-                TB: 1099511627776,    //tebibyte
-                PB: 1125899906842624  //pebibyte
-              }
-              var aBytes = Number(aSize[0]) * sizeRatio[aSize[1]]
-              var bBytes = Number(bSize[0]) * sizeRatio[bSize[1]]
-              if (isNaN(aBytes) || isNaN(bBytes)) console.warn('[AutoFlatpaks] Failed size conversion: ', aSize, bSize)
-              if (selectedOptions.sortOrder == 'ssmall') {
-                return aBytes - bBytes
-              }
-              return bBytes - aBytes
-            }
-            // Default to a2z if no other sorting set
-            return a.name.localeCompare(b.name)
-          })
-          .map(data => {
-            return(<FlatpakCard data={data} />)
-          })
-        }
+        { memoizedPackageList }
       </Focusable>
       : <div style={{alignItems: "center"}}><SteamSpinner/></div>
       }
