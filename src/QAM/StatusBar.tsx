@@ -67,6 +67,9 @@ export const StatusBar = () => {
     CSS = StatusBarCSS.ProcessingQueue
     if (queueProgress.currentItem && queueProgress.queueLength && queueProgress.queueProgress)
       StatusText = `(${queueProgress.queueProgress}/${queueProgress.queueLength}) ${queueProgress.currentItem.action} ${queueProgress.currentItem.packageRef}...`
+  } else if (appState == appStates.repairingPackages) {
+    StatusText = "Repairing packages..."
+    CSS = StatusBarCSS.ProcessingQueue
   }
   return (
     <PanelSectionRow>
