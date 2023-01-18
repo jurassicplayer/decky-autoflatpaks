@@ -135,7 +135,7 @@ class Plugin:
                 'branch':           package_match['branch'],
                 'op':               package_match['op'],
                 'remote':           package_match['remote'],
-                'download_size':    package_match['download_size'].replace(u"\u00A0", " "),
+                'download_size':    package_match['download_size'].replace(u"\u00A0", " ").replace("?", " "),
                 'partial':          partial,
             }
             package_list.append(package)
@@ -182,8 +182,8 @@ class Plugin:
                 'ref':              reference[1],
                 'commit':           package_match['commit'],
                 'runtime':          package_match['runtime'],
-                'installed_size':   package_match['installed_size'].replace(u"\u00A0", " "),
-                'download_size':    package_match['download_size'].replace(u"\u00A0", " "),
+                'installed_size':   package_match['installed_size'].replace(u"\u00A0", " ").replace("?", " "),
+                'download_size':    package_match['download_size'].replace(u"\u00A0", " ").replace("?", " "),
                 'options':          package_match['options'],
                 'packagetype':      reference[0],
                 'parent':           None
@@ -241,7 +241,7 @@ class Plugin:
                 'runtime':          package_match['runtime'],
                 'latest':           package_match['latest'],
                 'installation':     package_match['installation'],
-                'installed_size':   package_match['size'].replace(u"\u00A0", " "),
+                'installed_size':   package_match['size'].replace(u"\u00A0", " ").replace("?", " "),
                 'options':          package_match['options'],
                 'packagetype':      packageType,
                 'parent':           None
