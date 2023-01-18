@@ -19,7 +19,7 @@ parentPackageOverrides = {
 }
 
 userID = pwd.getpwnam(get_user()).pw_uid
-XDG_RUNTIME_DIR = os.path.join('run', 'user', str(userID))
+XDG_RUNTIME_DIR = os.path.join(os.path.abspath(os.sep), 'run', 'user', str(userID))
 
 class Plugin:
     async def settings_read(self):
