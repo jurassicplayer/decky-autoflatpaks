@@ -31,10 +31,15 @@ export const FlatpakCardInfo: VFC<{data: FlatpakMetadata, focus: boolean}> = (pr
   const [updateToggled, setUpdateToggled] = useState<boolean>(false)
   const [installToggled, setInstallToggled] = useState<boolean>(false)
 
-  const resetToggles = () => {
+  const restoreToggles = () => {
     setMaskToggled(Backend.getQueue().filter(item => item.packageRef == packageInfo.ref && (item.action.includes('mask') || item.action.includes('unmask'))).length > 0 || false)
     setUpdateToggled(Backend.getQueue().filter(item => item.packageRef == packageInfo.ref && (item.action.includes('update') || item.action.includes('update'))).length > 0 || false)
     setInstallToggled(Backend.getQueue().filter(item => item.packageRef == packageInfo.ref && (item.action.includes('install') || item.action.includes('uninstall'))).length > 0 || false)
+  }
+  const resetToggles = () => {
+    setMaskToggled(false)
+    setUpdateToggled(false)
+    setInstallToggled(false)
   }
   const onPackageInfoChange = (e: Event) => {
     setPackageInfo((e as events.PackageInfoEvent).packageInfo)
@@ -51,7 +56,7 @@ export const FlatpakCardInfo: VFC<{data: FlatpakMetadata, focus: boolean}> = (pr
   }
 
   useEffect(() => {
-    resetToggles()
+    restoreToggles()
     // Register listeners
     Backend.eventBus.addEventListener(packageInfo.ref, onPackageInfoChange)
     Backend.eventBus.addEventListener(events.AppStateEvent.eType, onAppStateChange)
@@ -67,7 +72,7 @@ export const FlatpakCardInfo: VFC<{data: FlatpakMetadata, focus: boolean}> = (pr
       <DialogButton
         style={props.focus ? CardInfo.focus : CardInfo.blur}
         onOKActionDescription='PkgInfo'
-        onClick={() => showModal(<FlatpakInfoModal data={props.data} />)}>
+        onClick={() => showModal(<FlatpakInfoModal data={packageInfo} />)}>
         <div>{packageInfo.name}</div>
         <div>{packageInfo.description}</div>
       </DialogButton>

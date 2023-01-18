@@ -7,18 +7,11 @@ import { FlatpakCardInfo } from "./FlatpakCardInfo"
 
 export const FlatpakCard: VFC<{data: FlatpakMetadata}> = (props) => {
   const { ref, inView } = useInView({
-    //triggerOnce: true,
-    rootMargin: '100px 100px'
+    triggerOnce: true,
+    rootMargin: '700px 0px 700px'
   })
   const [focus, setFocus] = useState<boolean>(false)
   
-  // useEffect(() => {
-  //   console.log("Card loaded: ", props.data.ref)
-  // }, [])
-  // useEffect(() => () => {
-  //   console.log("Card unloaded: ", props.data.ref)
-  // }, [])
-
   return (
     <div
       ref={ref}
