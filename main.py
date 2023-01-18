@@ -51,7 +51,7 @@ class Plugin:
     
     async def getSpaceRemaining(self):
         logging.info('Received request for space remaining')
-        return await self.pyexec_subprocess(self, 'df -P /home/deck/.var/app') # FIXME: Change to non-hardcoded file path # type: ignore
+        return await self.pyexec_subprocess(self, 'df -P {}'.format(os.path.join(get_home_path(get_user()),'.var','app'))) # type: ignore
 
     async def getPackageHistory(self):
         logging.info('Received request for package history')
