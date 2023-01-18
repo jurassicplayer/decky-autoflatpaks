@@ -76,7 +76,7 @@ export const StatusBar = () => {
             onGamepadFocus={() => setHover(true)}
             onGamepadBlur={() => setHover(false)}
             onOKActionDescription="Updates"
-            onOKButton={() => {showModal(<UpdateablePackagesModal/>, findSP(), {popupHeight: 100})}}
+            onClick={() => {showModal(<UpdateablePackagesModal/>, findSP(), {popupHeight: 100})}}
             style={hover ? StatusBarCSS.HiddenButtonHover : StatusBarCSS.HiddenButton }
             disabled={!ShowUpdateList}>
             {StatusText}
