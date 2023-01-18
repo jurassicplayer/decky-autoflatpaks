@@ -10,7 +10,8 @@ export enum appStates {
   idle,
   checkingForUpdates,
   buildingPackageList,
-  processingQueue
+  processingQueue,
+  repairingPackages
 } 
 
 export class Backend {
@@ -323,6 +324,14 @@ export class Backend {
     }
     returncode = await this.ProcessQueue()
     if (liveFPMQueue) this.setQueue(liveFPMQueue)
+    return returncode
+  }
+  static async RepairPackages(dryrun?:boolean) {
+    if (this.getAppState() != appStates.idle) return false
+    this.setAppState(appStates.repairingPackages)
+    if (!dryrun) dryrun = false
+    let returncode = await this.bridge("RepairPackages", {dryrun: dryrun})
+    this.setAppState(appStates.idle)
     return returncode
   }
   //#endregion
