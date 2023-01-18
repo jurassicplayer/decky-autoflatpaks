@@ -74,11 +74,18 @@ export const AboutPage: VFC = () => {
           <p>
             The QAM panel menu houses the settings for notifications and automatic updates available for flatpaks and consists of 5 main elements:
             <ul>
-              <li>An auto-hiding status bar showing app state, such as queue progress, checking for updates, and other actions.</li>
-              <li>A quick access button bar for opening the package manager, checking for updates, and manually updating all packages</li>
+              <li>An auto-hiding status bar showing various app states, including:
+                <ul>
+                  <li>queue progress</li>
+                  <li>checking for updates</li>
+                  <li>repairing packages</li>
+                  <li>available updates (clickable)</li>
+                </ul>
+              </li>
+              <li>A button bar to access the package manager, check for updates, and manually update all packages</li>
               <li>Settings for the interval of time to wait between automatic package checks</li>
-              <li>Settings for enabling package checks on boot and automatically installing all available package updates</li>
-              <li>Settings for notifications, allowing for Toast Only, Sound Only, Toast+Sound, or No Notification</li>
+              <li>Settings to check for updates on boot and automatically install available package updates</li>
+              <li>Settings for notifications: Toast Only, Sound Only, Toast+Sound, or No Notification</li>
             </ul> 
           </p>
 
@@ -90,17 +97,14 @@ export const AboutPage: VFC = () => {
             This area will be a place to see information about the project including:<br />
           </p>
           <ul>
-            <li>List of changes hard-coded</li>
             <li>List of things I intend to fix/add/remove</li>
           </ul>
           <ul>
-            <li>Add check if package running (not having flatpaks running while moving flatpak appdata sounds like a good idea)</li>
             <li>Custom flatpak install path: Manage symlinked ~/.var/app</li>
-            <li>Highlight package and then change tabs has odd visual glitching, only on going right, something to do with focus?</li>
+            <li>Visual glitching, more info on discord forum post (?)</li>
             <li>Persist highlighted button while scrolling package list</li>
             <li>Change CSS to be more friendly with CSSLoader themes instead of my own thing</li>
             <li>Add check for network connectivity before continuing intervalcheck (?)</li>
-            <li>Revise wording on QAM information, looks awful</li>
             <li>Add remaining space check</li>
             <li>Move logger into Advanced tab (?)</li>
             <li>Filter Search refinement (regex, fuzzy?)</li>
@@ -111,9 +115,7 @@ export const AboutPage: VFC = () => {
             <li>Remove minutes option</li>
             <li>Revise settings backend to reduce calls to python backend</li>
             <li>Backend persistent browse filter/sort options (?)</li>
-            <li>Fix being unable to escape (non-focusable)scrollview/nested focusable (?)</li>
             <li>Filter advanced mask refinement (?)</li>
-            <li>Rename Options to list options or something (x?)</li>
             <li>Flathub API integration (x)</li>
             <li>List of masks from flatpak mask (x)</li>
             <li>List of pins from flatpak pin (x)</li>
