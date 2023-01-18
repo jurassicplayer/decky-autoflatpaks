@@ -1,5 +1,5 @@
 import { ServerAPI } from "decky-frontend-lib"
-import { FlatpakMetadata, FlatpakUnused, FlatpakUpdate, LocalFlatpakMetadata, RemoteFlatpakMetadata } from "./Flatpak"
+import { FlatpakMetadata, FlatpakRunning, FlatpakUnused, FlatpakUpdate, LocalFlatpakMetadata, RemoteFlatpakMetadata } from "./Flatpak"
 import { JournalEntry } from "./History"
 import { queueData, BatteryState, cliOutput } from "./Backend.d"
 import { events } from "./Events"
@@ -226,6 +226,10 @@ export class Backend {
   static async getUnusedPackageList(): Promise<FlatpakUnused[]> {
     let proc = await this.bridge("getUnusedPackageList")
     return proc.output as FlatpakUnused[]
+  }
+  static async getRunningPackageList(): Promise<FlatpakRunning[]> {
+    let proc = await this.bridge("getRunningPackageList")
+    return proc.output as FlatpakRunning[]
   }
   static async getUpdatePackageList(internal?: boolean): Promise<FlatpakUpdate[]> {
     if (!internal) this.setAppState(appStates.checkingForUpdates)

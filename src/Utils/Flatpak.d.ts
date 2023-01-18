@@ -43,6 +43,21 @@ export interface FlatpakUnused {
   op:             string
 }
 
+export interface FlatpakRunning {
+  instance: string
+  pid: string
+  child_pid: string
+  application: string
+  arch: string
+  branch: string
+  commit: string
+  runtime: string
+  runtime_branch: string
+  runtime_commit: string
+  active: string //?
+  background: boolean
+}
+
 export interface LocalFlatpakMetadata {
   name: string
   application: string

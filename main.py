@@ -6,8 +6,7 @@ logging.basicConfig(filename="/tmp/autoflatpaks.log",
 logger=logging.getLogger()
 logger.setLevel(logging.INFO) # can be changed to logging.DEBUG for debugging issues
 
-import asyncio
-import json, os, re
+import asyncio, json, os, pwd, re
 
 from settings import SettingsManager # type: ignore
 from helpers import get_home_path, get_homebrew_path, get_user # type: ignore
@@ -18,6 +17,9 @@ settings.read()
 parentPackageOverrides = {
     'org.DolphinEmu.dolphin_emu' : 'org.DolphinEmu.dolphin-emu'
 }
+
+userID = pwd.getpwnam(get_user()).pw_uid
+XDG_RUNTIME_DIR = os.path.join('run', 'user', str(userID))
 
 class Plugin:
     async def settings_read(self):
@@ -32,13 +34,15 @@ class Plugin:
     async def settings_setSetting(self, key: str, value):
         output = settings.setSetting(key, value)
         return {'output': output, 'returncode': 0, 'stdout': '', 'stderr': ''}
-
     async def pyexec_subprocess(self, cmd:str, input:str=''):
         logging.info(f'Calling python subprocess: "{cmd}"')
+        runtimeDir = os.environ.get("XDG_RUNTIME_DIR")
+        if not runtimeDir: runtimeDir = XDG_RUNTIME_DIR
         proc = await asyncio.create_subprocess_shell(cmd,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
-            stdin=asyncio.subprocess.PIPE)
+            stdin=asyncio.subprocess.PIPE,
+            env={"XDG_RUNTIME_DIR": runtimeDir})
         stdout, stderr = await proc.communicate(input.encode())
         stdout = stdout.decode()
         stderr = stderr.decode()
@@ -76,6 +80,36 @@ class Plugin:
                 'application':      package_match['application'],
                 'branch':           package_match['branch'],
                 'op':               package_match['op']
+            }
+            package_list.append(package)
+        proc.update({'output': package_list})
+        return proc
+
+    async def getRunningPackageList(self):
+        logging.info('Received request for list of running packages')
+        proc = await self.pyexec_subprocess(self, 'flatpak ps --columns=instance:f,application:f,arch:f,branch:f,commit:f,runtime:f,pid:f,runtime-branch:f,child-pid:f,active:f,runtime-commit:f,background:f') # type: ignore
+        if proc['returncode'] != 0: raise NotImplementedError
+
+        lines = proc['stdout'].split('\n')
+        package_list = []
+        for line in lines:
+            package_match = re.match(r'(?P<instance>\d+)\s+(?P<application>\S+)\s+(?P<arch>(x86_64|i386|aarch64|arm))\s+(?P<branch>.*?)\s+(?P<commit>[aA-fF0-9]{12})\s+(?P<runtime>.*?)\s+(?P<pid>\d+)\s+(?P<runtime_branch>.*?)\s+(?P<child_pid>\d+)\s+(?P<active>.*?)\s+(?P<runtime_commit>[aA-fF0-9]{12})\s+(?P<background>.*?)$', line)
+            if not package_match:
+                if line: logging.info(f'Failed to parse: "{line}"')
+                continue
+            package: dict[str,str|None] = {
+                'instance':         package_match['instance'],
+                'pid':              package_match['pid'],
+                'child_pid':        package_match['child_pid'],
+                'application':      package_match['application'],
+                'arch':             package_match['arch'],
+                'branch':           package_match['branch'],
+                'commit':           package_match['commit'],
+                'runtime':          package_match['runtime'],
+                'runtime_branch':   package_match['runtime_branch'],
+                'runtime_commit':   package_match['runtime_commit'],
+                'active':           package_match['active'],
+                'background':       package_match['background']
             }
             package_list.append(package)
         proc.update({'output': package_list})
