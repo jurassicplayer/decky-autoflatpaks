@@ -2,9 +2,21 @@ import { DialogButton, findSP, Focusable, showModal } from "decky-frontend-lib"
 import { useEffect, useState, VFC } from "react"
 import { appStates, Backend } from "../../Utils/Backend"
 import { events } from "../../Utils/Events"
+import { SteamUtils } from "../../Utils/SteamUtils"
 import { UnusedPackagesModal } from "./UnusedPackages"
 
+const checkRunningPackages = async () => {
+  let result = false
+  let runningList = await Backend.getRunningPackageList()
+  console.log('Running List', runningList)
+  if (runningList.length > 0) result = true
+  return result
+}
 const flatpakRepair = async (dryrun?: boolean) => {
+  if (await checkRunningPackages()) {
+    SteamUtils.notify('AutoFlatpaks', 'Please close all flatpaks before repairing', true, true, 24) // 24: FailedNav sound effect
+    return
+  }
   let output = await Backend.RepairPackages(dryrun)
   console.log(dryrun ? 'Repair (dryrun): ': 'Repair: ', output)
 }
