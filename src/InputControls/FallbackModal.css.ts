@@ -1,5 +1,7 @@
+import { findSP } from "decky-frontend-lib"
+
 export const FallbackModalContainer = {
-  height: "calc(100% - 40px)",
+  maxHeight: Math.floor(findSP().window.innerHeight * 0.45),
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
