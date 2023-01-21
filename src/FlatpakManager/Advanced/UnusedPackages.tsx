@@ -1,4 +1,4 @@
-import { DialogButton, Focusable } from "decky-frontend-lib"
+import { findSP, Focusable } from "decky-frontend-lib"
 import { CSSProperties, useEffect, useRef, useState } from "react"
 import { appStates, Backend } from "../../Utils/Backend"
 import { events } from "../../Utils/Events"
@@ -10,15 +10,9 @@ const onRemoveUnusedPackages = () => {
   Backend.RemoveUnusedPackages()
 }
 export const UnusedListScrollPanel: CSSProperties = {
-  height: "80%",
-  //marginBottom: "4px",
-  // padding: "10px 10px 10px",
-  //flexGrow: "1",
+  maxHeight: Math.floor(findSP().window.innerHeight * 0.45),
   borderRadius: "7px",
-  // display: "flex",
-  //justifyContent: "center",
-  backgroundColor: "#121c25",
-  // flexDirection: "column"
+  backgroundColor: "#121c25"
 }
 export const UnusedListContainer: CSSProperties = {
   margin: "20px 20px 20px 20px",
