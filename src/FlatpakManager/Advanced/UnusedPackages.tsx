@@ -35,6 +35,10 @@ export const UnusedPackagesModal = (props: {closeModal?: CallableFunction}) => {
     setUnusedPackageList(unusedPackageList)
     setScrollViewReady(true)
   }
+  const closeModal = () => {
+    if (props.closeModal) { props.closeModal() }
+  }
+
   useEffect(() => {
     Backend.eventBus.addEventListener(events.AppStateEvent.eType, onAppStateChange)
     Backend.eventBus.addEventListener(events.QueueCompletionEvent.eType, onQueueCompletion)
@@ -44,52 +48,35 @@ export const UnusedPackagesModal = (props: {closeModal?: CallableFunction}) => {
     Backend.eventBus.removeEventListener(events.AppStateEvent.eType, onAppStateChange)
     Backend.eventBus.removeEventListener(events.QueueCompletionEvent.eType, onQueueCompletion)
   }, [])
-  
+
   return (
     <FallbackModal
       bAllowFullSize={true}
       bDisableBackgroundDismiss={false}
       bHideCloseIcon={false}
-      closeModal={()=>{ if (props.closeModal) { props.closeModal() }}}>
-      <Focusable
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          rowGap: "5px",
-          overflow: "hidden"
-        }}>
-        <ScrollPanel
-          style={UnusedListScrollPanel}
-          focusable={true}
-          autoFocus={true}
-          noFocusRing={true} //!scrollViewReady}
-          onClick={()=> scrollView.current?.focus()}
-          onOKButton={()=> scrollView.current?.focus()}
-          onButtonDown={(e: CustomEvent)=> {
-            if (e.detail.button == 10) scrollView.current?.focus()
-          }}>
-          { scrollViewReady
-          ? <Focusable
-              style={{
-                height: "18em",
-                display: "flex",
-                flexDirection: "column",
-                margin: "10px"
-              }}
-              // @ts-ignore
-              focusableIfNoChildren={true}
-              noFocusRing={true}
-              ref={scrollView}>
-              { unusedPackageList.map((item) => <div>{item.application} {item.branch}</div>) }
-            </Focusable>
-          : <div style={{height: "18em"}}>Searching for unused packages...</div>
-          }
-        </ScrollPanel>
-        <DialogButton
-            disabled={!(appState == appStates.idle && unusedPackageList.length > 0)}
-            onClick={() => onRemoveUnusedPackages()}>Remove Unused Packages</DialogButton>
-      </Focusable>
+      strTitle='Unused Packages'
+      closeModal={closeModal}
+      bOKDisabled={!(appState == appStates.idle && unusedPackageList.length > 0)}
+      onOK={() => onRemoveUnusedPackages()}>
+      <ScrollPanel
+        style={UnusedListScrollPanel}
+        focusable={true}
+        autoFocus={true}
+        noFocusRing={!scrollViewReady}>
+        { scrollViewReady
+        ? <Focusable
+            style={{
+              margin: "10px"
+            }}
+            // @ts-ignore
+            focusableIfNoChildren={true}
+            noFocusRing={true}
+            ref={scrollView}>
+            { unusedPackageList.map((item) => <div>{item.application} {item.branch}</div>) }
+          </Focusable>
+        : <div style={{height: "2em"}}>Searching for unused packages...</div>
+        }
+      </ScrollPanel>
     </FallbackModal>
   )
 }

@@ -1,16 +1,17 @@
 import { VFC } from "react";
-import { Focusable, ModalRoot, ModalRootProps } from "decky-frontend-lib"
+import { ConfirmModal, ConfirmModalProps, Focusable, ModalRoot } from "decky-frontend-lib"
 import { FallbackModalContainer, FallbackModalContent } from "./FallbackModal.css"
 
 
-export const FallbackModal: VFC<ModalRootProps> = (props) => {
+export const FallbackModal: VFC<ConfirmModalProps> = (props) => {
   const closeModal = () => {
     if (props.onCancel) props.onCancel()
     if (props.closeModal) props.closeModal()
   }
   if (ModalRoot != undefined) {
     return (
-      <ModalRoot
+      <ConfirmModal
+        // ModalRootProps
         onCancel={props.onCancel}
         closeModal={props.closeModal}
         onOK={props.onOK}
@@ -23,7 +24,16 @@ export const FallbackModal: VFC<ModalRootProps> = (props) => {
         bHideCloseIcon={props.bHideCloseIcon}
         bOKDisabled={props.bOKDisabled}
         bCancelDisabled={props.bCancelDisabled}
-      >{props.children}</ModalRoot>
+        // ConfirmModalProps
+        onMiddleButton={props.onMiddleButton}
+        strTitle={props.strTitle}
+        strDescription={props.strDescription}
+        strOKButtonText={props.strOKButtonText}
+        strCancelButtonText={props.strCancelButtonText}
+        strMiddleButtonText={props.strMiddleButtonText}
+        bAlertDialog={props.bAlertDialog}
+        bMiddleDisabled={props.bMiddleDisabled}
+      >{props.children}</ConfirmModal>
     )
   } else {
     return (
