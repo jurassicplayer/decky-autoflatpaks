@@ -3,7 +3,7 @@ import { DialogButton, findSP, PanelSectionRow, showModal } from "decky-frontend
 import { appStates, Backend } from "../Utils/Backend"
 import { StatusBarCSS } from "./StatusBar.css"
 import { events } from "../Utils/Events"
-import { UpdateablePackagesModal } from "./UpdateablePackages"
+import { UpdateablePackagesModal } from "./UpdateablePackagesModal"
 
 export const StatusBar = () => {
   const onAppStateChange = (e: Event) => {
@@ -81,7 +81,7 @@ export const StatusBar = () => {
     <PanelSectionRow>
       { appState != appStates.idle || ShowUpdateList
       ? <div style={CSS}>
-          { ShowUpdateList 
+          { ShowUpdateList
           ? <DialogButton
               onGamepadFocus={() => setHover(true)}
               onGamepadBlur={() => setHover(false)}
