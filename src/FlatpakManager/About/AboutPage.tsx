@@ -101,6 +101,7 @@ export const AboutPage: VFC = () => {
           </ul>
           <ul>
             <li>Custom flatpak install path: Manage symlinked ~/.var/app</li>
+            <li>Visual glitching when a game and modal open at the same time</li>
             <li>Visual glitching, more info on discord forum post (?)</li>
             <li>Persist highlighted button while scrolling package list</li>
             <li>Change CSS to be more friendly with CSSLoader themes instead of my own thing</li>
