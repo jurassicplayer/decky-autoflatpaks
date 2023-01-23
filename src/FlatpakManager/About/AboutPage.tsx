@@ -108,7 +108,6 @@ export const AboutPage: VFC = () => {
             <li>Add remaining space check</li>
             <li>Move logger into Advanced tab (?)</li>
             <li>Filter Search refinement (regex, fuzzy?)</li>
-            <li>Add aggressive filtering with toggle-able option in advanced page</li>
             <li>A How-To page with functionality explained in bite-sized chunks</li>
             <li>Test and fix any bugginess with update all button and desyncing package list</li>
             <li>Add to Steam (?)</li>
