@@ -37,6 +37,8 @@ export const OptionsModal = (props: {selectedOptions: FPMOptions, setSelectedOpt
   return (
     <FallbackModal
       bAllowFullSize={false}
+      bAlertDialog={true}
+      strTitle='List Options'
       closeModal={()=>{
         updateSelectedOptions({})
         if (props.closeModal) { props.closeModal() }
