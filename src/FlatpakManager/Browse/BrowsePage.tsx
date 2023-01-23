@@ -7,10 +7,12 @@ import { FlatpakMetadata } from "../../Utils/Flatpak"
 import { FlatpakCard } from "./FlatpakCard"
 import { BrowsePageContainer, PackageListContainer, RefreshButton } from "./BrowsePage.css"
 import { events } from "../../Utils/Events"
+import { Settings } from "../../Utils/Settings"
 
 export const BrowsePage: VFC = () => {
   const [browseReady,   setBrowseReady]   = useState<boolean>(false)
   const [packageList,   setPackageList]   = useState<FlatpakMetadata[]>(Backend.getPL())
+  const aggressiveEnabled = useState<boolean>(Settings.aggressiveEnabled)
   const [selectedOptions, setSelectedOptions] = useState<FPMOptions>({
     filterSearch: '',
     filterType: 'app',
@@ -37,12 +39,16 @@ export const BrowsePage: VFC = () => {
   const onQueueCompletion = () => { } //refreshBrowse(true) }
   const applyFilters = () => {
     let filteredList = packageList
-      /*  Filter out packages that look unimportant? Aggressive filtering  */
-      //.filter(data => data.application.includes('.BaseApp'))
-      //.filter(data => data.application.includes('.BaseExtension'))
-      //.filter(data => data.application.includes('.Sources'))
-      //.filter(data => data.application.includes('.Debug'))
-      .filter(data => data.options == undefined || !data.options.includes('eol='))
+    if (aggressiveEnabled) {
+      filteredList = filteredList
+        /*  Filter out packages that look unimportant? Aggressive filtering  */
+        .filter(data => !data.application.includes('.BaseApp'))
+        .filter(data => !data.application.includes('.BaseExtension'))
+        .filter(data => !data.application.includes('.Sources'))
+        .filter(data => !data.application.includes('.Debug'))
+        .filter(data => data.options == undefined || !data.options.includes('eol='))
+    }
+    filteredList = filteredList
       .filter(data => {
         if (selectedOptions.filterSearch.length == 0) return true
         if (data.name.includes(selectedOptions.filterSearch) || data.description.includes(selectedOptions.filterSearch) || data.ref.includes(selectedOptions.filterSearch) || data.origin.includes(selectedOptions.filterSearch)) return true
@@ -88,10 +94,10 @@ export const BrowsePage: VFC = () => {
         // Default to a2z if no other sorting set
         return a.name.localeCompare(b.name)
       })
-      .map(data => {
+    let filteredListElements = filteredList.map(data => {
         return(<FlatpakCard data={data} />)
       })
-    return filteredList
+    return filteredListElements
   }
   const memoizedPackageList = useMemo(() => applyFilters(), [packageList, selectedOptions.filterSearch, selectedOptions.filterType, selectedOptions.filterStatus, selectedOptions.filterMask, selectedOptions.sortOrder])
   

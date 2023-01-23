@@ -5,6 +5,7 @@ export class Settings {
   public static playSound:                  boolean = true
   public static checkOnBootEnabled:         boolean = true
   public static unattendedUpgradesEnabled:  boolean = false
+  public static aggressiveEnabled:          boolean = false
   public static updateInterval:             number = 720
   public static lastCheckTimestamp:         Date = new Date()
 
