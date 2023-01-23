@@ -108,6 +108,7 @@ export const AboutPage: VFC = () => {
             <li>Add check for network connectivity before continuing intervalcheck (?)</li>
             <li>Add remaining space check</li>
             <li>Move logger into Advanced tab (?)</li>
+            <li>Move QAM settings to Advanced tab (?)</li>
             <li>Filter Search refinement (regex, fuzzy?)</li>
             <li>A How-To page with functionality explained in bite-sized chunks</li>
             <li>Test and fix any bugginess with update all button and desyncing package list</li>
