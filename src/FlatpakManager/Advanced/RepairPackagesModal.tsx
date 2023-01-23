@@ -12,7 +12,7 @@ export const RepairPackagesModal = (props: any) => {
     <FallbackModal
       bDestructiveWarning={true}
       strTitle='Repair Packages'
-      strDescription='Only use this if you know what you are doing. Refer to flatpak-repair for more information of what this command will do. While running, most of AutoFlatpaks functions will be disabled.'
+      strDescription='Only use this if you know what you are doing. Refer to flatpak-repair man page for more information of what this command will do. While running, most of AutoFlatpaks functions will be disabled.'
       /*
       strOKButtonText='DryRun'
       strMiddleButtonText='Run'
