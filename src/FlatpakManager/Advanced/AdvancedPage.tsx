@@ -76,11 +76,13 @@ export const AdvancedPage: VFC = () => {
         <div className={staticClasses.PanelSectionTitle}>Packages</div>
         <PanelSectionRow>
           <DialogButton
+            style={{ margin: "4px" }}
             disabled={appState != appStates.idle}
             onClick={() => {showModal(<UnusedPackagesModal/>)}}>
             Unused Packages
           </DialogButton>
           <DialogButton
+            style={{ margin: "4px" }}
             disabled={appState != appStates.idle}
             onClick={() => {
               setShowStatusBar(false)
@@ -91,8 +93,7 @@ export const AdvancedPage: VFC = () => {
                 } else {
                   showModal(<RepairPackagesModal />)
                 }
-              })
-            }}>
+              })}}>
             Repair Packages
           </DialogButton>
         </PanelSectionRow>
@@ -114,7 +115,6 @@ export const AdvancedPage: VFC = () => {
       </p>
       <ul>
         <li>Set/Move flatpak app data directory</li>
-        <li>Toggle for aggressive filtering for app (BaseApp, BaseExtension, EoL packages) (?)</li>
         <li>Permissions Manager (GameMode Flatseal-ish maybe?)</li>
         <li>Complex mask handling and controls (?)</li>
       </ul>
