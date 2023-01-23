@@ -57,6 +57,7 @@ export const UnusedPackagesModal = (props: {closeModal?: CallableFunction}) => {
       strTitle='Unused Packages'
       closeModal={closeModal}
       bOKDisabled={!(appState == appStates.idle && unusedPackageList.length > 0)}
+      strOKButtonText='Remove Packages'
       onOK={() => onRemoveUnusedPackages()}>
       <ScrollPanel
         style={UnusedListScrollPanel}
