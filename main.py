@@ -1,25 +1,34 @@
 import logging
-logging.basicConfig(filename="/tmp/autoflatpaks.log",
+import asyncio, json, os, re
+
+from settings import SettingsManager # type: ignore
+from helpers import get_user_id, get_home_path # type: ignore
+
+# Setup environment variables
+settingsDir = os.environ["DECKY_PLUGIN_SETTINGS_DIR"]
+loggingDir = os.environ["DECKY_PLUGIN_LOG_DIR"]
+XDG_RUNTIME_DIR = os.path.join(os.path.abspath(os.sep), 'run', 'user', str(get_user_id()))
+
+# Setup backend logger
+logging.basicConfig(filename=os.path.join(loggingDir, 'backend.log'),
                     format='[AutoFlatpaks] %(asctime)s %(levelname)s %(message)s',
                     filemode='w+',
                     force=True)
 logger=logging.getLogger()
 logger.setLevel(logging.INFO) # can be changed to logging.DEBUG for debugging issues
 
-import asyncio, json, os, pwd, re
+# Migrate any old settings
+oldSettingsPath = os.path.join(get_home_path(), 'settings', 'autoflatpaks.json')
+if os.path.exists(oldSettingsPath):
+    os.replace(oldSettingsPath, os.path.join(settingsDir, 'settings.json'))
 
-from settings import SettingsManager # type: ignore
-from helpers import get_home_path, get_homebrew_path, get_user # type: ignore
-
-settings = SettingsManager(name="autoflatpaks", settings_directory='{}{}settings'.format(get_homebrew_path(get_home_path(get_user())), os.sep))
+# Setup decky-loader SettingsManager
+settings = SettingsManager(name="settings", settings_directory=settingsDir)
 settings.read()
 
 parentPackageOverrides = {
     'org.DolphinEmu.dolphin_emu' : 'org.DolphinEmu.dolphin-emu'
 }
-
-userID = pwd.getpwnam(get_user()).pw_uid
-XDG_RUNTIME_DIR = os.path.join(os.path.abspath(os.sep), 'run', 'user', str(userID))
 
 class Plugin:
     async def settings_read(self):
@@ -51,7 +60,7 @@ class Plugin:
     
     async def getSpaceRemaining(self):
         logging.info('Received request for space remaining')
-        return await self.pyexec_subprocess(self, 'df -P {}'.format(os.path.join(get_home_path(get_user()),'.var','app'))) # type: ignore
+        return await self.pyexec_subprocess(self, 'df -P {}'.format(os.path.join(get_home_path(),'.var','app'))) # type: ignore
 
     async def getPackageHistory(self):
         logging.info('Received request for package history')
