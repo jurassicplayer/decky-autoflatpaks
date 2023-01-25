@@ -10,9 +10,9 @@ import { events } from "../../Utils/Events"
 import { Settings } from "../../Utils/Settings"
 
 export const BrowsePage: VFC = () => {
+  const aggressiveEnabled = useState<boolean>(Settings.aggressiveEnabled)
   const [browseReady,   setBrowseReady]   = useState<boolean>(false)
   const [packageList,   setPackageList]   = useState<FlatpakMetadata[]>(Backend.getPL())
-  const aggressiveEnabled = useState<boolean>(Settings.aggressiveEnabled)
   const [selectedOptions, setSelectedOptions] = useState<FPMOptions>({
     filterSearch: '',
     filterType: 'app',

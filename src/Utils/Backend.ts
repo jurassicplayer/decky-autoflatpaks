@@ -88,11 +88,11 @@ export class Backend {
   static getQueue() { return this.queue }
   static setQueue(queue: queueData[]) { this.queue = queue }
   static getQueueLength() { return this.queueLength }
-  static setQueueLength() { this.queueLength = Backend.getQueue().length}
+  static setQueueLength() { this.queueLength = Backend.getQueue().length }
   static getQueueProgress() { return (this.queueLength - this.queueProgress + 1) } // Offset by one to show current number instead of previous
   static setQueueProgress(currentQueueLength: number) { this.queueProgress = currentQueueLength }
-  static setAppInitialized(state: boolean) {this.appState.initialized = state}
-  static getAppInitialized() { return this.appState.initialized}
+  static setAppInitialized(state: boolean) { this.appState.initialized = state }
+  static getAppInitialized() { return this.appState.initialized }
 
   static async bridge(functionName: string, namedArgs?: any) {
     namedArgs = (namedArgs) ? namedArgs : {}

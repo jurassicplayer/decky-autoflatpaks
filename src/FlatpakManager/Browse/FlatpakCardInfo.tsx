@@ -14,6 +14,7 @@ export const FlatpakInfoModal: VFC<{data: FlatpakMetadata, closeModal?: Callable
   return (
     <FallbackModal
       bAllowFullSize={false}
+      bAlertDialog={true}
       closeModal={()=>{ if (props.closeModal) props.closeModal() }}>
       <Focusable>
         <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}><div>Name: {props.data.name}</div><div>Installed Size: {props.data.installed_size}</div></div>
