@@ -208,6 +208,19 @@
                 "Publish:Defaults"
             ],
             "problemMatcher": []
-        }
+        },
+        // all-in-one plus
+        {
+            "label": "allinone+",
+            "detail": "Build, deploy, restart decky",
+            "dependsOrder": "sequence",
+            "group": "test",
+            "dependsOn": [
+                "buildall",
+                "deployall",
+                "restartdecky"
+            ],
+            "problemMatcher": []
+        },
     ]
 }
