@@ -334,5 +334,9 @@ export class Backend {
     this.setAppState(appStates.idle)
     return returncode
   }
+  static async getAppDataDir() {
+    let proc = await this.bridge("getAppDataDir")
+    return proc.output as string
+  }
   //#endregion
 }

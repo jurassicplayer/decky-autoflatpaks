@@ -43,6 +43,9 @@ class Plugin:
     async def settings_setSetting(self, key: str, value):
         output = settings.setSetting(key, value)
         return {'output': output, 'returncode': 0, 'stdout': '', 'stderr': ''}
+    async def getAppDataDir(self):
+        output = os.path.realpath(os.path.join(get_home_path(), '.var', 'app'))
+        return {'output': output, 'returncode': 0, 'stdout': '', 'stderr': ''}
     async def pyexec_subprocess(self, cmd:str, input:str=''):
         logging.info(f'Calling python subprocess: "{cmd}"')
         runtimeDir = os.environ.get("XDG_RUNTIME_DIR")
