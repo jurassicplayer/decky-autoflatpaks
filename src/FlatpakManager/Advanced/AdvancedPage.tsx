@@ -86,7 +86,7 @@ export const AdvancedPage: VFC = () => {
             disabled={appState != appStates.idle}
             onClick={() => {
               setShowStatusBar(false)
-              Promise.resolve(checkRunningPackages()).then((runningPackages) => {
+              checkRunningPackages().then((runningPackages) => {
                 if (runningPackages.length > 0) {
                   setShowStatusBar(true)
                   //showModal(<RunningPackagesModal runningPackages={runningPackages} />)
