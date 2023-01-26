@@ -294,6 +294,22 @@ export class Backend {
   //#endregion
 
   //#region Advanced Functions
+  static async getRunningPackages(){
+    let result: string[] = []
+    let runningList = await Backend.getRunningPackageList()
+    if (runningList.length == 0) return result
+    let localPackageList = await Backend.getLocalPackageList()
+    result = runningList.map(item => {
+      let application = item.application
+      if (localPackageList.length > 0) {
+        let app = localPackageList.find(LPLItem => LPLItem.application == item.application && LPLItem.branch == item.branch && LPLItem.arch == item.arch)
+        if (app) application = app.name
+      }
+      return application
+    })
+    result = [...new Set(result)]
+    return result
+  }
   static async RemoveUnusedPackages() {
     if (this.getAppState() != appStates.idle) return false
     let returncode = await this.UpdateOrUnusedPackages(this.getUnusedPackageList())
