@@ -1,6 +1,7 @@
 import { Focusable, PanelSectionRow, staticClasses, ToggleField } from "decky-frontend-lib"
 import { useEffect, useState, VFC } from "react"
 import { Settings } from "../../Utils/Settings"
+import { AppDataDirectory } from "./AppDataDirectory"
 import { RepairPackages } from "./RepairPackages"
 import { UnusedPackages } from "./UnusedPackages"
 
@@ -65,6 +66,7 @@ export const AdvancedPage: VFC = () => {
               setAggressiveEnabled(aggressiveEnabled)
             }}
           /></PanelSectionRow>
+          <AppDataDirectory setShowStatusBar={setShowStatusBar}/>
         </Focusable>
       </Focusable>
       <h2>Work In Progress</h2>
