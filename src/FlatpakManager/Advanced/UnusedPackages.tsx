@@ -1,5 +1,5 @@
-import { findSP, Focusable } from "decky-frontend-lib"
-import { CSSProperties, useEffect, useRef, useState } from "react"
+import { DialogButton, findSP, Focusable, showModal } from "decky-frontend-lib"
+import { CSSProperties, useEffect, useRef, useState, VFC } from "react"
 import { appStates, Backend } from "../../Utils/Backend"
 import { events } from "../../Utils/Events"
 import { FallbackModal } from "../../InputControls/FallbakModal"
@@ -9,20 +9,20 @@ import { ScrollPanel } from "../../InputControls/ScrollPanel"
 const onRemoveUnusedPackages = () => {
   Backend.RemoveUnusedPackages()
 }
-export const UnusedListScrollPanel: CSSProperties = {
+const UnusedListScrollPanel: CSSProperties = {
   maxHeight: Math.floor(findSP().window.innerHeight * 0.45),
   borderRadius: "7px",
   backgroundColor: "#121c25"
 }
-export const UnusedListContainer: CSSProperties = {
-  margin: "20px 20px 20px 20px",
-  paddingBottom: "15px",
-  display: "flex",
-  flexDirection: "column",
-  minWidth: "95%"
-}
+// const UnusedListContainer: CSSProperties = {
+//   margin: "20px 20px 20px 20px",
+//   paddingBottom: "15px",
+//   display: "flex",
+//   flexDirection: "column",
+//   minWidth: "95%"
+// }
 
-export const UnusedPackagesModal = (props: {closeModal?: CallableFunction}) => {
+const UnusedPackagesModal = (props: {closeModal?: CallableFunction}) => {
   const scrollView = useRef<HTMLDivElement>(null)
   const [scrollViewReady, setScrollViewReady] = useState<boolean>(false)
   const [unusedPackageList, setUnusedPackageList] = useState<FlatpakUnused[]>([])

@@ -1,4 +1,7 @@
-import { Backend } from "../../Utils/Backend"
+import { DialogButton, Focusable, showModal } from "decky-frontend-lib"
+import { useEffect, useState, VFC } from "react"
+import { appStates, Backend } from "../../Utils/Backend"
+import { events } from "../../Utils/Events"
 import { FallbackModal } from "../../InputControls/FallbakModal"
 
 const flatpakRepair = async (dryrun?: boolean) => {
@@ -6,8 +9,7 @@ const flatpakRepair = async (dryrun?: boolean) => {
   console.log(dryrun ? 'Repair (dryrun): ': 'Repair: ', output)
 }
 
-
-export const RepairPackagesModal = (props: any) => {
+const RepairPackagesModal = (props: any) => {
   return (
     <FallbackModal
       bDestructiveWarning={true}
