@@ -81,3 +81,25 @@ const UnusedPackagesModal = (props: {closeModal?: CallableFunction}) => {
     </FallbackModal>
   )
 }
+
+export const UnusedPackages: VFC = () => {
+  const [appState, setAppState] = useState<number>(Backend.getAppState())
+  const onAppStateChange = (e: Event) => { setAppState((e as events.AppStateEvent).appState) }
+
+  useEffect(() => {
+    Backend.eventBus.addEventListener(events.AppStateEvent.eType, onAppStateChange)
+  }, [])
+  useEffect(() => () => {
+    Backend.eventBus.removeEventListener(events.AppStateEvent.eType, onAppStateChange)
+  }, [])
+
+  return (
+    <Focusable>
+      <DialogButton
+        style={{ margin: "4px" }}
+        disabled={appState != appStates.idle}
+        onClick={() => {showModal(<UnusedPackagesModal/>)}}>
+        Unused Packages
+      </DialogButton>
+    </Focusable>
+  )}

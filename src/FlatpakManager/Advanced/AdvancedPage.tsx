@@ -1,22 +1,8 @@
-import { DialogButton, Focusable, PanelSection, PanelSectionRow, showModal, staticClasses, ToggleField } from "decky-frontend-lib"
+import { Focusable, PanelSectionRow, staticClasses, ToggleField } from "decky-frontend-lib"
 import { useEffect, useState, VFC } from "react"
-// import { FallbackModal } from "../../InputControls/FallbakModal"
-import { appStates, Backend } from "../../Utils/Backend"
-import { events } from "../../Utils/Events"
 import { Settings } from "../../Utils/Settings"
-import { RepairPackagesModal } from "./RepairPackagesModal"
-import { UnusedPackagesModal } from "./UnusedPackagesModal"
-
-const checkRunningPackages = async () => {
-  let result: (string|undefined)[] = []
-  let runningList = await Backend.getRunningPackageList()
-  console.log('Running List', runningList)
-  if (runningList.length == 0) return result
-  let localPackageList = await Backend.getLocalPackageList()
-  result = runningList.map(item => localPackageList ? localPackageList.find(LPLItem => LPLItem.application == item.application && LPLItem.branch == item.branch && LPLItem.arch == item.arch)?.name : item.application)
-  result = [...new Set(result)]
-  return result
-}
+import { RepairPackages } from "./RepairPackages"
+import { UnusedPackages } from "./UnusedPackages"
 
 const AdvancedStatusBar = () => {
   return (
@@ -49,56 +35,28 @@ const AdvancedStatusBar = () => {
 // }
 
 export const AdvancedPage: VFC = () => {
-  const [appState, setAppState] = useState<number>(Backend.getAppState())
   const [showStatusBar, setShowStatusBar] = useState<boolean>(false)
   const [aggressiveEnabled, setAggressiveEnabled] = useState<boolean>(Settings.aggressiveEnabled)
-  const onAppStateChange = (e: Event) => { setAppState((e as events.AppStateEvent).appState) }
   
   useEffect(() => {
-    if (Settings.aggressiveEnabled != aggressiveEnabled) Settings.aggressiveEnabled = aggressiveEnabled;
-    Settings.saveToLocalStorage();
+    if (Settings.aggressiveEnabled != aggressiveEnabled) Settings.aggressiveEnabled = aggressiveEnabled
+    Settings.saveToLocalStorage()
   }, [aggressiveEnabled])
-  useEffect(() => {
-    Backend.eventBus.addEventListener(events.AppStateEvent.eType, onAppStateChange)
-  }, [])
-  useEffect(() => () => {
-    Backend.eventBus.removeEventListener(events.AppStateEvent.eType, onAppStateChange)
-  }, [])
 
   return (
     <Focusable>
-      <PanelSection>
-        <PanelSectionRow>
+      <Focusable>
+        <Focusable>
           { showStatusBar
           ? <AdvancedStatusBar />
           : null }
-        </PanelSectionRow>
+        </Focusable>
         <div className={staticClasses.PanelSectionTitle}>Packages</div>
-        <PanelSectionRow>
-          <DialogButton
-            style={{ margin: "4px" }}
-            disabled={appState != appStates.idle}
-            onClick={() => {showModal(<UnusedPackagesModal/>)}}>
-            Unused Packages
-          </DialogButton>
-          <DialogButton
-            style={{ margin: "4px" }}
-            disabled={appState != appStates.idle}
-            onClick={() => {
-              setShowStatusBar(false)
-              checkRunningPackages().then((runningPackages) => {
-                if (runningPackages.length > 0) {
-                  setShowStatusBar(true)
-                  //showModal(<RunningPackagesModal runningPackages={runningPackages} />)
-                } else {
-                  showModal(<RepairPackagesModal />)
-                }
-              })}}>
-            Repair Packages
-          </DialogButton>
-        </PanelSectionRow>
+        <UnusedPackages />
+        <RepairPackages setShowStatusBar={setShowStatusBar}/>
         <div className={staticClasses.PanelSectionTitle}>Settings</div>
-        <PanelSectionRow>
+        <Focusable>
+          <PanelSectionRow>
           <ToggleField
             label="Aggressive Package Filtering"
             description="Filter out BaseApp, BaseExtension, Debug, Sources, and EoL packages"
@@ -106,9 +64,9 @@ export const AdvancedPage: VFC = () => {
             onChange={(aggressiveEnabled) => {
               setAggressiveEnabled(aggressiveEnabled)
             }}
-          />
-        </PanelSectionRow>
-      </PanelSection>
+          /></PanelSectionRow>
+        </Focusable>
+      </Focusable>
       <h2>Work In Progress</h2>
       <p>
         This is a tentative area that will be a place for advanced functions that hopefully won't need to be used.

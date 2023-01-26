@@ -28,3 +28,34 @@ const RepairPackagesModal = (props: any) => {
       }} />
   )
 }
+
+export const RepairPackages: VFC<{setShowStatusBar: CallableFunction}> = (props) => {
+  const [appState, setAppState] = useState<number>(Backend.getAppState())
+  const onAppStateChange = (e: Event) => { setAppState((e as events.AppStateEvent).appState) }
+
+  useEffect(() => {
+    Backend.eventBus.addEventListener(events.AppStateEvent.eType, onAppStateChange)
+  }, [])
+  useEffect(() => () => {
+    Backend.eventBus.removeEventListener(events.AppStateEvent.eType, onAppStateChange)
+  }, [])
+
+  return (
+    <Focusable>
+      <DialogButton
+        style={{ margin: "4px" }}
+        disabled={appState != appStates.idle}
+        onClick={() => {
+          props.setShowStatusBar(false)
+          Backend.getRunningPackages().then((runningPackages) => {
+            if (runningPackages.length > 0) {
+              props.setShowStatusBar(true)
+              //showModal(<RunningPackagesModal runningPackages={runningPackages} />)
+            } else {
+              showModal(<RepairPackagesModal />)
+            }
+          })}}>
+        Repair Packages
+      </DialogButton>
+    </Focusable>
+  )}
