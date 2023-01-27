@@ -1,6 +1,6 @@
 import { Focusable, Dropdown, staticClasses, TextField } from 'decky-frontend-lib'
 import { useState } from 'react'
-import { FallbackModal } from '../../InputControls/FallbakModal'
+import { FallbackModal } from '../../InputControls/FallbackModal'
 import { DropdownContainer, OptionRowContainer, OptionRowLabel } from "./OptionsModal.css"
 
 export interface FPMOptions {

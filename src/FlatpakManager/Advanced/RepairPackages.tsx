@@ -2,7 +2,7 @@ import { DialogButton, Focusable, showModal } from "decky-frontend-lib"
 import { useEffect, useState, VFC } from "react"
 import { appStates, Backend } from "../../Utils/Backend"
 import { events } from "../../Utils/Events"
-import { FallbackModal } from "../../InputControls/FallbakModal"
+import { FallbackModal } from "../../InputControls/FallbackModal"
 
 const flatpakRepair = async (dryrun?: boolean) => {
   let output = await Backend.RepairPackages(dryrun)

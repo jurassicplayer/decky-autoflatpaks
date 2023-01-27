@@ -1,6 +1,6 @@
 import { findSP, Focusable } from "decky-frontend-lib"
 import { useRef, useState, useEffect, CSSProperties } from "react"
-import { FallbackModal } from "../InputControls/FallbakModal"
+import { FallbackModal } from "../InputControls/FallbackModal"
 import { ScrollPanel } from "../InputControls/ScrollPanel"
 import { Backend } from "../Utils/Backend"
 import { events } from "../Utils/Events"

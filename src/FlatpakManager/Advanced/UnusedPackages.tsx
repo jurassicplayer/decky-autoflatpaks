@@ -2,7 +2,7 @@ import { DialogButton, findSP, Focusable, showModal } from "decky-frontend-lib"
 import { CSSProperties, useEffect, useRef, useState, VFC } from "react"
 import { appStates, Backend } from "../../Utils/Backend"
 import { events } from "../../Utils/Events"
-import { FallbackModal } from "../../InputControls/FallbakModal"
+import { FallbackModal } from "../../InputControls/FallbackModal"
 import { FlatpakUnused } from "../../Utils/Flatpak"
 import { ScrollPanel } from "../../InputControls/ScrollPanel"
 

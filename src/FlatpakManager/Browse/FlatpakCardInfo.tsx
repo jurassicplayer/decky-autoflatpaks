@@ -6,7 +6,7 @@ import { appStates, Backend } from "../../Utils/Backend"
 import { queueData } from "../../Utils/Backend.d"
 import { FlatpakMetadata } from "../../Utils/Flatpak"
 import { CardButton, CardInfo } from "./FlatpakCardInfo.css"
-import { FallbackModal } from "../../InputControls/FallbakModal"
+import { FallbackModal } from "../../InputControls/FallbackModal"
 import { events } from "../../Utils/Events"
 
 
