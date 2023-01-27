@@ -1,8 +1,10 @@
-import { DialogButton, Focusable, showModal } from "decky-frontend-lib"
+import { showModal } from "decky-frontend-lib"
 import { useEffect, useState, VFC } from "react"
 import { appStates, Backend } from "../../Utils/Backend"
 import { events } from "../../Utils/Events"
 import { FallbackModal } from "../../InputControls/FallbackModal"
+import { LabelButton } from "../../InputControls/LabelButton"
+import { FaEllipsisH } from "react-icons/fa"
 
 const flatpakRepair = async (dryrun?: boolean) => {
   let output = await Backend.RepairPackages(dryrun)
@@ -41,21 +43,38 @@ export const RepairPackages: VFC<{setShowStatusBar: CallableFunction}> = (props)
   }, [])
 
   return (
-    <Focusable>
-      <DialogButton
-        style={{ margin: "4px" }}
-        disabled={appState != appStates.idle}
-        onClick={() => {
-          props.setShowStatusBar(false)
-          Backend.getRunningPackages().then((runningPackages) => {
-            if (runningPackages.length > 0) {
-              props.setShowStatusBar(true)
-              //showModal(<RunningPackagesModal runningPackages={runningPackages} />)
-            } else {
-              showModal(<RepairPackagesModal />)
-            }
-          })}}>
-        Repair Packages
-      </DialogButton>
-    </Focusable>
+    <LabelButton
+      label="Repair Broken Packages"
+      description="Repair a flatpak installation by pruning and reinstalling invalid objects"
+      disabled={appState != appStates.idle}
+      onClick={() => {
+        props.setShowStatusBar(false)
+        Backend.getRunningPackages().then((runningPackages) => {
+          if (runningPackages.length > 0) {
+            props.setShowStatusBar(true)
+            //showModal(<RunningPackagesModal runningPackages={runningPackages} />)
+          } else {
+            showModal(<RepairPackagesModal />)
+          }
+        })
+      }}>
+      <FaEllipsisH />
+    </LabelButton>
+    // <Focusable>
+    //   <DialogButton
+    //     style={{ margin: "4px" }}
+    //     disabled={appState != appStates.idle}
+    //     onClick={() => {
+    //       props.setShowStatusBar(false)
+    //       Backend.getRunningPackages().then((runningPackages) => {
+    //         if (runningPackages.length > 0) {
+    //           props.setShowStatusBar(true)
+    //           //showModal(<RunningPackagesModal runningPackages={runningPackages} />)
+    //         } else {
+    //           showModal(<RepairPackagesModal />)
+    //         }
+    //       })}}>
+    //     Repair Packages
+    //   </DialogButton>
+    // </Focusable>
   )}

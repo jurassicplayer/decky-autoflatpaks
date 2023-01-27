@@ -1,10 +1,12 @@
-import { DialogButton, findSP, Focusable, showModal } from "decky-frontend-lib"
+import { findSP, Focusable, showModal } from "decky-frontend-lib"
 import { CSSProperties, useEffect, useRef, useState, VFC } from "react"
 import { appStates, Backend } from "../../Utils/Backend"
 import { events } from "../../Utils/Events"
+import { LabelButton } from "../../InputControls/LabelButton"
 import { FallbackModal } from "../../InputControls/FallbackModal"
 import { FlatpakUnused } from "../../Utils/Flatpak"
 import { ScrollPanel } from "../../InputControls/ScrollPanel"
+import { FaEllipsisH } from "react-icons/fa"
 
 const onRemoveUnusedPackages = () => {
   Backend.RemoveUnusedPackages()
@@ -94,12 +96,19 @@ export const UnusedPackages: VFC = () => {
   }, [])
 
   return (
-    <Focusable>
-      <DialogButton
-        style={{ margin: "4px" }}
-        disabled={appState != appStates.idle}
-        onClick={() => {showModal(<UnusedPackagesModal/>)}}>
-        Unused Packages
-      </DialogButton>
-    </Focusable>
+    <LabelButton
+      label="Clean Unused Packages"
+      description="List and uninstall all orphaned/unused packages no longer required by any package"
+      disabled={appState != appStates.idle}
+      onClick={() => {showModal(<UnusedPackagesModal/>)}}>
+      <FaEllipsisH />
+    </LabelButton>
+    // <Focusable>
+    //   <DialogButton
+    //     style={{ margin: "4px" }}
+    //     disabled={appState != appStates.idle}
+    //     onClick={() => {showModal(<UnusedPackagesModal/>)}}>
+    //     Unused Packages
+    //   </DialogButton>
+    // </Focusable>
   )}
