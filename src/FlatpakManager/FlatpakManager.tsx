@@ -18,7 +18,6 @@ export const FlatpakManager: VFC = () => {
       }}>
       <Tabs
         activeTab={currentTabRoute}
-        // @ts-ignore
         onShowTab={(tabID: string) => {
           setCurrentTabRoute(tabID);
         }}
