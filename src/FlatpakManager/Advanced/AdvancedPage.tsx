@@ -1,4 +1,4 @@
-import { Focusable, PanelSectionRow, staticClasses, ToggleField } from "decky-frontend-lib"
+import { Focusable, staticClasses, ToggleField } from "decky-frontend-lib"
 import { useEffect, useState, VFC } from "react"
 import { Settings } from "../../Utils/Settings"
 import { AppDataDirectory } from "./AppDataDirectory"
@@ -52,22 +52,31 @@ export const AdvancedPage: VFC = () => {
           ? <AdvancedStatusBar />
           : null }
         </Focusable>
-        <div className={staticClasses.PanelSectionTitle}>Packages</div>
-        <UnusedPackages />
-        <RepairPackages setShowStatusBar={setShowStatusBar}/>
+        
         <div className={staticClasses.PanelSectionTitle}>Settings</div>
-        <Focusable>
-          <PanelSectionRow>
+        <Focusable style={{
+            width: "95%",
+            margin: "auto"
+          }}>
           <ToggleField
             label="Aggressive Package Filtering"
             description="Filter out BaseApp, BaseExtension, Debug, Sources, and EoL packages"
             checked={aggressiveEnabled}
             onChange={(aggressiveEnabled) => {
               setAggressiveEnabled(aggressiveEnabled)
-            }}
-          /></PanelSectionRow>
+            }}/>
           <AppDataDirectory setShowStatusBar={setShowStatusBar}/>
         </Focusable>
+
+        <div className={staticClasses.PanelSectionTitle}>System Maintenance</div>
+        <Focusable style={{
+            width: "95%",
+            margin: "auto"
+          }}>
+          <UnusedPackages />
+          <RepairPackages setShowStatusBar={setShowStatusBar}/>
+        </Focusable>
+
       </Focusable>
       <h2>Work In Progress</h2>
       <p>
