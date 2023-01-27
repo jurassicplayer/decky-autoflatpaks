@@ -1,9 +1,15 @@
 import { DialogButton, Focusable, staticClasses } from "decky-frontend-lib"
-import { useEffect, useState, VFC } from "react"
+import { CSSProperties, useEffect, useState, VFC } from "react"
 import { FaFolderOpen, FaSave } from "react-icons/fa"
 import { appStates, Backend } from "../../Utils/Backend"
 import { events } from "../../Utils/Events"
 
+const emphasis: CSSProperties = {
+  background: '#ACB2C947',
+  borderRadius: '5px',
+  padding: '0px 6px 1px 6px',
+  color: '#fff'
+}
 
 export const AppDataDirectory: VFC<{setShowStatusBar: CallableFunction}> = (props) => {
   const [appState, setAppState] = useState<number>(Backend.getAppState())
@@ -33,8 +39,8 @@ export const AppDataDirectory: VFC<{setShowStatusBar: CallableFunction}> = (prop
         flexDirection: "column",
         flexGrow: 1
         }}>
-        <div className={staticClasses.Text}>AppData Directory:</div>
-        <div className={staticClasses.Label}>{selectedAppDataDir}</div>
+        <div className={staticClasses.Text}>AppData Directory: <span style={emphasis}>{selectedAppDataDir}</span></div>
+        <div className={staticClasses.Label}>Location of the flatpak app data directory. The path is <span style={emphasis}>~/.var/app</span> by default</div>
       </div>
       <DialogButton
         style={{margin:"4px", width: "auto", minWidth: "70px"}}
