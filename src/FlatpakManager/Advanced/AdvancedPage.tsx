@@ -1,6 +1,6 @@
-import { Focusable, staticClasses, ToggleField } from "decky-frontend-lib"
-import { useEffect, useState, VFC } from "react"
-import { Settings } from "../../Utils/Settings"
+import { Focusable, staticClasses } from "decky-frontend-lib"
+import { useState, VFC } from "react"
+import { AggressiveFilter } from "./AggressiveFilter"
 import { AppDataDirectory } from "./AppDataDirectory"
 import { RepairPackages } from "./RepairPackages"
 import { UnusedPackages } from "./UnusedPackages"
@@ -37,12 +37,6 @@ const AdvancedStatusBar = () => {
 
 export const AdvancedPage: VFC = () => {
   const [showStatusBar, setShowStatusBar] = useState<boolean>(false)
-  const [aggressiveEnabled, setAggressiveEnabled] = useState<boolean>(Settings.aggressiveEnabled)
-  
-  useEffect(() => {
-    if (Settings.aggressiveEnabled != aggressiveEnabled) Settings.aggressiveEnabled = aggressiveEnabled
-    Settings.saveToLocalStorage()
-  }, [aggressiveEnabled])
 
   return (
     <Focusable>
@@ -58,13 +52,7 @@ export const AdvancedPage: VFC = () => {
             width: "95%",
             margin: "auto"
           }}>
-          <ToggleField
-            label="Aggressive Package Filtering"
-            description="Filter out BaseApp, BaseExtension, Debug, Sources, and EoL packages"
-            checked={aggressiveEnabled}
-            onChange={(aggressiveEnabled) => {
-              setAggressiveEnabled(aggressiveEnabled)
-            }}/>
+          <AggressiveFilter />
           <AppDataDirectory setShowStatusBar={setShowStatusBar}/>
         </Focusable>
 
