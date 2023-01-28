@@ -6,15 +6,21 @@ interface LabelControlProps {
   description?: React.ReactNode
 }
 
-const RowContainer: CSSProperties = {
+export const RowContainer: CSSProperties = {
   display: "flex",
   flexDirection: "row",
   minHeight: "3em"
 }
-const LabelContainer: CSSProperties = {
+export const LabelContainer: CSSProperties = {
   display: "flex",
   flexDirection: "column",
+  justifyContent: "space-evenly",
   flexGrow: 1
+}
+export const ButtonStyle: CSSProperties = {
+  margin:"4px",
+  width: "auto",
+  minWidth: "70px"
 }
 
 export const LabelButton: FC<DialogButtonProps & LabelControlProps> = (props) => {
@@ -27,7 +33,7 @@ export const LabelButton: FC<DialogButtonProps & LabelControlProps> = (props) =>
       </div>
       <DialogButton
         {...props}
-        style={{margin:"4px", width: "auto", minWidth: "70px", ...props.style}}>{props.children}
+        style={{...ButtonStyle, ...props.style}}>{props.children}
       </DialogButton>
     </Focusable>
   )}

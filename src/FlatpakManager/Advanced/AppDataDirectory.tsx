@@ -1,14 +1,16 @@
 import { DialogButton, Focusable, staticClasses } from "decky-frontend-lib"
 import { CSSProperties, useEffect, useState, VFC } from "react"
 import { FaFolderOpen, FaSave } from "react-icons/fa"
+import { ButtonStyle, LabelContainer, RowContainer } from "../../InputControls/LabelControls"
 import { appStates, Backend } from "../../Utils/Backend"
 import { events } from "../../Utils/Events"
+import { SteamCssVariables } from "../../Utils/SteamUtils"
 
 const emphasis: CSSProperties = {
-  background: '#ACB2C947',
-  borderRadius: '5px',
+  background: SteamCssVariables.gpBackgroundNeutralLightSoft,
+  borderRadius: SteamCssVariables.gpCornerLarge,
   padding: '0px 6px 1px 6px',
-  color: '#fff'
+  color: SteamCssVariables.gpBackgroundNeutralLightHard
 }
 
 export const AppDataDirectory: VFC<{setShowStatusBar: CallableFunction}> = (props) => {
@@ -30,26 +32,19 @@ export const AppDataDirectory: VFC<{setShowStatusBar: CallableFunction}> = (prop
 
   return (
     <Focusable
-      style={{
-        display: "flex",
-        flexDirection: "row"
-      }}>
-      <div style={{
-        display: "flex",
-        flexDirection: "column",
-        flexGrow: 1
-        }}>
+      style={RowContainer}>
+      <div style={LabelContainer}>
         <div className={staticClasses.Text}>AppData Directory: <span style={emphasis}>{selectedAppDataDir}</span></div>
         <div className={staticClasses.Label}>Location of the flatpak app data directory. The path is <span style={emphasis}>~/.var/app</span> by default</div>
       </div>
       <DialogButton
-        style={{margin:"4px", width: "auto", minWidth: "70px"}}
+        style={ButtonStyle}
         onClick={async () => {
           let newPath = await Backend.getServer().openFilePicker(appDataDir, false)
           setSelectedAppDataDir(newPath.realpath)
         }}><FaFolderOpen /></DialogButton>
       <DialogButton
-        style={{margin:"4px", width: "auto", minWidth: "70px"}}
+        style={ButtonStyle}
         disabled={selectedAppDataDir == appDataDir || appState != appStates.idle}
         onClick={() => {
           props.setShowStatusBar(false)
