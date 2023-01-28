@@ -3,7 +3,7 @@ import { useEffect, useState, VFC } from "react"
 import { appStates, Backend } from "../../Utils/Backend"
 import { events } from "../../Utils/Events"
 import { FallbackModal } from "../../InputControls/FallbackModal"
-import { LabelButton } from "../../InputControls/LabelButton"
+import { LabelButton } from "../../InputControls/LabelControls"
 import { FaEllipsisH } from "react-icons/fa"
 
 const flatpakRepair = async (dryrun?: boolean) => {
