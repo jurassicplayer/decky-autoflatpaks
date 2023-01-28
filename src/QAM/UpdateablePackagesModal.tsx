@@ -1,15 +1,16 @@
-import { findSP, Focusable } from "decky-frontend-lib"
+import { Focusable } from "decky-frontend-lib"
 import { useRef, useState, useEffect, CSSProperties } from "react"
 import { FallbackModal } from "../InputControls/FallbackModal"
 import { ScrollPanel } from "../InputControls/ScrollPanel"
 import { Backend } from "../Utils/Backend"
 import { events } from "../Utils/Events"
+import { SteamCssVariables } from "../Utils/SteamUtils"
 
 
 export const UpdateListScrollPanel: CSSProperties = {
-  maxHeight: Math.floor(findSP().window.innerHeight * 0.45),
-  borderRadius: "7px",
-  backgroundColor: "#121c25"
+  maxHeight:"45vh",
+  borderRadius: SteamCssVariables.gpCornerLarge,
+  backgroundColor: SteamCssVariables.gpBackgroundLightSofter
 }
 export const UpdateablePackagesModal = (props: {closeModal?: CallableFunction}) => {
   const scrollView = useRef<HTMLDivElement>(null)

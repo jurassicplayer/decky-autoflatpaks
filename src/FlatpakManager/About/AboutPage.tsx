@@ -2,22 +2,23 @@ import { Focusable } from "decky-frontend-lib"
 import { CSSProperties, useRef, VFC } from "react"
 import { FaDownload, FaEye, FaEyeSlash, FaSyncAlt, FaTrashAlt, FaEllipsisH } from "react-icons/fa"
 import { ScrollPanel } from "../../InputControls/ScrollPanel"
+import { SteamCssVariables } from "../../Utils/SteamUtils"
 
 export const AboutScrollPanel: CSSProperties = {
   height: "95%",
   minHeight: "95%",
   margin: "0px",
-  borderRadius: "7px",
+  borderRadius: SteamCssVariables.gpCornerLarge,
   display: "flex",
   justifyContent: "center",
-  backgroundColor: "#121c25"
+  backgroundColor: SteamCssVariables.gpBackgroundLightSofter
 }
 export const AboutContainer: CSSProperties = {
   margin: "20px 20px 0px 20px",
   paddingBottom: "15px",
-  display: "flex",
   flexDirection: "column",
-  minWidth: "95%"
+  minWidth: "95%",
+  display: "flex"
 }
 
 export const AboutPage: VFC = () => {

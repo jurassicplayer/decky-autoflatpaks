@@ -10,7 +10,7 @@ const emphasis: CSSProperties = {
   background: SteamCssVariables.gpBackgroundNeutralLightSoft,
   borderRadius: SteamCssVariables.gpCornerLarge,
   padding: '0px 6px 1px 6px',
-  color: SteamCssVariables.gpBackgroundNeutralLightHard
+  color: SteamCssVariables.mainTextColor
 }
 
 export const AppDataDirectory: VFC<{setShowStatusBar: CallableFunction}> = (props) => {

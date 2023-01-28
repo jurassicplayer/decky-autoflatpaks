@@ -60,21 +60,4 @@ export const RepairPackages: VFC<{setShowStatusBar: CallableFunction}> = (props)
       }}>
       <FaEllipsisH />
     </LabelButton>
-    // <Focusable>
-    //   <DialogButton
-    //     style={{ margin: "4px" }}
-    //     disabled={appState != appStates.idle}
-    //     onClick={() => {
-    //       props.setShowStatusBar(false)
-    //       Backend.getRunningPackages().then((runningPackages) => {
-    //         if (runningPackages.length > 0) {
-    //           props.setShowStatusBar(true)
-    //           //showModal(<RunningPackagesModal runningPackages={runningPackages} />)
-    //         } else {
-    //           showModal(<RepairPackagesModal />)
-    //         }
-    //       })}}>
-    //     Repair Packages
-    //   </DialogButton>
-    // </Focusable>
   )}

@@ -1,4 +1,4 @@
-import { findSP, Focusable, showModal } from "decky-frontend-lib"
+import { Focusable, showModal } from "decky-frontend-lib"
 import { CSSProperties, useEffect, useRef, useState, VFC } from "react"
 import { appStates, Backend } from "../../Utils/Backend"
 import { events } from "../../Utils/Events"
@@ -7,22 +7,16 @@ import { FallbackModal } from "../../InputControls/FallbackModal"
 import { FlatpakUnused } from "../../Utils/Flatpak"
 import { ScrollPanel } from "../../InputControls/ScrollPanel"
 import { FaEllipsisH } from "react-icons/fa"
+import { SteamCssVariables } from "../../Utils/SteamUtils"
 
 const onRemoveUnusedPackages = () => {
   Backend.RemoveUnusedPackages()
 }
 const UnusedListScrollPanel: CSSProperties = {
-  maxHeight: Math.floor(findSP().window.innerHeight * 0.45),
-  borderRadius: "7px",
-  backgroundColor: "#121c25"
+  maxHeight:"45vh",
+  borderRadius: SteamCssVariables.gpCornerLarge,
+  backgroundColor: SteamCssVariables.gpBackgroundLightSofter
 }
-// const UnusedListContainer: CSSProperties = {
-//   margin: "20px 20px 20px 20px",
-//   paddingBottom: "15px",
-//   display: "flex",
-//   flexDirection: "column",
-//   minWidth: "95%"
-// }
 
 const UnusedPackagesModal = (props: {closeModal?: CallableFunction}) => {
   const scrollView = useRef<HTMLDivElement>(null)
@@ -103,12 +97,4 @@ export const UnusedPackages: VFC = () => {
       onClick={() => {showModal(<UnusedPackagesModal/>)}}>
       <FaEllipsisH />
     </LabelButton>
-    // <Focusable>
-    //   <DialogButton
-    //     style={{ margin: "4px" }}
-    //     disabled={appState != appStates.idle}
-    //     onClick={() => {showModal(<UnusedPackagesModal/>)}}>
-    //     Unused Packages
-    //   </DialogButton>
-    // </Focusable>
   )}
