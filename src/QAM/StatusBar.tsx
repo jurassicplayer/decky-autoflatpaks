@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { DialogButton, findSP, PanelSectionRow, showModal } from "decky-frontend-lib"
+import { DialogButton, PanelSectionRow, showModal } from "decky-frontend-lib"
 import { appStates, Backend } from "../Utils/Backend"
 import { StatusBarCSS } from "./StatusBar.css"
 import { events } from "../Utils/Events"
@@ -86,7 +86,7 @@ export const StatusBar = () => {
               onGamepadFocus={() => setHover(true)}
               onGamepadBlur={() => setHover(false)}
               onOKActionDescription="Updates"
-              onClick={() => {showModal(<UpdateablePackagesModal/>, findSP(), {popupHeight: 100})}}
+              onClick={() => {showModal(<UpdateablePackagesModal/>)}}
               style={hover ? StatusBarCSS.HiddenButtonHover : StatusBarCSS.HiddenButton }
               disabled={!ShowUpdateList}>
               {StatusText}

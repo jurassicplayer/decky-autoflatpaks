@@ -1,4 +1,4 @@
-import { DialogButton, Focusable, SteamSpinner, showModal, findSP } from "decky-frontend-lib"
+import { DialogButton, Focusable, SteamSpinner, showModal } from "decky-frontend-lib"
 import { FaRedoAlt } from "react-icons/fa"
 import { VFC, useEffect, useState, useMemo } from "react"
 import { FPMOptions, OptionsModal } from "./OptionsModal"
@@ -111,7 +111,7 @@ export const BrowsePage: VFC = () => {
   return (
     <Focusable
       style={BrowsePageContainer}
-      onOptionsButton={()=>{showModal(<OptionsModal selectedOptions={selectedOptions} setSelectedOptions={setSelectedOptions} />, findSP())}}
+      onOptionsButton={()=>{showModal(<OptionsModal selectedOptions={selectedOptions} setSelectedOptions={setSelectedOptions} />)}}
       onOptionsActionDescription="Options"
       onSecondaryButton={()=>Backend.ProcessQueue()}
       onSecondaryActionDescription="Apply Queue">
