@@ -1,5 +1,6 @@
 import { Focusable, staticClasses } from "decky-frontend-lib"
 import { useState, VFC } from "react"
+import { SteamCssVariables } from "../../Utils/SteamUtils"
 import { AggressiveFilter } from "./AggressiveFilter"
 import { AppDataDirectory } from "./AppDataDirectory"
 import { RepairPackages } from "./RepairPackages"
@@ -9,8 +10,8 @@ const AdvancedStatusBar = () => {
   return (
     <Focusable
       style={{
-        background: "#7a0a0a",
-        borderRadius: "2px",
+        background: SteamCssVariables.gpColorRedHi,
+        borderRadius: SteamCssVariables.gpCornerMedium,
         padding: "10px 10px 10px 20px"}}>
       [Error] Please close any running flatpaks before proceeding.
     </Focusable>
@@ -35,6 +36,16 @@ const AdvancedStatusBar = () => {
 //   )
 // }
 
+const Separator = () => {
+  return (
+    <hr style={{
+      height: "0.5px",
+      margin: "2px 0px 2px 0px",
+      borderWidth: "0px",
+      background: SteamCssVariables.gpBackgroundNeutralLightSoft
+    }}/>
+  )}
+
 export const AdvancedPage: VFC = () => {
   const [showStatusBar, setShowStatusBar] = useState<boolean>(false)
 
@@ -53,7 +64,9 @@ export const AdvancedPage: VFC = () => {
             margin: "auto"
           }}>
           <AggressiveFilter />
+          <Separator />
           <AppDataDirectory setShowStatusBar={setShowStatusBar}/>
+          <Separator />
         </Focusable>
 
         <div className={staticClasses.PanelSectionTitle}>System Maintenance</div>
@@ -62,7 +75,9 @@ export const AdvancedPage: VFC = () => {
             margin: "auto"
           }}>
           <UnusedPackages />
+          <Separator />
           <RepairPackages setShowStatusBar={setShowStatusBar}/>
+          <Separator />
         </Focusable>
 
       </Focusable>
