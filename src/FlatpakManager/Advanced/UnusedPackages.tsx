@@ -75,8 +75,7 @@ const UnusedPackagesModal = (props: {closeModal?: CallableFunction}) => {
         }
       </ScrollPanel>
     </FallbackModal>
-  )
-}
+  )}
 
 export const UnusedPackages: VFC = () => {
   const [appState, setAppState] = useState<number>(Backend.getAppState())

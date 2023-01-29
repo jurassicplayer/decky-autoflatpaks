@@ -2,6 +2,7 @@ import { showModal } from "decky-frontend-lib"
 import { useEffect, useState, VFC } from "react"
 import { appStates, Backend } from "../../Utils/Backend"
 import { events } from "../../Utils/Events"
+import { RunningPackagesModal } from "./RunningPackages"
 import { FallbackModal } from "../../InputControls/FallbackModal"
 import { LabelButton } from "../../InputControls/LabelControls"
 import { FaEllipsisH } from "react-icons/fa"
@@ -12,22 +13,32 @@ const flatpakRepair = async (dryrun?: boolean) => {
 }
 
 const RepairPackagesModal = (props: any) => {
+  const closeModal = () => {
+    if (props.closeModal) { props.closeModal() }
+  }
   return (
     <FallbackModal
       bDestructiveWarning={true}
-      strTitle='Repair Packages'
-      strDescription='Only use this if you know what you are doing. Refer to flatpak-repair man page for more information of what this command will do. While running, most of AutoFlatpaks functions will be disabled.'
-      /*
+      strTitle='Repair Broken Packages'
+      strDescription='This process may take several minutes to complete and while running, most of AutoFlatpaks functions will be disabled. Also, until websockets is implemented and merged into decky-loader, there will be no indication of progress or resultant output beyond the status bar indicating that the process is still running or complete. Refer to the flatpak-repair man page for more information on what this process entails.'
       strOKButtonText='DryRun'
       strMiddleButtonText='Run'
-      onOK={() => flatpakRepair(true)}
-      onMiddleButton={() => flatpakRepair()}
-      */
+      onOK={() => {
+        flatpakRepair(true)
+        closeModal()
+      }}
+      onMiddleButton={() => {
+        flatpakRepair()
+        closeModal()
+      }}
+      /*
       strOKButtonText='Run'
-      onOK={() => flatpakRepair()}
-      closeModal={()=>{
-        if (props.closeModal) { props.closeModal() }
-      }} />
+      onOK={() => {
+        flatpakRepair()
+        closeModal()
+      }}
+      */
+      closeModal={closeModal} />
   )
 }
 
@@ -45,14 +56,14 @@ export const RepairPackages: VFC<{setShowStatusBar: CallableFunction}> = (props)
   return (
     <LabelButton
       label="Repair Broken Packages"
-      description="Repair a flatpak installation by pruning and reinstalling invalid objects"
+      description="Repair a flatpak installation by pruning and reinstalling invalid objects. USE AT YOUR OWN RISK"
       disabled={appState != appStates.idle}
       onClick={() => {
         props.setShowStatusBar(false)
         Backend.getRunningPackages().then((runningPackages) => {
           if (runningPackages.length > 0) {
             props.setShowStatusBar(true)
-            //showModal(<RunningPackagesModal runningPackages={runningPackages} />)
+            showModal(<RunningPackagesModal runningPackages={runningPackages} />)
           } else {
             showModal(<RepairPackagesModal />)
           }
