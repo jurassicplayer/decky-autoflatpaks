@@ -106,14 +106,12 @@ export const AboutPage: VFC = () => {
             <li>Visual glitching when a game and modal open at the same time</li>
             <li>Visual glitching, more info on discord forum post (?)</li>
             <li>Persist highlighted button while scrolling package list (?)</li>
-            <li>Change CSS to be more friendly with CSSLoader themes instead of my own thing</li>
             <li>Add check for network connectivity before continuing intervalcheck (?)</li>
             <li>Add remaining space check</li>
             <li>Move logger into Advanced tab (?)</li>
             <li>Move QAM settings to Advanced tab (?)</li>
             <li>Filter Search refinement (regex, fuzzy?)</li>
             <li>A How-To page with functionality explained in bite-sized chunks</li>
-            <li>Test and fix any bugginess with update all button and desyncing package list</li>
             <li>Add to Steam (?)</li>
             <li>Remove minutes option</li>
             <li>Revise settings backend to reduce calls to python backend</li>
