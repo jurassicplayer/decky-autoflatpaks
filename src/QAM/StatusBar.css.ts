@@ -1,7 +1,8 @@
 import { CSSProperties } from "react";
+import { SteamCssVariables } from "../Utils/SteamUtils";
 
 const StatusBarBase: CSSProperties = {
-  color: "#FFFFFF",
+  color: SteamCssVariables.mainTextColor,
   fontSize: "13px",
   overflow: "hidden",
   whiteSpace: "nowrap"
@@ -23,10 +24,10 @@ export const StatusBarCSS: {[key: string]: CSSProperties} = {
   },
   CheckForUpdates: {
     ...StatusBarBase,
-    backgroundColor: "#0b6f4c"
+    backgroundColor: SteamCssVariables.customStatusGreen
   },
   ProcessingQueue: {
     ...StatusBarBase,
-    backgroundColor: "#7a0a0a"
+    backgroundColor: SteamCssVariables.customStatusRed
   }
 }

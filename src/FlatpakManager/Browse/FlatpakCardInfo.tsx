@@ -71,7 +71,7 @@ export const FlatpakCardInfo: VFC<{data: FlatpakMetadata, focus: boolean}> = (pr
   return (
     <Focusable style={CardInfo.container}>
       <DialogButton
-        style={props.focus ? CardInfo.focus : CardInfo.blur}
+        style={CardInfo.base}
         onOKActionDescription='PkgInfo'
         onClick={() => showModal(<FlatpakInfoModal data={packageInfo} />)}>
         <div>{packageInfo.name}</div>

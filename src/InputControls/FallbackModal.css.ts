@@ -1,3 +1,5 @@
+import { SteamCssVariables } from "../Utils/SteamUtils"
+
 export const FallbackModalContainer = {
   maxHeight: "45vh",
   display: "flex",
@@ -9,8 +11,8 @@ export const FallbackModalContainer = {
 }
 
 export const FallbackModalContent = {
-  backgroundColor: "#1b1c25",
-  borderRadius: "8px",
+  backgroundColor: SteamCssVariables.gpBackgroundLightSofter,
+  borderRadius: SteamCssVariables.gpCornerLarge,
   height: "fit-content",
   width: "70%",
   padding: "20px"

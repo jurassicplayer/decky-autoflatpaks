@@ -1,14 +1,5 @@
 import { CSSProperties } from "react";
-
-const CardInfoBase: CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
-  overflow: "scroll",
-  whiteSpace: "nowrap",
-  color: "white",
-  padding: "0px"
-}
+import { SteamCssVariables } from "../../Utils/SteamUtils";
 
 export const CardInfo: {[key: string]: CSSProperties} = {
   container: {
@@ -17,13 +8,15 @@ export const CardInfo: {[key: string]: CSSProperties} = {
     justifyContent: "space-between",
     minWidth: "100%"
   },
-  focus: {
-    ...CardInfoBase,
-    backgroundColor: "#4b6e90" //"#1f2933"
-  },
-  blur: {
-    ...CardInfoBase,
-    backgroundColor: "#121c25"
+  base: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    overflow: "scroll",
+    whiteSpace: "nowrap",
+    padding: "0px",
+    color: SteamCssVariables.mainTextColor,
+    backgroundColor: SteamCssVariables.customTransparent
   }
 }
 
@@ -37,7 +30,7 @@ const CardButtonBase = {
 export const CardButton: {[key: string]: CSSProperties} = {
   maskToggled: {
     ...CardButtonBase,
-    backgroundColor: "#9c8f40"
+    backgroundColor: SteamCssVariables.customStatusYellow
   },
   mask: {
     ...CardButtonBase
@@ -47,14 +40,14 @@ export const CardButton: {[key: string]: CSSProperties} = {
   },
   installToggled: {
     ...CardButtonBase,
-    backgroundColor: "#296829"
+    backgroundColor: SteamCssVariables.customStatusGreen
   },
   uninstall: {
     ...CardButtonBase
   },
   uninstallToggled: {
     ...CardButtonBase,
-    backgroundColor: "#5f1919"
+    backgroundColor: SteamCssVariables.customStatusRed
   },
   update: {
     ...CardButtonBase

@@ -1,7 +1,9 @@
+import { SteamCssVariables } from "../../Utils/SteamUtils"
+
 const CardBase = {
+  borderRadius: SteamCssVariables.gpCornerLarge,
   display: "flex",
   justifyContent: "space-between",
-  borderRadius: "7px",
   minHeight: "3em",
   maxHeight: "3em",
   margin: "2px",
@@ -11,10 +13,10 @@ const CardBase = {
 export const Card = {
   focus: {
     ...CardBase,
-    backgroundColor: "#4b6e90" //"#1f2933"
+    backgroundColor: SteamCssVariables.gpStoreDarkGrey
   },
   blur: {
     ...CardBase,
-    backgroundColor: "#121c25"
+    backgroundColor: SteamCssVariables.mainEditorInputBgColor
   }
 }

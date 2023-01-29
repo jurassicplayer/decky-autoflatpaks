@@ -1,4 +1,6 @@
 import { CSSProperties } from "react"
+import { SteamCssVariables } from "../../Utils/SteamUtils"
+
 export const BrowsePageContainer: CSSProperties = {
   display: "flex",
   justifyContent: "center",
@@ -14,7 +16,7 @@ export const PackageListContainer: CSSProperties = {
 }
 
 export const RefreshButton: CSSProperties = {
-  margin: "2px",
+  borderRadius: SteamCssVariables.gpCornerLarge,
   maxWidth: "99.5%",
-  borderRadius: "7px"
+  margin: "2px"
 }

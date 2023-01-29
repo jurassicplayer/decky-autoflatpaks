@@ -146,4 +146,11 @@ export class SteamCssVariables {
   static gpTextBodyLarge = "var(--gpText-BodyLarge)"                                            // normal 400 16px/1.4 "Motiva Sans", Arial, Sans-serif
   static gpTextBodyMedium = "var(--gpText-BodyMedium)"                                          // normal 400 14px/1.4 "Motiva Sans", Arial, Sans-serif
   static gpTextBodySmall = "var(--gpText-BodySmall)"                                            // normal 400 12px/1.4 "Motiva Sans", Arial, Sans-serif
+
+  // Custom shared CSS
+  static customTransparent = "#fff0" // Transparent
+  static customStatusGreen = "#0b6f4c"
+  static customStatusYellow = "#9c8f40"
+  static customStatusRed = "#7a0a0a"
+  static customSpinnerBgColor = "#0c1519"
 }

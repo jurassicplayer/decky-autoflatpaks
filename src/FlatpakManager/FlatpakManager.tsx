@@ -1,5 +1,6 @@
 import { Focusable, Tabs } from "decky-frontend-lib"
 import { VFC, useState } from "react"
+import { SteamCssVariables } from "../Utils/SteamUtils"
 import { AboutPage } from "./About/AboutPage"
 import { AdvancedPage } from "./Advanced/AdvancedPage"
 import { BrowsePage } from "./Browse/BrowsePage"
@@ -14,7 +15,7 @@ export const FlatpakManager: VFC = () => {
       style={{
         marginTop: "40px",
         height: "calc(100% - 40px)",
-        background: "#0c1519"
+        background: SteamCssVariables.customSpinnerBgColor
       }}>
       <Tabs
         activeTab={currentTabRoute}

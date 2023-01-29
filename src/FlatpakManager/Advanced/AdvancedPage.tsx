@@ -1,4 +1,5 @@
 import { Focusable, staticClasses } from "decky-frontend-lib"
+import { CSSProperties } from "react"
 import { useState, VFC } from "react"
 import { SteamCssVariables } from "../../Utils/SteamUtils"
 import { AggressiveFilter } from "./AggressiveFilter"
@@ -45,6 +46,10 @@ const Separator = () => {
       background: SteamCssVariables.gpBackgroundNeutralLightSoft
     }}/>
   )}
+const SectionStyle: CSSProperties = {
+  width: "95%",
+  margin: "auto"
+}
 
 export const AdvancedPage: VFC = () => {
   const [showStatusBar, setShowStatusBar] = useState<boolean>(false)
@@ -59,10 +64,7 @@ export const AdvancedPage: VFC = () => {
         </Focusable>
         
         <div className={staticClasses.PanelSectionTitle}>Settings</div>
-        <Focusable style={{
-            width: "95%",
-            margin: "auto"
-          }}>
+        <Focusable style={SectionStyle}>
           <AggressiveFilter />
           <Separator />
           <AppDataDirectory setShowStatusBar={setShowStatusBar}/>
@@ -70,10 +72,7 @@ export const AdvancedPage: VFC = () => {
         </Focusable>
 
         <div className={staticClasses.PanelSectionTitle}>System Maintenance</div>
-        <Focusable style={{
-            width: "95%",
-            margin: "auto"
-          }}>
+        <Focusable style={SectionStyle}>
           <UnusedPackages />
           <Separator />
           <RepairPackages setShowStatusBar={setShowStatusBar}/>

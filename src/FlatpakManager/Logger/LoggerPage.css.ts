@@ -15,7 +15,7 @@ export const HistoryReadyScrollPanel: CSSProperties = {
 }
 export const HistoryNotReadyScrollPanel: CSSProperties = {
   ...HistoryScrollPanelBase,
-  backgroundColor: SteamCssVariables.gpBackgroundDarkSofter
+  backgroundColor: SteamCssVariables.customSpinnerBgColor
 }
 export const HistoryLogContainer: CSSProperties = {
   margin: "20px 20px 0px 20px",
