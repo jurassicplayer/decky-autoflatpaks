@@ -11,7 +11,8 @@ export enum appStates {
   checkingForUpdates,
   buildingPackageList,
   processingQueue,
-  repairingPackages
+  repairingPackages,
+  migratingAppData
 } 
 
 export class Backend {
@@ -353,6 +354,13 @@ export class Backend {
   static async getAppDataDir() {
     let proc = await this.bridge("getAppDataDir")
     return proc.output as string
+  }
+  static async MigrateAppData(currentAppDataDir: string, targetAppDataDir: string) {
+    if (this.getAppState() != appStates.idle) return false
+    this.setAppState(appStates.migratingAppData)
+    let returncode = await this.bridge("MigrateAppData", {currentAppDataDir: currentAppDataDir, targetAppDataDir: targetAppDataDir})
+    this.setAppState(appStates.idle)
+    return returncode
   }
   //#endregion
 }
