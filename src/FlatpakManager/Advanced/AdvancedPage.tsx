@@ -1,41 +1,11 @@
 import { Focusable, staticClasses } from "decky-frontend-lib"
-import { CSSProperties } from "react"
-import { useState, VFC } from "react"
+import { CSSProperties, useState, VFC } from "react"
 import { SteamCssVariables } from "../../Utils/SteamUtils"
+import { AdvancedStatusBar } from "./AdvancedStatusBar"
 import { AggressiveFilter } from "./AggressiveFilter"
 import { AppDataDirectory } from "./AppDataDirectory"
 import { RepairPackages } from "./RepairPackages"
 import { UnusedPackages } from "./UnusedPackages"
-
-const AdvancedStatusBar = () => {
-  return (
-    <Focusable
-      style={{
-        background: SteamCssVariables.gpColorRedHi,
-        borderRadius: SteamCssVariables.gpCornerMedium,
-        padding: "10px 10px 10px 20px"}}>
-      [Error] Please close any running flatpaks before proceeding.
-    </Focusable>
-  )
-}
-// const RunningPackagesModal = (props: any) => {
-//   return (
-//     <FallbackModal
-//       bDestructiveWarning={true}
-//       strTitle='Error: Packages Still Running'
-//       strDescription='This procedure would be safer done without any flatpaks running. Please close any running flatpaks first.'
-//       bCancelDisabled={true}
-//       bMiddleDisabled={true}
-//       bAlertDialog={true}
-//       closeModal={()=>{
-//         if (props.closeModal) { props.closeModal() }
-//       }}>
-//       {props.runningPackages.sort((a:string, b:string) => a.localeCompare(b)).map((item: string) => 
-//         <div>{item}</div>
-//       )}
-//     </FallbackModal>
-//   )
-// }
 
 const Separator = () => {
   return (
@@ -57,12 +27,7 @@ export const AdvancedPage: VFC = () => {
   return (
     <Focusable>
       <Focusable>
-        <Focusable>
-          { showStatusBar
-          ? <AdvancedStatusBar />
-          : null }
-        </Focusable>
-        
+        <AdvancedStatusBar statusBar={showStatusBar} />
         <div className={staticClasses.PanelSectionTitle}>Settings</div>
         <Focusable style={SectionStyle}>
           <AggressiveFilter />

@@ -76,6 +76,9 @@ export const StatusBar = () => {
   } else if (appState == appStates.repairingPackages) {
     StatusText = "Repairing packages..."
     CSS = StatusBarCSS.ProcessingQueue
+  } else if (appState == appStates.migratingAppData) {
+    StatusText = "Moving application data..."
+    CSS = StatusBarCSS.ProcessingQueue
   }
   return (
     <PanelSectionRow>
