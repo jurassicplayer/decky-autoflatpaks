@@ -161,12 +161,10 @@ class Plugin:
         return proc
     async def getLocalPackageList(self):
         logging.info('Received request for list of local packages')
-        cmdBase = 'flatpak list -a --columns=name:f,installation:f,description:f,size:f,version:f,active:f,branch:f,ref:f,origin:f,application:f,runtime:f,arch:f,options:f,latest:f'
-        cmdApp = cmdBase + ' --app'
-        cmdRuntime = cmdBase + ' --runtime'
+        cmd = 'flatpak list -a --columns=name:f,installation:f,description:f,size:f,version:f,active:f,branch:f,ref:f,origin:f,application:f,runtime:f,arch:f,options:f,latest:f'
         regex = r'(?P<name>.*?)\s+(?P<installation>(system|user))\s+(?P<description>.*)\s+(?P<installed_size>((\d+(\.\d+)?)|(\.\d+)).(bytes|kB|MB|GB|TB|PB))\s+(?P<version>.*?)\s+(?P<active>[aA-fF0-9]{12})\s+(?P<branch>.*?)\s+(?P<ref>\S+)\s+(?P<origin>.*?)\s+(?P<application>[^\s,]+)\s+(?P<runtime>.*?)\s+(?P<arch>(x86_64|i386|aarch64|arm))\s+(?P<options>.*)\s+(?P<latest>(-|[aA-fF0-9]{12}))$'
-        LPLApplication = await self.digestCLIOutput(self, cmdApp, regex, CLIPostProcessor.getLocalPackageList, packageType="app") # type: ignore
-        LPLRuntime     = await self.digestCLIOutput(self, cmdRuntime, regex, CLIPostProcessor.getLocalPackageList, packageType="runtime") # type: ignore
+        LPLApplication = await self.digestCLIOutput(self, f'{cmd} --app', regex, CLIPostProcessor.getLocalPackageList, packageType="app") # type: ignore
+        LPLRuntime     = await self.digestCLIOutput(self, f'{cmd} --runtime', regex, CLIPostProcessor.getLocalPackageList, packageType="runtime") # type: ignore
         LocalPackageList = LPLRuntime['output'] + LPLApplication['output']
         returncode = LPLRuntime['returncode'] | LPLApplication['returncode']
         stdout = "{}\n{}".format(LPLRuntime['stdout'], LPLApplication['stdout'])
