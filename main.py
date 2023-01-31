@@ -138,7 +138,7 @@ class Plugin:
         logging.info('Received request for list of running packages')
         cmd = 'flatpak ps --columns=instance:f,application:f,arch:f,branch:f,commit:f,runtime:f,pid:f,runtime-branch:f,child-pid:f,active:f,runtime-commit:f,background:f'
         regex = r'(?P<instance>\d+)\s+(?P<application>\S+)\s+(?P<arch>(x86_64|i386|aarch64|arm))\s+(?P<branch>.*?)\s+(?P<commit>[aA-fF0-9]{12})\s+(?P<runtime>.*?)\s+(?P<pid>\d+)\s+(?P<runtime_branch>.*?)\s+(?P<child_pid>\d+)\s+(?P<active>.*?)\s+(?P<runtime_commit>[aA-fF0-9]{12})\s+(?P<background>.*?)$'
-        proc = await self.digestCLIOutput(cmd, regex)
+        proc = await self.digestCLIOutput(self, cmd, regex) # type: ignore
         return proc
     async def getUpdatePackageList(self):
         logging.info('Received request for list of available updates')
