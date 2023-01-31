@@ -62,7 +62,7 @@ export const AppDataDirectory: VFC<{setShowStatusBar: CallableFunction}> = (prop
   const onAppStateChange = (e: Event) => { setAppState((e as events.AppStateEvent).appState) }
 
   useEffect(() => {
-    Backend.getAppDataDir().then(path => { 
+    Backend.getAppDataDirectory().then(path => { 
       setAppDataDir(path)
       setSelectedAppDataDir(path)
     })

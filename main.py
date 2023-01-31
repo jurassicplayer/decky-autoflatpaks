@@ -7,7 +7,7 @@ from helpers import get_user_id, get_home_path # type: ignore
 # Setup environment variables
 settingsDir = os.environ["DECKY_PLUGIN_SETTINGS_DIR"]
 loggingDir = os.environ["DECKY_PLUGIN_LOG_DIR"]
-appdataDir = os.path.join(get_home_path(), '.var', 'app')
+defaultAppDataDirectory = os.path.join(get_home_path(), '.var', 'app')
 XDG_RUNTIME_DIR = os.path.join(os.path.abspath(os.sep), 'run', 'user', str(get_user_id()))
 
 # Setup backend logger
@@ -44,8 +44,8 @@ class Plugin:
     async def settings_setSetting(self, key: str, value):
         output = settings.setSetting(key, value)
         return {'output': output, 'returncode': 0, 'stdout': '', 'stderr': ''}
-    async def getAppDataDir(self):
-        output = os.path.realpath(appdataDir)
+    async def getAppDataDirectory(self):
+        output = os.path.realpath(defaultAppDataDirectory)
         return {'output': output, 'returncode': 0, 'stdout': '', 'stderr': ''}
     async def pyexec_subprocess(self, cmd:str, input:str=''):
         logging.info(f'Calling python subprocess: "{cmd}"')
@@ -291,40 +291,3 @@ class Plugin:
         if dryrun: cmd += ' --dry-run'
         logging.info('Received request to repair flatpak installation')
         return await self.pyexec_subprocess(self, cmd) # type: ignore
-    async def MigrateAppData(self, currentAppDataDir, targetAppDataDir):
-        currentAppDataDir = os.path.join(currentAppDataDir, '')
-        sourceAppDataDir = os.path.join(currentAppDataDir, '.')
-        targetAppDataDir = os.path.join(targetAppDataDir, '')
-        logging.info(f'Received request to migrate flatpak app data: {currentAppDataDir} => {targetAppDataDir}')
-        logText = ""
-        if targetAppDataDir == appdataDir: logText += "Target == appdataDir: True\n"
-        if currentAppDataDir == os.path.realpath(appdataDir): logText += "Source == realpath(appdataDir): True\n"
-        if os.path.islink(targetAppDataDir): logText += "Target is symlink: True\n"
-        if os.path.isdir(targetAppDataDir): logText += "Target is directory: True\n"
-        if os.makedirs(targetAppDataDir, exist_ok=True): logText += "Made Target directory: True\n"
-        if os.path.isdir(targetAppDataDir): logText += "Target is directory (after): True"
-        logging.info(logText)
-        # Check if target path is ~/.var/app
-        proc = {'output': '', 'returncode': 1, 'stdout': '', 'stderr': ''}
-        # Migrate back to default
-        try:
-            if targetAppDataDir == os.path.join(appdataDir, ''):
-                logging.info("Migrating back to default location")
-                # Remove symlink
-                os.unlink(appdataDir)
-                #shutil.move(currentAppDataDir, targetAppDataDir)
-                cmd = f'cp -rp "{sourceAppDataDir}" "{targetAppDataDir}"'
-                proc = await self.pyexec_subprocess(self, cmd) # type: ignore
-            else:
-                logging.info("Create target directory")
-                os.makedirs(targetAppDataDir, exist_ok=True)
-                # shutil.move(currentAppDataDir, targetAppDataDir)
-                logging.info("Copying to target directory")
-                cmd = f'cp -rp "{sourceAppDataDir}" "{targetAppDataDir}"'
-                proc = await self.pyexec_subprocess(self, cmd) # type: ignore
-                logging.info("Creating/updating symlink")
-                cmd = f'ln -sf "{targetAppDataDir}" "{appdataDir}"'
-                proc = await self.pyexec_subprocess(self, cmd) # type: ignore
-        except Exception as e:
-            logging.info(f"Something failed: {e}")
-        return proc

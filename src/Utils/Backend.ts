@@ -351,8 +351,8 @@ export class Backend {
     this.setAppState(appStates.idle)
     return returncode
   }
-  static async getAppDataDir() {
-    let proc = await this.bridge("getAppDataDir")
+  static async getAppDataDirectory() {
+    let proc = await this.bridge("getAppDataDirectory")
     return proc.output as string
   }
   static async MigrateAppData(currentAppDataDir: string, targetAppDataDir: string) {
