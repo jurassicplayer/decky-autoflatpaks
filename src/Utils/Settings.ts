@@ -8,6 +8,7 @@ export class Settings {
   public static aggressiveEnabled:          boolean = false
   public static updateInterval:             number = 720
   public static lastCheckTimestamp:         Date = new Date()
+  public static appDataLocation:            string = '/home'
 
   static async loadFromLocalStorage() {
     var returncode = true
