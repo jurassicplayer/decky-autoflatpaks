@@ -6,8 +6,10 @@ export const AggressiveFilter: VFC = () => {
   const [aggressiveEnabled, setAggressiveEnabled] = useState<boolean>(Settings.aggressiveEnabled)
 
   useEffect(() => {
-    if (Settings.aggressiveEnabled != aggressiveEnabled) Settings.aggressiveEnabled = aggressiveEnabled
-    Settings.saveToLocalStorage()
+    if (Settings.aggressiveEnabled != aggressiveEnabled) {
+      Settings.aggressiveEnabled = aggressiveEnabled
+      Settings.saveToLocalStorage()
+    }
   }, [aggressiveEnabled])
 
   return (
