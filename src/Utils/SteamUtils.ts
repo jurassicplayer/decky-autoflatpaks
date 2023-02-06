@@ -37,6 +37,34 @@ export class SteamUtils {
   }
 }
 
+interface AppEntry {
+  nAppID: number
+  rtLastPlayed: number
+  strAppName: string
+  strDLCSize: string
+  strSortAs: string
+  strStagedSize: string
+  strUsedSize: string
+  strWorkshopSize: string
+}
+
+export interface InstallFolderEntry {
+  bIsDefaultFolder: boolean
+  bIsFixed: boolean
+  bIsMounted: boolean
+  nFolderIndex: number
+  strCapacity: string
+  strDLCSize: string
+  strDriveName: string
+  strFolderPath: string
+  strFreeSpace: string
+  strStagedSize: string
+  strUsedSize: string
+  strUserLabel: string
+  strWorkshopSize: string
+  vecApps: AppEntry[]
+}
+
 export class SteamCssVariables {
   static basicuiHeaderHeight = "var(--basicui-header-height)"                                   // 0px
   static stickyHeaderBackgroundOpacity = "var(--sticky-header-background-opacity)"              // 0
