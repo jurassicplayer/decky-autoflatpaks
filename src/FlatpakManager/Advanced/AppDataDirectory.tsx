@@ -1,6 +1,6 @@
 import { DialogButton, Dropdown, Focusable, showModal, staticClasses } from "decky-frontend-lib"
 import { useEffect, useState, VFC } from "react"
-import { FaArrowRight, FaDollyFlatbed } from "react-icons/fa"
+import { FaArrowRight, FaEllipsisH } from "react-icons/fa"
 import { FallbackModal } from "../../InputControls/FallbackModal"
 import { ButtonStyle, LabelContainer, RowContainer } from "../../InputControls/LabelControls"
 import { appStates, Backend } from "../../Utils/Backend"
@@ -41,7 +41,7 @@ export const AppDataDirectory: VFC<{setShowStatusBar: CallableFunction}> = (prop
       style={RowContainer}>
       <div style={LabelContainer}>
         <div className={staticClasses.Text}>Default AppData Location</div>
-        <div className={staticClasses.Label}>Change the default location of flatpak app data.</div>
+        <div className={staticClasses.Label}>Change the default location of flatpak app data</div>
       </div>
       <div style={{width: "35%", margin: "auto"}}>
         <Dropdown
@@ -166,7 +166,7 @@ export const AppDataMigration: VFC<{setShowStatusBar: CallableFunction}> = (prop
                 }
               })
             }}>
-            <FaDollyFlatbed />
+            <FaEllipsisH />
           </DialogButton>
         </div>
       </div>
