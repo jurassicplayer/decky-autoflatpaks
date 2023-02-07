@@ -101,9 +101,9 @@ export const AboutPage: VFC = () => {
             <li>List of things I intend to fix/add/remove</li>
           </ul>
           <ul>
-            <li>Custom flatpak install path: Manage symlinked ~/.var/app</li>
-            <li>Use <FaEllipsisH /> in Advanced page for all buttons that open up modals (?)</li>
-            <li>Visual glitching when a game and modal open at the same time</li>
+            <li>Create and symlink appdata folder on install</li>
+            <li>Convert FlatpakInfo modal to router page</li>
+            <li>Add AppData migration to FlatpakInfo</li>
             <li>Visual glitching, more info on discord forum post (?)</li>
             <li>Persist highlighted button while scrolling package list (?)</li>
             <li>Add check for network connectivity before continuing intervalcheck (?)</li>
