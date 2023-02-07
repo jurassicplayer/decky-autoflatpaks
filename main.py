@@ -35,6 +35,7 @@ parentPackageOverrides = {
 class CLIPostProcessor:
     @staticmethod
     def getUpdatePackageList(item, kwargs):
+        if item.get('download_size'): item['download_size'] = item['download_size'].replace(u"\u00A0", " ").replace("?", " ")
         item['partial'] = True if item['partial'] else False
         return item
     @staticmethod
@@ -78,9 +79,6 @@ class Plugin:
     async def settings_setSetting(self, key: str, value):
         output = settings.setSetting(key, value)
         return {'output': output, 'returncode': 0, 'stdout': '', 'stderr': ''}
-    async def getAppDataDirectory(self):
-        output = os.path.realpath(defaultAppDataDirectory)
-        return {'output': output, 'returncode': 0, 'stdout': '', 'stderr': ''}
     async def pyexec_subprocess(self, cmd:str, input:str=''):
         logging.info(f'Calling python subprocess: "{cmd}"')
         runtimeDir = os.environ.get("XDG_RUNTIME_DIR")
@@ -101,7 +99,6 @@ class Plugin:
         proc = await self.pyexec_subprocess(self, cmd) # type: ignore
         proc.update({'output': ''})
         try:
-            if proc['returncode'] != 0: raise NotImplementedError
             lines = proc['stdout'].split('\n')
             matchList = []
             for line in lines:
@@ -116,7 +113,7 @@ class Plugin:
         except Exception as e:
             logging.info(f'Failed to digest CLI output: {e}')
         return proc
-    
+
     async def getSpaceRemaining(self):
         logging.info('Received request for space remaining')
         return await self.pyexec_subprocess(self, 'df -P {}'.format(os.path.join(get_home_path(),'.var','app'))) # type: ignore
@@ -171,6 +168,7 @@ class Plugin:
         stderr = "{}\n{}".format(LPLRuntime['stderr'], LPLApplication['stderr'])
         return {'output': LocalPackageList, 'returncode': returncode, 'stdout': stdout, 'stderr': stderr}
 
+    # Backend commands that don't need output
     async def MaskPackage(self, pkgref):
         logging.info(f'Received request to mask package: {pkgref}')
         return await self.pyexec_subprocess(self, f'flatpak mask {pkgref}') # type: ignore
