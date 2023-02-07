@@ -1,6 +1,6 @@
 import { Focusable } from "decky-frontend-lib"
 import { CSSProperties, useRef, VFC } from "react"
-import { FaDownload, FaEye, FaEyeSlash, FaSyncAlt, FaTrashAlt, FaEllipsisH } from "react-icons/fa"
+import { FaDownload, FaEye, FaEyeSlash, FaSyncAlt, FaTrashAlt } from "react-icons/fa"
 import { ScrollPanel } from "../../InputControls/ScrollPanel"
 import { SteamCssVariables } from "../../Utils/SteamUtils"
 
