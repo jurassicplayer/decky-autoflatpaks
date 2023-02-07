@@ -3,7 +3,7 @@ import { CSSProperties, useState, VFC } from "react"
 import { SteamCssVariables } from "../../Utils/SteamUtils"
 import { AdvancedStatusBar } from "./AdvancedStatusBar"
 import { AggressiveFilter } from "./AggressiveFilter"
-import { AppDataDirectory } from "./AppDataDirectory"
+import { AppDataDirectory, AppDataMigration } from "./AppDataDirectory"
 import { RepairPackages } from "./RepairPackages"
 import { UnusedPackages } from "./UnusedPackages"
 
@@ -34,6 +34,8 @@ export const AdvancedPage: VFC = () => {
           <Separator />
           <AppDataDirectory setShowStatusBar={setShowStatusBar}/>
           <Separator />
+          <AppDataMigration setShowStatusBar={setShowStatusBar}/>
+          <Separator />
         </Focusable>
 
         <div className={staticClasses.PanelSectionTitle}>System Maintenance</div>
@@ -46,11 +48,7 @@ export const AdvancedPage: VFC = () => {
 
       </Focusable>
       <h2>Work In Progress</h2>
-      <p>
-        This is a tentative area that will be a place for advanced functions that hopefully won't need to be used.
-      </p>
       <ul>
-        <li>Set/Move flatpak app data directory</li>
         <li>Permissions Manager (GameMode Flatseal-ish maybe?)</li>
         <li>Complex mask handling and controls (?)</li>
       </ul>
