@@ -101,6 +101,7 @@ export const AboutPage: VFC = () => {
             <li>List of things I intend to fix/add/remove</li>
           </ul>
           <ul>
+            <li>Add pretty link to ko-fi account: https://ko-fi.com/jurassicplayer</li>
             <li>Create and symlink appdata folder on install</li>
             <li>Convert FlatpakInfo modal to router page</li>
             <li>Add AppData migration to FlatpakInfo</li>
