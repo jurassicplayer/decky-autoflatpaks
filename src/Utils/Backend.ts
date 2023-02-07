@@ -3,6 +3,8 @@ import { FlatpakMetadata, FlatpakRunning, FlatpakUnused, FlatpakUpdate, LocalFla
 import { JournalEntry } from "./History"
 import { queueData, BatteryState, cliOutput } from "./Backend.d"
 import { events } from "./Events"
+import { Settings } from "./Settings"
+import { InstallFolderEntry } from "./SteamUtils"
 
 export enum appStates {
   initializing,
@@ -149,6 +151,7 @@ export class Backend {
       if (item.action == 'uninstall' && item.extraParameters?.removeUnused) { retcode = await this.UnInstallPackage(item.packageRef, item.extraParameters.removeUnused) }
       else if (item.action == 'uninstall') { retcode = await this.UnInstallPackage(item.packageRef) }
       if (item.action == 'update')    { retcode = await this.UpdatePackage(item.packageRef) }
+      if (item.action == 'datamigration') { retcode = await this.MigrateAppData(item.packageRef, item.extraParameters?.appdataDestination) }
       if (!retcode) returncode = false
       queueRetCode.push({queueData: item, retcode: retcode})
       await this.dequeueAction(item, true)
@@ -292,6 +295,12 @@ export class Backend {
     let returncode = await this.UpdateOrUnusedPackages(this.getUpdatePackageList())
     return returncode
   }
+  static async MigrateAppData(packageRef: string, destination: string[]|undefined) {
+    // Undefined appdataDestination should default to migrating to system default path
+    let proc = await this.bridge("migrateAppData", {packageRef: packageRef, destination: destination})
+    if (proc.returncode != 0) return false
+    return true
+  }
   //#endregion
 
   //#region Advanced Functions
@@ -351,15 +360,33 @@ export class Backend {
     this.setAppState(appStates.idle)
     return returncode
   }
-  static async getAppDataDirectory() {
-    let proc = await this.bridge("getAppDataDirectory")
+
+  static async getDefaultAppDataDirectory() {
+    let proc = await this.bridge("getDefaultAppDataDirectory")
     return proc.output as string
   }
-  static async MigrateAppData(currentAppDataDir: string, targetAppDataDir: string) {
+  static async getAppDataDirectoryList(appDataLocation: string[]) {
+    let proc = await this.bridge("getAppDataDirectoryList", {appDataLocation: appDataLocation})
+    return proc.output as string[]
+  }
+  static async getAppDataLocationOrDefault() {
+    let installFolders: InstallFolderEntry[] = await SteamClient.InstallFolder.GetInstallFolders()
+    let installFolder = installFolders.find(installFolder => installFolder.strDriveName == Settings.appDataLocation)
+    if (!installFolder) installFolder = installFolders.find(installFolder => installFolder.bIsDefaultFolder == true)
+    if (!installFolder) installFolder = installFolders[0]
+    return {installFolder: installFolder, installFolders: installFolders}
+  }
+  static async MigrateAllAppData(source: string[], destination: string[]) {
+    let returncode = true
     if (this.getAppState() != appStates.idle) return false
-    this.setAppState(appStates.migratingAppData)
-    let returncode = await this.bridge("MigrateAppData", {currentAppDataDir: currentAppDataDir, targetAppDataDir: targetAppDataDir})
-    this.setAppState(appStates.idle)
+    let liveFPMQueue = [...this.queue]
+    if (liveFPMQueue) this.setQueue([])
+    let packages = await this.getAppDataDirectoryList(source)
+    for (let idx in packages) {
+      this.queueAction({action: "datamigration", packageRef: packages[idx], extraParameters: {appdataDestination: destination}})
+    }
+    returncode = await this.ProcessQueue()
+    if (liveFPMQueue) this.setQueue(liveFPMQueue)
     return returncode
   }
   //#endregion

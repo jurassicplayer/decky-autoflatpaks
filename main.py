@@ -1,5 +1,5 @@
 import logging
-import asyncio, json, os, re
+import asyncio, json, os, re, shutil
 from typing import Callable
 
 from settings import SettingsManager # type: ignore
@@ -191,3 +191,41 @@ class Plugin:
         if dryrun: cmd += ' --dry-run'
         logging.info('Received request to repair flatpak installation')
         return await self.pyexec_subprocess(self, cmd) # type: ignore
+
+    async def getAppDataDirectoryList(self, appDataLocation: list[str]):
+        allFolders = os.listdir(os.path.join(*appDataLocation))
+        output = []
+        for folder in allFolders:
+            if os.path.islink(os.path.join(*appDataLocation, folder)): continue
+            output.append(folder)
+        return {'output': output, 'returncode': 0, 'stdout': '', 'stderr': ''}
+    async def migrateAppData(self, packageRef, destination: list[str]):
+        # Arguments:
+        #   - Package reference: org.kde.Platform
+        #   - Source path: /home/deck/.var/app => Real path to app data
+        #   - Destination path: /run/media/mmcblk0p1 => Target device to place appdata                  /.steamos/autoflatpaks/app
+        appdataSource = os.path.join(defaultAppDataDirectory, packageRef)
+        appdataDestination = os.path.join(*destination, packageRef)
+        output = True
+        stderr = ''
+        try:
+            # Create destination folder
+            # Copy from source to destination
+            # Delete source
+            # Remove symlink
+            # Recreate symlink
+            logging.info(f'Shutil copy2: {appdataSource} => {appdataDestination}')
+            #shutil.copy2(source, destination)
+            logging.info(f'Shutil rmtree: {appdataSource}')
+            #shutil.rmtree(source)
+        except Exception as e:
+            stderr = e
+            logging.info(f'Failed to migrate AppData: {appdataSource} => {appdataDestination}')
+            output = False
+        return {'output': output, 'returncode': not output, 'stdout': '', 'stderr': stderr}
+
+
+    async def getDefaultAppDataDirectory(self):
+        output = os.path.realpath(defaultAppDataDirectory)
+        return {'output': output, 'returncode': 0, 'stdout': '', 'stderr': ''}
+    

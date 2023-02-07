@@ -3,8 +3,9 @@ export interface queueData {
   packageRef: string
   extraParameters?: {
     removeUnused?: boolean
-    installation?: string
-    installationTarget?: string
+    installSource?: string
+    installDestination?: string
+    appdataDestination?: string[]
   }
 }
 
