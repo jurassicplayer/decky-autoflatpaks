@@ -182,3 +182,11 @@ export class SteamCssVariables {
   static customStatusRed = "#7a0a0a"
   static customSpinnerBgColor = "#0c1519"
 }
+
+import { CSSProperties } from "react";
+export const emphasis: CSSProperties = {
+  background: SteamCssVariables.gpBackgroundNeutralLightSoft,
+  borderRadius: SteamCssVariables.gpCornerLarge,
+  padding: '0px 6px 1px 6px',
+  color: SteamCssVariables.mainTextColor
+}
