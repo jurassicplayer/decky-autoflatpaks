@@ -34,12 +34,12 @@ export const AdvancedPage: VFC = () => {
           <Separator />
           <AppDataDirectory setShowStatusBar={setShowStatusBar}/>
           <Separator />
-          <AppDataMigration setShowStatusBar={setShowStatusBar}/>
-          <Separator />
         </Focusable>
 
         <div className={staticClasses.PanelSectionTitle}>System Maintenance</div>
         <Focusable style={SectionStyle}>
+          <AppDataMigration setShowStatusBar={setShowStatusBar}/>
+          <Separator />
           <UnusedPackages />
           <Separator />
           <RepairPackages setShowStatusBar={setShowStatusBar}/>
