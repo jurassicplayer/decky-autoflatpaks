@@ -32,7 +32,7 @@ export const AdvancedPage: VFC = () => {
         <Focusable style={SectionStyle}>
           <AggressiveFilter />
           <Separator />
-          <AppDataDirectory setShowStatusBar={setShowStatusBar}/>
+          <AppDataDirectory />
           <Separator />
         </Focusable>
 
