@@ -285,7 +285,10 @@ export class Backend {
     return true
   }
   static async UpdatePackage(pkgref: string) {
+    let flatpakMetadata = this.getPLPackage(pkgref)
+    if (flatpakMetadata?.masked) { await this.UnMaskPackage(pkgref) }
     let proc = await this.bridge("UpdatePackage", {pkgref: pkgref})
+    if (flatpakMetadata?.masked) { await this.MaskPackage(pkgref) }
     if (proc.returncode != 0) return false
     this.setPLPackage(pkgref, {updateable: false})
     return true
