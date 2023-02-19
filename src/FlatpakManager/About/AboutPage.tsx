@@ -1,6 +1,7 @@
 import { Focusable } from "decky-frontend-lib"
 import { CSSProperties, useRef, VFC } from "react"
 import { FaDownload, FaEye, FaEyeSlash, FaSyncAlt, FaTrashAlt } from "react-icons/fa"
+import { SiGithub, SiKofi } from "react-icons/si"
 import { ScrollPanel } from "../../InputControls/ScrollPanel"
 import { SteamCssVariables } from "../../Utils/SteamUtils"
 
@@ -89,7 +90,35 @@ export const AboutPage: VFC = () => {
               <li>Settings for notifications: Toast Only, Sound Only, Toast+Sound, or No Notification</li>
             </ul> 
           </p>
-
+          <h3>Advanced Page</h3>
+          <p>
+            The Advanced page houses more complex and/or system altering functions that can be used to maintain and manage more intricate flatpak setups.
+            <ul>
+              <li>Aggressive Package Filtering: Hide packages on the Browse page that are irrelevant to most users, consisting of packages containing:
+                <ul>
+                  <li>BaseApp</li>
+                  <li>BaseExtension</li>
+                  <li>Debug</li>
+                  <li>Sources</li>
+                  <li>EoL (End of Life)</li>
+                </ul>
+              </li>
+              <li>Default AppData Location: The default location where autoflatpak-installed flatpaks will place their appdata</li>
+              <li>Migrate AppData: Moving flatpak appdata from one location to another</li>
+              <li>Clean Unused Packages: List and remove packages as determined by the "flatpak remove --unused" command</li>
+              <li>Repair Broken Packages: A proxy button to run the "flatpak repair" command</li>
+            </ul>
+          </p>
+          <h3>AppData Locations</h3>
+          <p>
+            The AppData locations are per mounted device as exposed by SteamOS. By default, the standard location of flatpak appdata is available in the "~/.var/app" folder. In order to accomplish separate AppData install locations, symlinks leading to the actual location of each application's AppData is created on install (via AutoFlatpaks) as well as during AppData migration. These symlinks will not be removed on plugin removal and must either be reverted via AutoFlatpaks prior to plugin removal or manually reverted, BUT removing AutoFlatpaks will not cause any breakages to anything currently configured.
+          </p>
+          <h3>Social Media</h3>
+          <ul>
+            <li><SiGithub /> <a href="https://github.com/jurassicplayer">github.com/jurassicplayer</a></li>
+            <li><SiKofi /> <a href="https://ko-fi.com/jurassicplayer">ko-fi.com/jurassicplayer</a></li>
+          </ul>
+          <br />
           <h2>Work In Progress</h2>
           <p>
             While AutoFlatpaks isn't intended to be a fully featured flatpak manager/store, it may end up being close, or even seen as one by some standards.<br />
@@ -101,10 +130,9 @@ export const AboutPage: VFC = () => {
             <li>List of things I intend to fix/add/remove</li>
           </ul>
           <ul>
-            <li>Add pretty link to ko-fi account: https://ko-fi.com/jurassicplayer</li>
-            <li>Create and symlink appdata folder on install</li>
             <li>Convert FlatpakInfo modal to router page</li>
             <li>Add AppData migration to FlatpakInfo</li>
+            <li>Flatseal-like permissions manager</li>
             <li>Visual glitching, more info on discord forum post (?)</li>
             <li>Persist highlighted button while scrolling package list (?)</li>
             <li>Add check for network connectivity before continuing intervalcheck (?)</li>
