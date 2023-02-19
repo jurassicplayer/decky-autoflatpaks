@@ -9,23 +9,22 @@ import { Settings } from "../../Utils/Settings"
 import { InstallFolderEntry } from "../../Utils/SteamUtils"
 import { RunningPackagesModal } from "./RunningPackages"
 
-export const AppDataDirectory: VFC<{setShowStatusBar: CallableFunction}> = (props) => {
+export const AppDataDirectory: VFC = () => {
   const [componentInit, setComponentInit] = useState<boolean>(false)
   const [appState, setAppState] = useState<number>(Backend.getAppState())
-  const [selectedInstallFolder, setSelectedInstallFolder] = useState<InstallFolderEntry>()
+  const [selectedInstallFolder, setSelectedInstallFolder] = useState<string>(Settings.appDataLocation)
   const [installFolders, setInstallFolders] = useState<InstallFolderEntry[]>([])
   const onAppStateChange = (e: Event) => { setAppState((e as events.AppStateEvent).appState) }
 
   useEffect(() => {
     if (!componentInit) return
-    if (selectedInstallFolder?.strDriveName && Settings.appDataLocation != selectedInstallFolder.strDriveName) {
-      Settings.appDataLocation = selectedInstallFolder.strDriveName
+    if (Settings.appDataLocation != selectedInstallFolder) {
+      Settings.appDataLocation = selectedInstallFolder
       Settings.saveToLocalStorage()
     }
   }, [selectedInstallFolder])
   useEffect(() => {
-    Backend.getAppDataLocationOrDefault().then(({installFolder, installFolders}) => {
-      setSelectedInstallFolder(installFolder)
+    SteamClient.InstallFolder.GetInstallFolders().then((installFolders: InstallFolderEntry[]) => {
       setInstallFolders(installFolders)
       setComponentInit(true)
     })
@@ -50,7 +49,7 @@ export const AppDataDirectory: VFC<{setShowStatusBar: CallableFunction}> = (prop
           onChange={(e) => {setSelectedInstallFolder(e.data)}}
           rgOptions={installFolders.map(installFolder => {
             let folderLabel = installFolder.strUserLabel ? installFolder.strUserLabel : installFolder.strDriveName
-            return {label: folderLabel, data: installFolder}
+            return {label: folderLabel, data: installFolder.strDriveName}
           })} />
       </div>
     </Focusable>
@@ -60,7 +59,7 @@ export const AppDataDirectory: VFC<{setShowStatusBar: CallableFunction}> = (prop
 
 
 
-const AppDataMigrationModal = (props: {closeModal?: CallableFunction, selectedSourceFolder: InstallFolderEntry|undefined, selectedDestinationFolder: InstallFolderEntry|undefined}) => {
+const AppDataMigrationModal = (props: {closeModal?: CallableFunction, selectedSourceFolder: string, selectedDestinationFolder: string}) => {
   const [appState, setAppState] = useState<number>(Backend.getAppState())
   const onAppStateChange = (e: Event) => { setAppState((e as events.AppStateEvent).appState) }
   const closeModal = () => {
@@ -88,34 +87,22 @@ const AppDataMigrationModal = (props: {closeModal?: CallableFunction, selectedSo
       closeModal={closeModal} />
   )}
 
-const installFolderToPathArray = async (installFolder: InstallFolderEntry) => {
-  let defaultAppDataDirectory = await Backend.getDefaultAppDataDirectory()
-  return installFolder.nFolderIndex == 0 ? [defaultAppDataDirectory] : [installFolder.strDriveName, '.steamos', 'autoflatpaks', 'appdata']
-}
-const MigrateAllAppData = async (sourceInstall: InstallFolderEntry|undefined, destinationInstall: InstallFolderEntry|undefined) => {
-  if (!sourceInstall || !destinationInstall) return
-  // Determine/build final folder paths from installFolders and pass in as array for python to join together
-  let source = await installFolderToPathArray(sourceInstall)
-  let destination = await installFolderToPathArray(destinationInstall)
-  await Backend.MigrateAllAppData(source, destination)
+const MigrateAllAppData = async (sourceInstall: string, destinationInstall: string) => {
+  console.log(`MigrateAllAppData: ${sourceInstall} => ${destinationInstall}`)
+  await Backend.MigrateAllAppData(sourceInstall, destinationInstall)
 }
 export const AppDataMigration: VFC<{setShowStatusBar: CallableFunction}> = (props) => {
   const [appState, setAppState] = useState<number>(Backend.getAppState())
-  const [selectedSourceFolder, setSelectedSourceFolder] = useState<InstallFolderEntry>()
-  const [selectedDestinationFolder, setSelectedDestinationFolder] = useState<InstallFolderEntry>()
+  const [selectedSourceFolder, setSelectedSourceFolder] = useState<string>(Settings.appDataLocation)
+  const [selectedDestinationFolder, setSelectedDestinationFolder] = useState<string>(Settings.appDataLocation)
   const [installFolders, setInstallFolders] = useState<InstallFolderEntry[]>([])
   const [componentInit, setComponentInit] = useState<boolean>(false)
   const onAppStateChange = (e: Event) => { setAppState((e as events.AppStateEvent).appState) }
   
   useEffect(() => {
-    SteamClient.InstallFolder.GetInstallFolders().then((paths: InstallFolderEntry[]) => {
-      setInstallFolders(paths)
-      Backend.getAppDataLocationOrDefault().then(({installFolder, installFolders}) => {
-        setSelectedSourceFolder(installFolder)
-        setSelectedDestinationFolder(installFolder)
-        setInstallFolders(installFolders)
-        setComponentInit(true)
-      })
+    SteamClient.InstallFolder.GetInstallFolders().then((installFolders: InstallFolderEntry[]) => {
+      setInstallFolders(installFolders)
+      setComponentInit(true)
     })
     Backend.eventBus.addEventListener(events.AppStateEvent.eType, onAppStateChange)
   }, [])
@@ -138,7 +125,7 @@ export const AppDataMigration: VFC<{setShowStatusBar: CallableFunction}> = (prop
               onChange={(e) => {setSelectedSourceFolder(e.data)}}
               rgOptions={installFolders.map(installFolder => {
                 let folderLabel = installFolder.strUserLabel ? installFolder.strUserLabel : installFolder.strDriveName
-                return {label: folderLabel, data: installFolder}
+                return {label: folderLabel, data: installFolder.strDriveName}
               })} />
           </div>
           <div style={{padding: "0% 2% 0% 2%", margin: "auto"}}><FaArrowRight /></div>
@@ -149,7 +136,7 @@ export const AppDataMigration: VFC<{setShowStatusBar: CallableFunction}> = (prop
               onChange={(e) => {setSelectedDestinationFolder(e.data)}}
               rgOptions={installFolders.map(installFolder => {
                 let folderLabel = installFolder.strUserLabel ? installFolder.strUserLabel : installFolder.strDriveName
-                return {label: folderLabel, data: installFolder}
+                return {label: folderLabel, data: installFolder.strDriveName}
               })} />
           </div>
           <DialogButton

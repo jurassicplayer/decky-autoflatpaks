@@ -32,6 +32,26 @@ parentPackageOverrides = {
     'org.DolphinEmu.dolphin_emu' : 'org.DolphinEmu.dolphin-emu'
 }
 
+class helpers:
+    @staticmethod
+    def recursiveChown(path, user, group):
+        for dirpath, dirnames, filenames in os.walk(path):
+            shutil.chown(dirpath, user, group)
+            for filename in filenames:
+                shutil.chown(os.path.join(dirpath, filename), user, group)
+    @staticmethod
+    def singleSubPathChown(pathStart, pathEnd, user, group):
+        currentHead = pathEnd
+        pathTokens = []
+        while currentHead != pathStart:
+            head, tail = os.path.split(currentHead)
+            pathTokens.insert(0, tail)
+            currentHead = head
+        for token in pathTokens:
+            dirpath = os.path.join(currentHead, token)
+            shutil.chown(dirpath, user, group)
+            currentHead = dirpath
+
 class CLIPostProcessor:
     @staticmethod
     def getUpdatePackageList(item, kwargs):
@@ -175,8 +195,25 @@ class Plugin:
     async def UnMaskPackage(self, pkgref):
         logging.info(f'Received request to unmask package: {pkgref}')
         return await self.pyexec_subprocess(self, f'flatpak mask --remove {pkgref}') # type: ignore
-    async def InstallPackage(self, pkgref):
+    async def InstallPackage(self, pkgref, appDataDevice):
         logging.info(f'Received request to install package: {pkgref}')
+        statInfo = os.stat(defaultAppDataDirectory)
+        uid = statInfo.st_uid
+        gid = statInfo.st_gid
+        appDataDeviceDestination = await self.getDefaultOrHomeDevice(self, appDataDevice) # type: ignore
+        appName = pkgref.split('/')[0]
+        appdataDestination = os.path.join(appDataDeviceDestination, appName)
+        appdataSymlink = os.path.join(defaultAppDataDirectory, appName)
+        # Create destination folder
+        if not os.path.exists(appdataDestination):
+            logging.info(f'Creating appdata directory: {appdataDestination}')
+            os.makedirs(appdataDestination, exist_ok=True)
+            helpers.singleSubPathChown(appDataDevice, appdataDestination, uid, gid)
+        # Recreate symlink
+        if not os.path.exists(appdataSymlink) and appdataDestination != appdataSymlink:
+            logging.info(f'Creating symlink: {appdataDestination} => {appdataSymlink}')
+            os.symlink(appdataDestination, appdataSymlink)
+            os.chown(appdataSymlink, uid, gid, follow_symlinks=False)
         return await self.pyexec_subprocess(self, f'flatpak install --noninteractive {pkgref}') # type: ignore
     async def UnInstallPackage(self, pkgref, removeUnused = False):
         logging.info(f'Received request to uninstall package: {pkgref}')
@@ -192,40 +229,71 @@ class Plugin:
         logging.info('Received request to repair flatpak installation')
         return await self.pyexec_subprocess(self, cmd) # type: ignore
 
-    async def getAppDataDirectoryList(self, appDataLocation: list[str]):
-        allFolders = os.listdir(os.path.join(*appDataLocation))
+
+    async def getDefaultOrHomeDevice(self, appDataDevice: str):
+        if appDataDevice == 'DefaultHome':
+            appDataDevice = defaultAppDataDirectory
+        else:
+            appDataDevice = os.path.join(appDataDevice, '.steamos', 'autoflatpaks', 'appdata')
+        return appDataDevice
+
+    async def getAppDataDirectoryList(self, appDataDevice: str):
+        appDataDevice = await self.getDefaultOrHomeDevice(self, appDataDevice) # type: ignore
+        allAppDataFolders = os.listdir(appDataDevice)
         output = []
-        for folder in allFolders:
-            if os.path.islink(os.path.join(*appDataLocation, folder)): continue
+        for folder in allAppDataFolders:
+            if os.path.islink(os.path.join(appDataDevice, folder)): continue
             output.append(folder)
         return {'output': output, 'returncode': 0, 'stdout': '', 'stderr': ''}
-    async def migrateAppData(self, packageRef, destination: list[str]):
+    async def migrateAppData(self, pkgref, appDataSource: str, appDataDevice: str):
         # Arguments:
         #   - Package reference: org.kde.Platform
-        #   - Source path: /home/deck/.var/app => Real path to app data
         #   - Destination path: /run/media/mmcblk0p1 => Target device to place appdata                  /.steamos/autoflatpaks/app
-        appdataSource = os.path.join(defaultAppDataDirectory, packageRef)
-        appdataDestination = os.path.join(*destination, packageRef)
+        statInfo = os.stat(defaultAppDataDirectory)
+        uid = statInfo.st_uid
+        gid = statInfo.st_gid
+        appdataSymlink = os.path.join(defaultAppDataDirectory, pkgref)
+        appdataSource = await self.getDefaultOrHomeDevice(self, appDataSource) # type: ignore
+        appdataSource = os.path.join(appdataSource, pkgref)
+        appDataDeviceDestination = await self.getDefaultOrHomeDevice(self, appDataDevice) # type: ignore
+        appdataDestination = os.path.join(appDataDeviceDestination, pkgref)
+        ldso = os.path.join(appdataSymlink, '.ld.so')
         output = True
         stderr = ''
+        logging.info(f'Received request to migrate AppData for {pkgref}: {appdataSource} => {appdataDestination}')
         try:
-            # Create destination folder
-            # Copy from source to destination
-            # Delete source
             # Remove symlink
-            # Recreate symlink
+            if os.path.islink(appdataSymlink):
+                logging.info(f'Unlinking {appdataSymlink}')
+                os.unlink(appdataSymlink)
+
+            # Create destination folder
+            if not os.path.exists(appDataDeviceDestination):
+                logging.info(f'Creating folder {appDataDeviceDestination}')
+                os.makedirs(appDataDeviceDestination, exist_ok=True)
+                helpers.singleSubPathChown(appDataDevice, appDataDeviceDestination, uid, gid)
+
+            # Copy from source to destination
             logging.info(f'Shutil copy2: {appdataSource} => {appdataDestination}')
-            #shutil.copy2(source, destination)
+            shutil.copytree(appdataSource, appdataDestination, dirs_exist_ok=True)
+            helpers.recursiveChown(appdataDestination, uid, gid)
+
+            # Delete source
             logging.info(f'Shutil rmtree: {appdataSource}')
-            #shutil.rmtree(source)
+            shutil.rmtree(appdataSource)
+
+            # Recreate symlink
+            if not os.path.exists(appdataSymlink):
+                logging.info(f'Creating symlink: {appdataDestination} => {appdataSymlink}')
+                os.symlink(appdataDestination, appdataSymlink)
+                os.chown(appdataSymlink, uid, gid, follow_symlinks=False)
+            
+            # Clear .ld.so cache
+            if os.path.exists(ldso) and os.path.isdir(ldso):
+                logging.info(f'Removing .ld.so cache: {ldso}')
+                shutil.rmtree(ldso)
         except Exception as e:
             stderr = e
             logging.info(f'Failed to migrate AppData: {appdataSource} => {appdataDestination}')
             output = False
         return {'output': output, 'returncode': not output, 'stdout': '', 'stderr': stderr}
-
-
-    async def getDefaultAppDataDirectory(self):
-        output = os.path.realpath(defaultAppDataDirectory)
-        return {'output': output, 'returncode': 0, 'stdout': '', 'stderr': ''}
-    

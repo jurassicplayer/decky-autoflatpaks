@@ -5,7 +5,8 @@ export interface queueData {
     removeUnused?: boolean
     installSource?: string
     installDestination?: string
-    appdataDestination?: string[]
+    appdataSource?: string
+    appdataDestination?: string
   }
 }
 

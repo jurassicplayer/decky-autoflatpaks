@@ -72,6 +72,9 @@ export class Backend {
     this.packageList = packageList
     this.eventBus.dispatchEvent(new events.PackageListEvent(this.packageList))
   }
+  static getPLPackage(pkgref: string) {
+    return this.packageList.find(plitem => plitem.ref == pkgref)
+  }
   static setPLPackage(pkgref: string, metadata: any) {
     let idx = this.packageList.findIndex(plitem => plitem.ref == pkgref)
     this.packageList[idx] = {...this.packageList[idx], ...metadata}
@@ -100,7 +103,7 @@ export class Backend {
   static async bridge(functionName: string, namedArgs?: any) {
     namedArgs = (namedArgs) ? namedArgs : {}
     let output = await this.serverAPI.callPluginMethod(functionName, namedArgs)
-    console.debug('[AutoFlatpaks] bridge - ', functionName,': ', output)
+    console.debug('[AutoFlatpaks] bridge - ', functionName,': ', namedArgs, ' output: ', output)
     return output.result as cliOutput
   }
   //#endregion
@@ -147,11 +150,11 @@ export class Backend {
       // Run await action: mask/unmask, install/uninstall, update
       if (item.action == 'mask')      { retcode = await this.MaskPackage(item.packageRef) }
       if (item.action == 'unmask')    { retcode = await this.UnMaskPackage(item.packageRef) }
-      if (item.action == 'install')   { retcode = await this.InstallPackage(item.packageRef) }
+      if (item.action == 'install')   { retcode = await this.InstallPackage(item.packageRef, item.extraParameters?.appdataDestination) }
       if (item.action == 'uninstall' && item.extraParameters?.removeUnused) { retcode = await this.UnInstallPackage(item.packageRef, item.extraParameters.removeUnused) }
       else if (item.action == 'uninstall') { retcode = await this.UnInstallPackage(item.packageRef) }
       if (item.action == 'update')    { retcode = await this.UpdatePackage(item.packageRef) }
-      if (item.action == 'datamigration') { retcode = await this.MigrateAppData(item.packageRef, item.extraParameters?.appdataDestination) }
+      if (item.action == 'datamigration') { retcode = await this.MigrateAppData(item.packageRef, item.extraParameters?.appdataSource, item.extraParameters?.appdataDestination) }
       if (!retcode) returncode = false
       queueRetCode.push({queueData: item, retcode: retcode})
       await this.dequeueAction(item, true)
@@ -272,8 +275,9 @@ export class Backend {
     this.packageList.filter(item => item.parent == pkgref).forEach(item => this.setPLPackage(item.ref, {parentMasked: false}))
     return true
   }
-  static async InstallPackage(pkgref: string) {
-    let proc = await this.bridge("InstallPackage", {pkgref: pkgref})
+  static async InstallPackage(pkgref: string, appDataDevice: string|undefined) {
+    appDataDevice = await this.sanitizeHomeDevice(appDataDevice)
+    let proc = await this.bridge("InstallPackage", {pkgref: pkgref, appDataDevice: appDataDevice})
     if (proc.returncode != 0) return false
     this.setPLPackage(pkgref, {installed: true})
     return true
@@ -298,16 +302,35 @@ export class Backend {
     let returncode = await this.UpdateOrUnusedPackages(this.getUpdatePackageList())
     return returncode
   }
-  static async MigrateAppData(packageRef: string, destination: string[]|undefined) {
-    // Undefined appdataDestination should default to migrating to system default path
-    let proc = await this.bridge("migrateAppData", {packageRef: packageRef, destination: destination})
+  static async MigrateAppData(pkgref: string, appDataSource: string|undefined, appDataDevice: string|undefined) {
+    appDataSource = await this.sanitizeHomeDevice(appDataSource)
+    appDataDevice = await this.sanitizeHomeDevice(appDataDevice)
+    let proc = await this.bridge("migrateAppData", {pkgref: pkgref, appDataSource: appDataSource, appDataDevice: appDataDevice})
     if (proc.returncode != 0) return false
     return true
   }
   //#endregion
 
+  //#region Helper Functions
+  static async sanitizeHomeDevice(destinationDevice: string|undefined) {
+    let logText = `[AutoFlatpaks] Sanitize device: ${destinationDevice} => `
+    // Convert /home => DefaultHome
+    if (!destinationDevice) { destinationDevice = Settings.appDataLocation }
+    let installFolders: InstallFolderEntry[] = await SteamClient.InstallFolder.GetInstallFolders()
+    let homeInstallFolder = installFolders.find(installFolder => installFolder.nFolderIndex == 0)
+    if (homeInstallFolder?.strDriveName == destinationDevice) { destinationDevice = 'DefaultHome' }
+    console.log(logText+destinationDevice)
+    return destinationDevice
+  }
+  static async getAppDataDirectoryList(appDataDevice: string|undefined) {
+    appDataDevice = await this.sanitizeHomeDevice(appDataDevice)
+    let proc = await this.bridge("getAppDataDirectoryList", {appDataDevice: appDataDevice})
+    return proc.output as string[]
+  }
+  //#endregion
+
   //#region Advanced Functions
-  static async getRunningPackages(){
+  static async getRunningPackages() {
     let result: string[] = []
     let runningList = await Backend.getRunningPackageList()
     if (runningList.length == 0) return result
@@ -355,41 +378,25 @@ export class Backend {
     if (liveFPMQueue) this.setQueue(liveFPMQueue)
     return returncode
   }
-  static async RepairPackages(dryrun?:boolean) {
-    if (this.getAppState() != appStates.idle) return false
-    this.setAppState(appStates.repairingPackages)
-    if (!dryrun) dryrun = false
-    let returncode = await this.bridge("RepairPackages", {dryrun: dryrun})
-    this.setAppState(appStates.idle)
-    return returncode
-  }
-
-  static async getDefaultAppDataDirectory() {
-    let proc = await this.bridge("getDefaultAppDataDirectory")
-    return proc.output as string
-  }
-  static async getAppDataDirectoryList(appDataLocation: string[]) {
-    let proc = await this.bridge("getAppDataDirectoryList", {appDataLocation: appDataLocation})
-    return proc.output as string[]
-  }
-  static async getAppDataLocationOrDefault() {
-    let installFolders: InstallFolderEntry[] = await SteamClient.InstallFolder.GetInstallFolders()
-    let installFolder = installFolders.find(installFolder => installFolder.strDriveName == Settings.appDataLocation)
-    if (!installFolder) installFolder = installFolders.find(installFolder => installFolder.bIsDefaultFolder == true)
-    if (!installFolder) installFolder = installFolders[0]
-    return {installFolder: installFolder, installFolders: installFolders}
-  }
-  static async MigrateAllAppData(source: string[], destination: string[]) {
+  static async MigrateAllAppData(source: string, destination: string) {
     let returncode = true
     if (this.getAppState() != appStates.idle) return false
     let liveFPMQueue = [...this.queue]
     if (liveFPMQueue) this.setQueue([])
     let packages = await this.getAppDataDirectoryList(source)
     for (let idx in packages) {
-      this.queueAction({action: "datamigration", packageRef: packages[idx], extraParameters: {appdataDestination: destination}})
+      this.queueAction({action: "datamigration", packageRef: packages[idx], extraParameters: {appdataSource: source, appdataDestination: destination}})
     }
     returncode = await this.ProcessQueue()
     if (liveFPMQueue) this.setQueue(liveFPMQueue)
+    return returncode
+  }
+  static async RepairPackages(dryrun?:boolean) {
+    if (this.getAppState() != appStates.idle) return false
+    this.setAppState(appStates.repairingPackages)
+    if (!dryrun) dryrun = false
+    let returncode = await this.bridge("RepairPackages", {dryrun: dryrun})
+    this.setAppState(appStates.idle)
     return returncode
   }
   //#endregion
