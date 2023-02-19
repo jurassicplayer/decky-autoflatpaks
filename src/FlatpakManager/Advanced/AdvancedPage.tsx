@@ -26,32 +26,24 @@ export const AdvancedPage: VFC = () => {
 
   return (
     <Focusable>
-      <Focusable>
-        <AdvancedStatusBar statusBar={showStatusBar} />
-        <div className={staticClasses.PanelSectionTitle}>Settings</div>
-        <Focusable style={SectionStyle}>
-          <AggressiveFilter />
-          <Separator />
-          <AppDataDirectory />
-          <Separator />
-        </Focusable>
-
-        <div className={staticClasses.PanelSectionTitle}>System Maintenance</div>
-        <Focusable style={SectionStyle}>
-          <AppDataMigration setShowStatusBar={setShowStatusBar}/>
-          <Separator />
-          <UnusedPackages />
-          <Separator />
-          <RepairPackages setShowStatusBar={setShowStatusBar}/>
-          <Separator />
-        </Focusable>
-
+      <AdvancedStatusBar statusBar={showStatusBar} />
+      <div className={staticClasses.PanelSectionTitle}>Settings</div>
+      <Focusable style={SectionStyle}>
+        <AggressiveFilter />
+        <Separator />
+        <AppDataDirectory />
+        <Separator />
       </Focusable>
-      <h2>Work In Progress</h2>
-      <ul>
-        <li>Permissions Manager (GameMode Flatseal-ish maybe?)</li>
-        <li>Complex mask handling and controls (?)</li>
-      </ul>
+
+      <div className={staticClasses.PanelSectionTitle}>System Maintenance</div>
+      <Focusable style={SectionStyle}>
+        <AppDataMigration setShowStatusBar={setShowStatusBar}/>
+        <Separator />
+        <UnusedPackages />
+        <Separator />
+        <RepairPackages setShowStatusBar={setShowStatusBar}/>
+        <Separator />
+      </Focusable>
     </Focusable>
   )
 }
