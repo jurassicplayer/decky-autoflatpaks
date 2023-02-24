@@ -6,9 +6,11 @@ from settings import SettingsManager # type: ignore
 from helpers import get_user_id, get_home_path # type: ignore
 
 # Setup environment variables
+deckyUserHome = os.environ["DECKY_USER_HOME"]
+deckyHomeDir = os.environ["DECKY_HOME_DIR"]
 settingsDir = os.environ["DECKY_PLUGIN_SETTINGS_DIR"]
 loggingDir = os.environ["DECKY_PLUGIN_LOG_DIR"]
-defaultAppDataDirectory = os.path.join(get_home_path(), '.var', 'app')
+defaultAppDataDirectory = os.path.join(deckyUserHome, '.var', 'app')
 XDG_RUNTIME_DIR = os.path.join(os.path.abspath(os.sep), 'run', 'user', str(get_user_id()))
 
 # Setup backend logger
@@ -20,9 +22,14 @@ logger=logging.getLogger()
 logger.setLevel(logging.INFO) # can be changed to logging.DEBUG for debugging issues
 
 # Migrate any old settings
-oldSettingsPath = os.path.join(get_home_path(), 'settings', 'autoflatpaks.json')
+newSettingsPath = os.path.join(settingsDir, 'settings.json')
+oldSettingsPath = os.path.join(deckyHomeDir, 'settings', 'autoflatpaks.json')
 if os.path.exists(oldSettingsPath):
-    os.replace(oldSettingsPath, os.path.join(settingsDir, 'settings.json'))
+  logger.info(f'Migrating settings: {oldSettingsPath} => {newSettingsPath}')
+  try:
+    os.replace(oldSettingsPath, newSettingsPath)
+  except Exception as e:
+    logger.info(f'Failed to migrate old settings: {e}')
 
 # Setup decky-loader SettingsManager
 settings = SettingsManager(name="settings", settings_directory=settingsDir)
@@ -136,7 +143,7 @@ class Plugin:
 
     async def getSpaceRemaining(self):
         logging.info('Received request for space remaining')
-        return await self.pyexec_subprocess(self, 'df -P {}'.format(os.path.join(get_home_path(),'.var','app'))) # type: ignore
+        return await self.pyexec_subprocess(self, 'df -P {}'.format(os.path.join(deckyUserHome,'.var','app'))) # type: ignore
 
     async def getPackageHistory(self):
         logging.info('Received request for package history')
