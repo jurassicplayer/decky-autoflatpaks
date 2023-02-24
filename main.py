@@ -3,7 +3,7 @@ import asyncio, json, os, re, shutil
 from typing import Callable
 
 from settings import SettingsManager # type: ignore
-from helpers import get_user_id, get_home_path # type: ignore
+from helpers import get_user_id # type: ignore
 
 # Setup environment variables
 deckyUserHome = os.environ["DECKY_USER_HOME"]
