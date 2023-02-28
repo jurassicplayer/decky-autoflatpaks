@@ -60,8 +60,8 @@ const IntervalCheck = async () => {
   let currentTime = new Date()
   if (!((currentTime.getTime() - Settings.lastCheckTimestamp.getTime())/1000/60 > Settings.updateInterval)) return
   // Time to check for updates
-  let package_count = await Backend.getPackageCount()
   Settings.lastCheckTimestamp = currentTime
+  let package_count = await Backend.getPackageCount()
   await Settings.saveLastCheckTimestamp()
   if (!package_count) return
   if (Settings.unattendedUpgradesEnabled) {
