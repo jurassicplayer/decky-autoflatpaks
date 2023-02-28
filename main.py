@@ -7,7 +7,7 @@ from helpers import get_user_id # type: ignore
 
 # Setup environment variables
 deckyUserHome = os.environ["DECKY_USER_HOME"]
-deckyHomeDir = os.environ["DECKY_HOME_DIR"]
+deckyHomeDir = os.environ["DECKY_HOME"]
 settingsDir = os.environ["DECKY_PLUGIN_SETTINGS_DIR"]
 loggingDir = os.environ["DECKY_PLUGIN_LOG_DIR"]
 defaultAppDataDirectory = os.path.join(deckyUserHome, '.var', 'app')
@@ -32,6 +32,7 @@ if os.path.exists(oldSettingsPath):
     logger.info(f'Failed to migrate old settings: {e}')
 
 # Setup decky-loader SettingsManager
+logger.info(f'Settings path: {newSettingsPath}')
 settings = SettingsManager(name="settings", settings_directory=settingsDir)
 settings.read()
 
