@@ -49,9 +49,10 @@ class helpers:
                 shutil.chown(os.path.join(dirpath, filename), user, group)
     @staticmethod
     def singleSubPathChown(pathStart, pathEnd, user, group):
+        logging.info(f'singleSubPathChown: {pathStart} {pathEnd} {user} {group}')
         currentHead = pathEnd
         pathTokens = []
-        while currentHead != pathStart:
+        while currentHead != pathStart and len(currentHead) > len(pathStart):
             head, tail = os.path.split(currentHead)
             pathTokens.insert(0, tail)
             currentHead = head
@@ -216,7 +217,7 @@ class Plugin:
         if not os.path.exists(appdataDestination):
             logging.info(f'Creating appdata directory: {appdataDestination}')
             os.makedirs(appdataDestination, exist_ok=True)
-            helpers.singleSubPathChown(appDataDevice, appdataDestination, uid, gid)
+            helpers.singleSubPathChown(appDataDeviceDestination, appdataDestination, uid, gid)
         # Recreate symlink
         if not os.path.exists(appdataSymlink) and appdataDestination != appdataSymlink:
             logging.info(f'Creating symlink: {appdataDestination} => {appdataSymlink}')
