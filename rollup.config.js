@@ -24,7 +24,7 @@ export default defineConfig({
     })
   ],
   context: 'window',
-  external: ['react', 'react-dom'],
+  external: ['react', 'react-dom', 'decky-frontend-lib'],
   output: {
     file: 'dist/index.js',
     globals: {
