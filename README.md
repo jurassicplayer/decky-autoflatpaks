@@ -1,4 +1,4 @@
-![Decky store](https://img.shields.io/badge/dynamic/json?color=blue&label=release&query=%24[%3F(%40.name%3D%3D%27AutoFlatpaks%27)].versions[0].name&url=https%3A%2F%2Fplugins.deckbrew.xyz%2Fplugins) [<img src="https://img.shields.io/badge/kofi-kofi?logo=kofi&logoColor=ffffff&label=donate">](https://ko-fi.com/jurassicplayer)
+![Decky store](https://img.shields.io/badge/dynamic/json?color=blue&label=release&query=%24[%3F(%40.name%3D%3D%27AutoFlatpaks%27)].versions[0].name&url=https%3A%2F%2Fplugins.deckbrew.xyz%2Fplugins) ![Decky Loader](https://img.shields.io/badge/dynamic/json?url=https://plugins.deckbrew.xyz/plugins&query=%24[%3F(%40.name%3D%3D%27AutoFlatpaks%27)].downloads&label=installs&color=3ea6a3) [<img src="https://img.shields.io/badge/kofi-kofi?logo=kofi&logoColor=ffffff&label=donate">](https://ko-fi.com/jurassicplayer)
 ## Decky-AutoFlatpaks Plugin
 A plugin to manage, notify, and automatically update flatpaks on your steamdeck console after an interval of time without DesktopMode. Requires root permissions.
 
