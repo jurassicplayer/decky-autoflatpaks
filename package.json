@@ -1,7 +1,8 @@
 {
   "name": "decky-autoflatpaks",
-  "version": "1.6.6",
+  "version": "2.0.0",
   "description": "A plugin to manage, notify, and automatically update flatpaks on your steamdeck console",
+  "type": "module",
   "scripts": {
     "build": "rollup -c",
     "watch": "rollup -c -w",
@@ -34,7 +35,7 @@
   },
   "dependencies": {
     "@decky/api": "^1.0.5",
-    "@decky/ui": "^4.0.3",
+    "@decky/ui": "^4.5.0",
     "react-icons": "^5.2.1",
     "react-intersection-observer": "^9.4.1",
     "tslib": "^2.6.3"
