@@ -90,6 +90,7 @@ export default definePlugin(() => {
     });
   });
   return {
+    name: "AutoFlatpaks",
     title: <div className={staticClasses.Title}>API v2 Example Plugin</div>,
     content: <Content />,
     icon: <FaShip />,
