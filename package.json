@@ -3,7 +3,7 @@
   "version": "1.6.6",
   "description": "A plugin to manage, notify, and automatically update flatpaks on your steamdeck console",
   "scripts": {
-    "build": "shx rm -rf dist && rollup -c",
+    "build": "rollup -c",
     "watch": "rollup -c -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -25,24 +25,19 @@
   },
   "homepage": "https://github.com/jurassicplayer/decky-autoflatpaks#readme",
   "devDependencies": {
-    "decky-frontend-lib": "^3.24.5",
-    "@rollup/plugin-commonjs": "^21.1.0",
-    "@rollup/plugin-json": "^4.1.0",
-    "@rollup/plugin-node-resolve": "^13.3.0",
-    "@rollup/plugin-replace": "^4.0.0",
-    "@rollup/plugin-typescript": "^8.5.0",
-    "@types/react": "16.14.0",
-    "@types/webpack": "^5.28.0",
-    "pnpm": "^7.14.2",
-    "rollup": "^2.79.1",
-    "rollup-plugin-import-assets": "^1.1.1",
-    "shx": "^0.3.4",
-    "tslib": "^2.4.1",
-    "typescript": "^4.8.4"
+    "@decky/rollup": "^1.0.0",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "@types/webpack": "^5.28.5",
+    "rollup": "^4.18.0",
+    "typescript": "^5.5.3"
   },
   "dependencies": {
-    "react-icons": "^4.7.1",
-    "react-intersection-observer": "^9.4.1"
+    "@decky/api": "^1.0.5",
+    "@decky/ui": "^4.0.3",
+    "react-icons": "^5.2.1",
+    "react-intersection-observer": "^9.4.1",
+    "tslib": "^2.6.3"
   },
   "pnpm": {
     "peerDependencyRules": {
