@@ -121,7 +121,8 @@
             "group": "none",
             "dependsOn": [
                 "build",
-                "deploy"
+                "deploy",
+                "restartloader"
             ],
             "problemMatcher": []
         },
@@ -144,5 +145,14 @@
             "command": "ssh ${config:deckuser}@${config:deckip} -p ${config:deckport} ${config:deckkey} 'echo '${config:deckpass}' | sudo -S chmod -R ug+rw ${config:deckdir}/homebrew/plugins/'",
             "problemMatcher": []
         },
+        //Restart decky-loader
+        {
+            "label": "restartloader",
+            "detail": "restart decky loader via systemctl",
+            "type": "shell",
+            "group": "none",
+            "command": "ssh ${config:deckuser}@${config:deckip} -p ${config:deckport} ${config:deckkey} 'echo '${config:deckpass}' | sudo -S systemctl restart plugin_loader'",
+            "problemMatcher": []
+        }
     ]
 }
