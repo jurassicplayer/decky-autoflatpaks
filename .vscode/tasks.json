@@ -93,7 +93,16 @@
             "command": "rsync -azp --chmod=D0755,F0755 --rsh='ssh -p ${config:deckport} ${config:deckkey}' out/ ${config:deckuser}@${config:deckip}:${config:deckdir}/homebrew/plugins",
             "problemMatcher": []
         },
-        //
+        //Removes the previous plugin build in the plugins folder (if it exists)
+        {
+            "label": "removepreviousbuild",
+            "detail": "Remove previous plugin folder on the deck",
+            "type": "shell",
+            "group": "none",
+            "command": "echo \"Removing previous build: \"$(echo \"${config:deckdir}/homebrew/plugins/${config:pluginname}\" | sed \"s| |-|g\")\"\" && ssh ${config:deckuser}@${config:deckip} -p ${config:deckport} ${config:deckkey} 'echo ${config:deckpass} | sudo -S rm -rf \"$(echo \"${config:deckdir}/homebrew/plugins/${config:pluginname}\" | sed \"s| |-|g\")\"'",
+            "problemMatcher": []
+        },
+        //extracts the zip file of the built plugin to the plugins folder
         {
             "label": "extractzip",
             "detail": "",
@@ -109,6 +118,7 @@
             "group": "none",
             "dependsOn": [
                 "copyzip",
+                "removepreviousbuild",
                 "extractzip"
             ],
             "problemMatcher": []
