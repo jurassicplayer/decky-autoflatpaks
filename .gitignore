@@ -33,6 +33,8 @@ Thumbs.db
 
 # Ignore built ts files
 dist/
+cli/
+out/
 
 __pycache__/
 
@@ -40,6 +42,7 @@ __pycache__/
 yalc.lock
 
 .vscode/settings.json
+deck.json
 
 # Ignore output folder
 
