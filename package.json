@@ -25,7 +25,6 @@
   },
   "homepage": "https://github.com/jurassicplayer/decky-autoflatpaks#readme",
   "devDependencies": {
-    "decky-frontend-lib": "^3.24.5",
     "@rollup/plugin-commonjs": "^21.1.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.3.0",
@@ -33,6 +32,7 @@
     "@rollup/plugin-typescript": "^8.5.0",
     "@types/react": "16.14.0",
     "@types/webpack": "^5.28.0",
+    "decky-frontend-lib": "^3.25.0",
     "pnpm": "^7.14.2",
     "rollup": "^2.79.1",
     "rollup-plugin-import-assets": "^1.1.1",
