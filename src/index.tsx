@@ -8,6 +8,7 @@ import {
 import {
   addEventListener,
   removeEventListener,
+  call,
   callable,
   definePlugin,
   toaster,
@@ -23,18 +24,61 @@ import { FaShip } from "react-icons/fa";
 //   left: number;
 //   right: number;
 // }
+
+interface Error {
+  name: string
+  pythonTraceback: string
+  stack: string
+}
+
 const add = callable<[first: number, second: number], number>("add");
+const errorFunction = callable<[trigger: boolean], boolean>("callableError")
 const startTimer = callable<[], void>("start_timer");
 function Content() {
   const [result, setResult] = useState<number | undefined>();
+  const [trigger, setTrigger] = useState<boolean>(false)
 
   const onClick = async () => {
     const result = await add(Math.random(), Math.random());
     setResult(result);
   };
+  const onClickCallFunctionError = async () => {
+    try {
+      const result = await call<[trigger: boolean], boolean>("callableError", trigger);
+      setTrigger(!trigger)
+      console.log(result)
+    } catch (error) {
+      let traceback = (error as Error).pythonTraceback.split('Exception: ').slice(1)[0]
+      console.log(traceback)
+    }
+  };
+  const onClickCallableFunctionError = async () => {
+    try {
+      const result = await errorFunction(trigger)
+      setTrigger(!trigger)
+      console.log(result)
+    } catch (error) {
+      let traceback = (error as Error).pythonTraceback.split('Exception: ').slice(1)[0]
+      console.log(traceback)
+    }
+  }
 
   return (
     <PanelSection title="Panel Section">
+      <PanelSectionRow>
+        <ButtonItem
+          layout="below"
+          onClick={onClickCallFunctionError}
+        >Call function with error
+        </ButtonItem>
+      </PanelSectionRow>
+      <PanelSectionRow>
+        <ButtonItem
+          layout="below"
+          onClick={onClickCallableFunctionError}
+        >Callable function with error
+        </ButtonItem>
+      </PanelSectionRow>
       <PanelSectionRow>
         <ButtonItem
           layout="below"
