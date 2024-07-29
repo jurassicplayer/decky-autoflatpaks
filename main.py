@@ -1,3 +1,31 @@
+#region Local Testing
+# import sys
+# sys.dont_write_bytecode = True
+from flatpak import *
+# objs = Installation.getAll()
+# print(objs[0].__dict__)
+# from uuid import uuid4
+obj = Installation.InstallationObject()
+print(f'Created empty new Installation object: {vars(obj)}')
+obj = Installation.InstallationObject({'configFile': None})
+print(f'Created new Installation object based on data: {vars(obj)}')
+print(type(obj.configFile))
+# obj.save()
+# print(f'Saved new Installation object')
+# objID = obj.id
+# obj.load(objID)
+# print(f'Loaded Installation object by Id: {objID} => {vars(obj)}')
+# obj2 = Installation.InstallationObject(vars(obj))
+# print(f'Created new Installation object from previous: {vars(obj2)}')
+# obj2.save()
+# print(f'Saved new Installation object')
+# obj.id
+#flatpakInterop.getInstallations()
+
+#endregion
+
+
+#region Plugin Template
 import os
 
 # The decky plugin module is located at decky-loader/plugin
@@ -10,6 +38,14 @@ class Plugin:
     # A normal method. It can be called from the TypeScript side using @decky/api.
     async def add(self, left: int, right: int) -> int:
         return left + right
+
+    async def callableError(self, trigger: bool) -> bool:
+        if trigger:
+            obj = Installation.InstallationObject()
+            obj.save()
+            raise Exception('Something has failed terribly')
+        else:
+            return trigger
 
     async def long_running(self):
         await asyncio.sleep(15)
@@ -54,3 +90,4 @@ class Plugin:
         decky.migrate_runtime(
             os.path.join(decky.DECKY_HOME, "template"),
             os.path.join(decky.DECKY_USER_HOME, ".local", "share", "decky-template"))
+#endregion
