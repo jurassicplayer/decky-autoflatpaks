@@ -22,6 +22,8 @@ coverage
 # Dependency directory
 node_modules
 bower_components
+.venv
+.pnpm-store
 
 # Editors
 .idea
