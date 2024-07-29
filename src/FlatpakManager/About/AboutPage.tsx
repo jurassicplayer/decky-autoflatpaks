@@ -1,8 +1,7 @@
-import { Focusable } from "decky-frontend-lib"
+import { Focusable, ScrollPanel } from "decky-frontend-lib"
 import { CSSProperties, useRef, VFC } from "react"
 import { FaDownload, FaEye, FaEyeSlash, FaSyncAlt, FaTrashAlt } from "react-icons/fa"
 import { SiGithub, SiKofi } from "react-icons/si"
-import { ScrollPanel } from "../../InputControls/ScrollPanel"
 import { SteamCssVariables } from "../../Utils/SteamUtils"
 
 export const AboutScrollPanel: CSSProperties = {

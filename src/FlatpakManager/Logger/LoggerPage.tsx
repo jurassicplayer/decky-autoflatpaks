@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState, VFC } from "react"
-import { Focusable, SteamSpinner } from "decky-frontend-lib"
+import { Focusable, ScrollPanel, SteamSpinner } from "decky-frontend-lib"
 import { Backend } from "../../Utils/Backend"
 import { events } from "../../Utils/Events"
 import { JournalEntry } from "../../Utils/History"
-import { ScrollPanel } from "../../InputControls/ScrollPanel"
 import { LogEntry } from "./LogEntry"
 import { HistoryLogContainer, HistoryReadyScrollPanel, HistoryNotReadyScrollPanel } from "./LoggerPage.css"
 

@@ -1,11 +1,10 @@
-import { Focusable, showModal } from "decky-frontend-lib"
+import { Focusable, showModal, ScrollPanel } from "decky-frontend-lib"
 import { CSSProperties, useEffect, useRef, useState, VFC } from "react"
 import { appStates, Backend } from "../../Utils/Backend"
 import { events } from "../../Utils/Events"
 import { LabelButton } from "../../InputControls/LabelControls"
 import { FallbackModal } from "../../InputControls/FallbackModal"
 import { FlatpakUnused } from "../../Utils/Flatpak"
-import { ScrollPanel } from "../../InputControls/ScrollPanel"
 import { FaEllipsisH } from "react-icons/fa"
 import { SteamCssVariables } from "../../Utils/SteamUtils"
 

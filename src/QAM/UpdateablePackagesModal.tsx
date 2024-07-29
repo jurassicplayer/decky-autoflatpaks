@@ -1,7 +1,6 @@
-import { Focusable } from "decky-frontend-lib"
+import { Focusable, ScrollPanel } from "decky-frontend-lib"
 import { useRef, useState, useEffect, CSSProperties } from "react"
 import { FallbackModal } from "../InputControls/FallbackModal"
-import { ScrollPanel } from "../InputControls/ScrollPanel"
 import { Backend } from "../Utils/Backend"
 import { events } from "../Utils/Events"
 import { SteamCssVariables } from "../Utils/SteamUtils"
