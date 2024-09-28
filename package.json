@@ -35,7 +35,9 @@
   },
   "dependencies": {
     "@decky/api": "^1.0.5",
-    "@decky/ui": "^4.6.0",
+    "@decky/ui": "^4.7.2",
+    "@preact/signals-react": "^2.1.0",
+    "deepsignal": "^1.5.0",
     "react-icons": "^5.2.1",
     "react-intersection-observer": "^9.4.1",
     "tslib": "^2.6.3"
