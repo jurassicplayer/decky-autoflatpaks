@@ -1,15 +1,36 @@
 #region Local Testing
 # import sys
 # sys.dont_write_bytecode = True
-from flatpak import *
+#from flatpak import *
+from interops import *
 # objs = Installation.getAll()
 # print(objs[0].__dict__)
 # from uuid import uuid4
-obj = Installation.InstallationObject()
-print(f'Created empty new Installation object: {vars(obj)}')
-obj = Installation.InstallationObject({'configFile': None})
-print(f'Created new Installation object based on data: {vars(obj)}')
-print(type(obj.configFile))
+# import sys
+
+# import urllib.request as ur
+# import urllib.error as ue
+# import json
+# import pprint as pp
+
+# try:
+#     response = ur.urlopen('https://flathub.org/api/v2/stats')
+#     jresponse = json.loads(response.read())
+#     pp.pprint(jresponse.get('category_totals'))
+#     response = ur.urlopen('https://flathub.org/api/v2/collection/recently-added')
+#     jresponse = json.loads(response.read())
+#     pp.pprint(jresponse.get('hits')[0])
+    
+# except ue.URLError:
+#     pass
+
+# installs = Installation.getInstallations()
+# print(installs)
+# obj = Installation.InstallationObject()
+# print(f'Created empty new Installation object: {vars(obj)}')
+# obj = Installation.InstallationObject({'configFile': None})
+# print(f'Created new Installation object based on data: {vars(obj)}')
+# print(type(obj.configFile))
 # obj.save()
 # print(f'Saved new Installation object')
 # objID = obj.id
@@ -32,7 +53,8 @@ import os
 # For easy intellisense checkout the decky-loader code repo
 # and add the `decky_loader/plugin/imports` path to `python.analysis.extraPaths` in `.vscode/settings.json`
 import decky
-import asyncio
+import asyncio, sys
+from typing import Any
 
 class Plugin:
     # A normal method. It can be called from the TypeScript side using @decky/api.
@@ -50,6 +72,20 @@ class Plugin:
     async def long_running(self):
         await asyncio.sleep(15)
         await decky.emit("test_event", "Hello from the backend!", True, 2)
+
+    async def pyCall(self, className:str, functionName:str, args:Any):
+        try:
+            staticClass = getattr(sys.modules["interops"], className)
+            staticFunction = getattr(staticClass, functionName)
+            result = None
+            if (args):
+                result = await staticFunction(args)
+            else:
+                result = await staticFunction()
+            #await decky.emit("test_event", result)
+            return result
+        except Exception as e:
+            raise e
 
     # Asyncio-compatible long-running code, executed in a task when the plugin is loaded
     async def _main(self):
