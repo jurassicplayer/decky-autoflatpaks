@@ -73,7 +73,7 @@ class Plugin:
         await asyncio.sleep(15)
         await decky.emit("test_event", "Hello from the backend!", True, 2)
 
-    async def pyCall(self, className:str, functionName:str, args:Any):
+    async def pyCall(self, className:str, functionName:str, args:Any=None):
         try:
             staticClass = getattr(sys.modules["interops"], className)
             staticFunction = getattr(staticClass, functionName)
@@ -82,7 +82,6 @@ class Plugin:
                 result = await staticFunction(args)
             else:
                 result = await staticFunction()
-            #await decky.emit("test_event", result)
             return result
         except Exception as e:
             raise e
