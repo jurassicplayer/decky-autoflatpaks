@@ -2,7 +2,7 @@
   "name": "AutoFlatpaks",
   "author": "jurassicplayer",
   "flags": ["_root"],
-  "api_version": 1,
+  "api_version": 2,
   "publish": {
     "tags": ["flatpak", "package-management", "utility", "update", "root"],
     "description": "A plugin to manage, notify, and automatically update flatpaks on your steamdeck console",

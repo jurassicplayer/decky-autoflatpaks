@@ -34,7 +34,7 @@
     "typescript": "^5.5.3"
   },
   "dependencies": {
-    "@decky/api": "^1.0.5",
+    "@decky/api": "^1.1.2",
     "@decky/ui": "^4.7.2",
     "@preact/signals-react": "^2.1.0",
     "deepsignal": "^1.5.0",

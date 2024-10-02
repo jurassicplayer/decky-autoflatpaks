@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@decky/api':
-    specifier: ^1.0.5
-    version: 1.0.6
+    specifier: ^1.1.2
+    version: 1.1.2
   '@decky/ui':
     specifier: ^4.7.2
     version: 4.7.2
@@ -49,8 +49,8 @@ devDependencies:
 
 packages:
 
-  /@decky/api@1.0.6:
-    resolution: {integrity: sha512-pacO2qvAin7ZoB9AnCgQbevQS+6Wiy0t1C6QVEJPCWeQQdEgJaUm3KSeRjh2KNqsjKHsbV0j72Pv4X5Q44Lr7Q==}
+  /@decky/api@1.1.2:
+    resolution: {integrity: sha512-lTMqRpHOrGTCyH2c1jJvkmWhOq2dcnX5/ioHbfCVmyQOBik1OM1BnzF1uROsnNDC5GkRvl3J/ATqYp6vhYpRqw==}
     dev: false
 
   /@decky/rollup@1.0.1:
