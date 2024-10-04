@@ -137,6 +137,18 @@
             "problemMatcher": []
         },
         //GENERAL TASKS
+        //Update libraries
+        {
+            "label": "updatelib",
+            "detail": "Update @decky/ui and @decky/api",
+            "dependsOrder": "sequence",
+            "group": "none",
+            "dependsOn": [
+                "updatefrontendlib",
+                "updatebackendlib"
+            ],
+            "problemMatcher": []
+        },
         //Update Decky Frontend Library, aka DFL
         {
             "label": "updatefrontendlib",
@@ -144,6 +156,15 @@
             "group": "build",
             "detail": "Update @decky/ui aka DFL",
             "command": "pnpm update @decky/ui --latest",
+            "problemMatcher": []
+        },
+        //Update Decky Loader API Library, aka loader-api
+        {
+            "label": "updatebackendlib",
+            "type": "shell",
+            "group": "build",
+            "detail": "Update @decky/api aka loader-api",
+            "command": "pnpm update @decky/api --latest",
             "problemMatcher": []
         },
         //Used chmod plugins folder to allow copy-over of files
