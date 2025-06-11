@@ -363,6 +363,10 @@ export class Backend {
       let idx = rpl.findIndex(rplitem => rplitem.application == uplitem.application && rplitem.branch == uplitem.branch && (('remote' in uplitem && rplitem.origin == uplitem.remote) || !('remote' in uplitem)))
       let pkgAction = ''
       let extraParameters = {}
+      if (idx < 0) {
+        console.debug(`[AutoFlatpaks] Item "${uplitem.application}" not found in the package list - skipping`)
+        continue
+      }
       if (['i', 'u'].includes(uplitem.op)) { pkgAction = 'update'}
       if (uplitem.op == 'r') {
         pkgAction = 'uninstall'
