@@ -86,6 +86,7 @@ export class Backend {
       this.updateList = []
     } else if ('op' in updateList[0]) {
       this.updateList = (updateList as FlatpakUpdate[]).map((item) => item.application)
+    //  ##FIXME## This section is probably causing discrepancy
     } else if ('updateable' in updateList[0]) {
       this.updateList = (updateList as FlatpakMetadata[]).filter(item => item.updateable && !item.masked && !item.parentMasked).map(item => item.application)
     }
@@ -215,7 +216,7 @@ export class Backend {
       //console.log('PL (LPL+U+RPL+MPL): ', output)
     })
     this.setPL(output)
-    this.setUpdateList(output) // Maybe update package count issue is here
+    this.setUpdateList(output) // ##FIXME## Maybe update package count issue is here
     // Using check for updates on QAM returns results from `flatpak update --no-deps`
     // Using getPackageList returns cobbled together results, which probably is missing the new dependencies that need to be installed
     this.setAppState(appStates.idle)
