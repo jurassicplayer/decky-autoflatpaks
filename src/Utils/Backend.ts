@@ -215,7 +215,9 @@ export class Backend {
       //console.log('PL (LPL+U+RPL+MPL): ', output)
     })
     this.setPL(output)
-    this.setUpdateList(output)
+    this.setUpdateList(output) // Maybe update package count issue is here
+    // Using check for updates on QAM returns results from `flatpak update --no-deps`
+    // Using getPackageList returns cobbled together results, which probably is missing the new dependencies that need to be installed
     this.setAppState(appStates.idle)
     return output as FlatpakMetadata[]
   }
