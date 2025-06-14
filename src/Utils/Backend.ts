@@ -14,7 +14,8 @@ export enum appStates {
   buildingPackageList,
   processingQueue,
   repairingPackages,
-  migratingAppData
+  migratingAppData,
+  degraded
 } 
 
 export class Backend {
@@ -172,9 +173,11 @@ export class Backend {
     if (this.getAppState() == appStates.buildingPackageList) return undefined
     this.setAppState(appStates.buildingPackageList)
     let output: FlatpakMetadata[] = []
+    let degraded: Boolean = false
     let fpu: FlatpakUpdate[] = []
     await Promise.all([this.getRemotePackageList(), this.getRemotePackageList(true), this.getLocalPackageList(), this.getMaskList(), this.getUpdatePackageList()]).then((value: [RemoteFlatpakMetadata[], RemoteFlatpakMetadata[], LocalFlatpakMetadata[], string[], FlatpakUpdate[]]) => {
       let rpl = value[0] || []
+      if (rpl.length <= 0) {degraded = true}
       let upl = value[1] || []
       let lpl = value[2]
       let mpl = value[3]
@@ -217,7 +220,12 @@ export class Backend {
     this.setPL(output)
     // Use flatpak updates --no-deps to get update list (shows new dependencies to install as well as installed package updates)
     this.setUpdateList(fpu)
+    if (degraded) {
+      this.setAppState(appStates.degraded)
+      console.debug("[AutoFlatpaks] Failed to get results from `flatpak remote-ls` command. Check internet or repository connections.")
+    } else {
       this.setAppState(appStates.idle)
+    }
     return output as FlatpakMetadata[]
   }
   static async getLocalPackageList(): Promise<LocalFlatpakMetadata[]> {

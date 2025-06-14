@@ -98,7 +98,7 @@ export const QAMPanel: VFC = () => {
             onOKActionDescription='Manage Packages'><FaBoxOpen /></DialogButton>
           <DialogButton
             style={FlatpakManagerButtons}
-            disabled={appState != appStates.idle}
+            disabled={appState != appStates.idle && appState != appStates.degraded}
             onClick={onCheckForUpdates}
             onOKActionDescription='Check Updates&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'><FaRedoAlt /></DialogButton>
           <DialogButton
