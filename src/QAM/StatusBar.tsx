@@ -79,6 +79,9 @@ export const StatusBar = () => {
   } else if (appState == appStates.migratingAppData) {
     StatusText = "Moving application data..."
     CSS = StatusBarCSS.ProcessingQueue
+  } else if (appState == appStates.degraded) {
+    StatusText = "flatpak remote-ls issue..."
+    CSS = StatusBarCSS.ProcessingQueue
   }
   return (
     <PanelSectionRow>

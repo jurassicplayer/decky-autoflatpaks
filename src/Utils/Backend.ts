@@ -14,7 +14,8 @@ export enum appStates {
   buildingPackageList,
   processingQueue,
   repairingPackages,
-  migratingAppData
+  migratingAppData,
+  degraded
 } 
 
 export class Backend {
@@ -81,13 +82,11 @@ export class Backend {
     this.eventBus.dispatchEvent(new events.PackageInfoEvent(this.packageList[idx]))
   }
   static getUpdateList() { return this.updateList }
-  static setUpdateList(updateList: FlatpakUpdate[] | FlatpakMetadata[]) {
+  static setUpdateList(updateList: FlatpakUpdate[]) {
     if (updateList.length == 0) {
       this.updateList = []
     } else if ('op' in updateList[0]) {
       this.updateList = (updateList as FlatpakUpdate[]).map((item) => item.application)
-    } else if ('updateable' in updateList[0]) {
-      this.updateList = (updateList as FlatpakMetadata[]).filter(item => item.updateable && !item.masked && !item.parentMasked).map(item => item.application)
     }
     this.eventBus.dispatchEvent(new events.UpdateListEvent(this.updateList))
   }
@@ -174,11 +173,15 @@ export class Backend {
     if (this.getAppState() == appStates.buildingPackageList) return undefined
     this.setAppState(appStates.buildingPackageList)
     let output: FlatpakMetadata[] = []
-    await Promise.all([this.getRemotePackageList(), this.getRemotePackageList(true), this.getLocalPackageList(), this.getMaskList()]).then((value: [RemoteFlatpakMetadata[], RemoteFlatpakMetadata[], LocalFlatpakMetadata[], string[]]) => {
+    let degraded: Boolean = false
+    let fpu: FlatpakUpdate[] = []
+    await Promise.all([this.getRemotePackageList(), this.getRemotePackageList(true), this.getLocalPackageList(), this.getMaskList(), this.getUpdatePackageList()]).then((value: [RemoteFlatpakMetadata[], RemoteFlatpakMetadata[], LocalFlatpakMetadata[], string[], FlatpakUpdate[]]) => {
       let rpl = value[0] || []
+      if (rpl.length <= 0) {degraded = true}
       let upl = value[1] || []
       let lpl = value[2]
       let mpl = value[3]
+      fpu = value[4]
       // Add local packages & updateable data to list
       output = lpl.map(lplitem => {
         let default_metadata = {
@@ -215,8 +218,14 @@ export class Backend {
       //console.log('PL (LPL+U+RPL+MPL): ', output)
     })
     this.setPL(output)
-    this.setUpdateList(output)
-    this.setAppState(appStates.idle)
+    // Use flatpak updates --no-deps to get update list (shows new dependencies to install as well as installed package updates)
+    this.setUpdateList(fpu)
+    if (degraded) {
+      this.setAppState(appStates.degraded)
+      console.debug("[AutoFlatpaks] Failed to get results from `flatpak remote-ls` command. Check internet or repository connections.")
+    } else {
+      this.setAppState(appStates.idle)
+    }
     return output as FlatpakMetadata[]
   }
   static async getLocalPackageList(): Promise<LocalFlatpakMetadata[]> {

@@ -170,8 +170,8 @@ class Plugin:
         return proc
     async def getRemotePackageList(self, updateOnly = False):
         logging.info('Received request for list of remote packages')
-        cmd = 'flatpak remote-ls --columns=name:f,installed-size:f,description:f,download-size:f,version:f,commit:f,branch:f,ref:f,origin:f,application:f,runtime:f,arch:f,options:f'
-        if updateOnly: cmd += ' -a --updates'
+        cmd = 'flatpak remote-ls --columns=name:f,installed-size:f,description:f,download-size:f,version:f,commit:f,branch:f,ref:f,origin:f,application:f,runtime:f,arch:f,options:f -a'
+        if updateOnly: cmd += ' --updates'
         regex = r'(?P<name>.*?)\s+(?P<installed_size>((\d+(\.\d+)?)|(\.\d+)).(bytes|kB|MB|GB))\s+(?P<description>.*)\s+(?P<download_size>((\d+(\.\d+)?)|(\.\d+)).(bytes|kB|MB|GB))\s+(?P<version>.*?)\s+(?P<commit>[aA-fF0-9]{12})\s+(?P<branch>.*?)\s+(?P<ref>\S+)\s+(?P<origin>.*?)\s+(?P<application>\S+)\s+(?P<runtime>.*?)\s+(?P<arch>(x86_64|i386|aarch64|arm))(|\s+(?P<options>.*))$'
         proc = await self.digestCLIOutput(self, cmd, regex, CLIPostProcessor.getRemotePackageList) # type: ignore
         return proc
