@@ -81,14 +81,11 @@ export class Backend {
     this.eventBus.dispatchEvent(new events.PackageInfoEvent(this.packageList[idx]))
   }
   static getUpdateList() { return this.updateList }
-  static setUpdateList(updateList: FlatpakUpdate[] | FlatpakMetadata[]) {
+  static setUpdateList(updateList: FlatpakUpdate[]) {
     if (updateList.length == 0) {
       this.updateList = []
     } else if ('op' in updateList[0]) {
       this.updateList = (updateList as FlatpakUpdate[]).map((item) => item.application)
-    //  ##FIXME## This section is probably causing discrepancy
-    } else if ('updateable' in updateList[0]) {
-      this.updateList = (updateList as FlatpakMetadata[]).filter(item => item.updateable && !item.masked && !item.parentMasked).map(item => item.application)
     }
     this.eventBus.dispatchEvent(new events.UpdateListEvent(this.updateList))
   }
@@ -175,11 +172,13 @@ export class Backend {
     if (this.getAppState() == appStates.buildingPackageList) return undefined
     this.setAppState(appStates.buildingPackageList)
     let output: FlatpakMetadata[] = []
-    await Promise.all([this.getRemotePackageList(), this.getRemotePackageList(true), this.getLocalPackageList(), this.getMaskList()]).then((value: [RemoteFlatpakMetadata[], RemoteFlatpakMetadata[], LocalFlatpakMetadata[], string[]]) => {
+    let fpu: FlatpakUpdate[] = []
+    await Promise.all([this.getRemotePackageList(), this.getRemotePackageList(true), this.getLocalPackageList(), this.getMaskList(), this.getUpdatePackageList()]).then((value: [RemoteFlatpakMetadata[], RemoteFlatpakMetadata[], LocalFlatpakMetadata[], string[], FlatpakUpdate[]]) => {
       let rpl = value[0] || []
       let upl = value[1] || []
       let lpl = value[2]
       let mpl = value[3]
+      fpu = value[4]
       // Add local packages & updateable data to list
       output = lpl.map(lplitem => {
         let default_metadata = {
@@ -216,10 +215,9 @@ export class Backend {
       //console.log('PL (LPL+U+RPL+MPL): ', output)
     })
     this.setPL(output)
-    this.setUpdateList(output) // ##FIXME## Maybe update package count issue is here
-    // Using check for updates on QAM returns results from `flatpak update --no-deps`
-    // Using getPackageList returns cobbled together results, which probably is missing the new dependencies that need to be installed
-    this.setAppState(appStates.idle)
+    // Use flatpak updates --no-deps to get update list (shows new dependencies to install as well as installed package updates)
+    this.setUpdateList(fpu)
+      this.setAppState(appStates.idle)
     return output as FlatpakMetadata[]
   }
   static async getLocalPackageList(): Promise<LocalFlatpakMetadata[]> {
