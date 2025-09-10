@@ -96,6 +96,7 @@ For manual installation, you will need to use the terminal a little and a keyboa
 ## Notes
 - All settings changes are instantly applied
 - A full flatpak manager interface probably won't happen (definition dependant)
+- Currently only supports system-installed flatpaks. Adding multiple repositories, local user-installed, or installation locations will not work (for the time being).
 
 ## Thanks
 - All of the decky-loader devs
