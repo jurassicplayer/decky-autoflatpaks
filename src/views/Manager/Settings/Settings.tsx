@@ -3,8 +3,8 @@ import { DefaultSettings, SettingKey, SettingsManager } from "../../../plugin/pl
 import { PluginSettings } from "../../../plugin/plugin.types"
 import { useEffect, useMemo, useState } from "react"
 import { logger } from "../../../plugin/backend"
-import { ActionType, AppState, useAppContext } from "../../../plugin/context.v4"
-
+import { useAppContext } from "../../../plugin/app.context"
+import { ActionType, AppState } from "../../../plugin/app.context.types"
 export default function Content(){
   const {state, dispatch, reloadSources} = useAppContext("PluginSettingsPage")
   const { serviceConstructors, activeServices, debug, appState } = state

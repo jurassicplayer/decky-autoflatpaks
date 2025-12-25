@@ -1,8 +1,8 @@
 import { FC } from "react"
-import { SourcePackage, SourceService, SourceSettings } from "../plugin/source.service"
-import { ConfigurationComponent, ConfigurationComponentProps } from "./example/SourceConfiguration"
 import { FaGithub } from "react-icons/fa"
-import { logger } from "../plugin/backend"
+import { logger } from "../../plugin/backend"
+import { SourcePackage, SourceService, SourceSettings } from "../../plugin/source.service"
+import { ConfigurationComponent, ConfigurationComponentProps } from "./SourceConfiguration"
 
 export type SettingsType = SourceSettings & {
   cooked: boolean

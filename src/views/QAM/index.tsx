@@ -1,5 +1,6 @@
 import { ButtonItem, PanelSection, PanelSectionRow, Router, ToggleField } from "@decky/ui"
-import { ActionType, useAppContext } from "../../plugin/context.v4"
+import { useAppContext } from "../../plugin/app.context"
+import { ActionType } from "../../plugin/app.context.types"
 
 export default function Content() {
   const {state, dispatch} = useAppContext("QAM")

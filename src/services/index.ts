@@ -1,6 +1,6 @@
 import { SourceServiceCtor } from "../plugin/source.service"
-import ExampleService from "./example.service"
-import FlatpakService from "./flatpak.service"
+import ExampleService from "./example/Service"
+import FlatpakService from "./flatpak/Service"
 
 const Services:SourceServiceCtor<any, any>[] = [
   ExampleService,

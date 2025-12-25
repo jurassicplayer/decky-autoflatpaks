@@ -1,5 +1,5 @@
 import { TextField, ToggleField, DialogButton } from "@decky/ui"
-import { PackageService, SettingsType } from "../flatpak.service"
+import { PackageService, SettingsType } from "./Service"
 import { useMemo, useState } from "react"
 import { logger } from "../../plugin/backend"
 

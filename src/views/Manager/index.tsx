@@ -4,7 +4,7 @@ import PackagesPage from "./Packages"
 import PluginSettings from "./Settings/Settings"
 import { FaArchive, FaBox, FaCog, FaNetworkWired, FaPuzzlePiece, FaStore } from "react-icons/fa"
 import { logger } from "../../plugin/backend"
-import { useAppContext } from "../../plugin/context.v4"
+import { useAppContext } from "../../plugin/app.context"
 
 enum ContentType {
   Packages = 'Packages',

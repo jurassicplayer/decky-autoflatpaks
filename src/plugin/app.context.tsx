@@ -1,44 +1,43 @@
-import { SourceServiceCtor, SourceService } from "./source.service"
+import { ComponentType, createContext, FC, ReactNode, useContext, useEffect, useState } from "react"
+import { routerHook } from "@decky/api"
 import { PackageServices } from "../services"
-import { ComponentType, createContext, Dispatch, FC, ReactNode, useContext, useEffect, useState } from "react";
-import { getAppInfo, logger } from "./backend";
-import { SettingKey, SettingsManager } from "./plugin.settings";
-import { routerHook } from "@decky/api";
-import Manager from "../views/Manager";
+import { getAppInfo, logger } from "./backend"
+import { SettingKey, SettingsManager } from "./plugin.settings"
+import { ContextState, AppAction, ActionType, AppState, AppContext } from "./app.context.types"
 
-// For autocomplete
-export enum ActionType {
-  SET_APPINFO = 'SET_APPINFO',
-  SET_APPSTATE = 'SET_APPSTATE',
-  SET_DEBUG = 'SET_DEBUG',
-  SET_ERRORLOG = 'SET_ERRORLOG',
-  SET_SERVICES = 'SET_SERVICES',
-  ADD_ERROR = 'ADD_ERROR'
-}
-// For autocomplete
-export enum AppState {
-  IDLE = 'IDLE',
-  BUSY = 'BUSY',
-  FAIL = 'FAIL'
-}
+// // For autocomplete
+// export enum ActionType {
+//   SET_APPINFO = 'SET_APPINFO',
+//   SET_APPSTATE = 'SET_APPSTATE',
+//   SET_DEBUG = 'SET_DEBUG',
+//   SET_ERRORLOG = 'SET_ERRORLOG',
+//   SET_SERVICES = 'SET_SERVICES',
+//   ADD_ERROR = 'ADD_ERROR'
+// }
+// // For autocomplete
+// export enum AppState {
+//   IDLE = 'IDLE',
+//   BUSY = 'BUSY',
+//   FAIL = 'FAIL'
+// }
 
-export type AppAction =
-  | { type: ActionType.SET_APPINFO; payload: { appName: string; appVersion: string } }
-  | { type: ActionType.SET_APPSTATE; payload: AppState }
-  | { type: ActionType.SET_DEBUG; payload: boolean }
-  | { type: ActionType.SET_ERRORLOG; payload: Error[] }
-  | { type: ActionType.SET_SERVICES; payload: SourceService<any, any>[] }
-  | { type: ActionType.ADD_ERROR; payload: Error }
+// export type AppAction =
+//   | { type: ActionType.SET_APPINFO; payload: { appName: string; appVersion: string } }
+//   | { type: ActionType.SET_APPSTATE; payload: AppState }
+//   | { type: ActionType.SET_DEBUG; payload: boolean }
+//   | { type: ActionType.SET_ERRORLOG; payload: Error[] }
+//   | { type: ActionType.SET_SERVICES; payload: SourceService<any, any>[] }
+//   | { type: ActionType.ADD_ERROR; payload: Error }
 
-export interface ContextState {
-  serviceConstructors:Record<string, SourceServiceCtor<any, any>>
-  activeServices:SourceService<any, any>[]
-  errorLog:Error[]
-  debug:boolean
-  appName:string
-  appVersion:string
-  appState:AppState
-}
+// export interface ContextState {
+//   serviceConstructors:Record<string, SourceServiceCtor<any, any>>
+//   activeServices:SourceService<any, any>[]
+//   errorLog:Error[]
+//   debug:boolean
+//   appName:string
+//   appVersion:string
+//   appState:AppState
+// }
 
 export const initialState:ContextState = {
   serviceConstructors: PackageServices,
@@ -50,15 +49,15 @@ export const initialState:ContextState = {
   appState: AppState.BUSY
 }
 
-export interface AppContext {
-  state: ContextState
-  dispatch: Dispatch<AppAction>
-  subscribe(origin:string, listener: ()=>void): ()=>void 
-  onMount(): Promise<void>
-  onDismount(): void
-  reloadSources(): Promise<void>
-  onTest(): void
-}
+// export interface AppContext {
+//   state: ContextState
+//   dispatch: Dispatch<AppAction>
+//   subscribe(origin:string, listener: ()=>void): ()=>void 
+//   onMount(): Promise<void>
+//   onDismount(): void
+//   reloadSources(): Promise<void>
+//   onTest(): void
+// }
 
 const AppContext = createContext<AppContext|null>(null)
 export const useAppContext = (origin:string) => {
@@ -126,8 +125,6 @@ export class PluginService implements AppContext {
     const {appName, appVersion} = await getAppInfo()
     this.dispatch({type: ActionType.SET_APPINFO, payload: {appName, appVersion}})
     await this.reloadSources()
-    logger.debug("Adding manager route")
-    routerHook.addRoute("/autoflatpaks/manager", withAppContext(Manager))
     logger.debug("Handle plugin CheckOnBoot/UnattendedUpgrades...")
     const {checkOnBoot, unattendedUpgrades} = await SettingsManager.getSettings([SettingKey.checkOnBoot, SettingKey.unattendedUpgrades])
     if (checkOnBoot) {
