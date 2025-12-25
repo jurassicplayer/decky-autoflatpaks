@@ -5,6 +5,7 @@ import PluginSettings from "./Settings/Settings"
 import { FaArchive, FaBox, FaCog, FaNetworkWired, FaPuzzlePiece, FaStore } from "react-icons/fa"
 import { logger } from "../../plugin/backend"
 import { useAppContext } from "../../plugin/app.context"
+import Debug from "../Debug"
 
 enum ContentType {
   Packages = 'Packages',
@@ -16,50 +17,62 @@ enum ContentType {
 }
 
 export default function SideNavContent(){
-  const pages:SidebarNavigationPage[] = useMemo(()=>[
-    {
-      title: ContentType.Packages,
-      content: <PackagesPage/>,
-      icon: <FaBox/>,
-      hideTitle: false,
-      padding: 'none'
-    },
-    {
-      title: ContentType.Install,
-      content: <ServiceTabs contentType={ContentType.Install}/>,
-      icon: <FaStore/>,
-      hideTitle: false,
-      padding: 'none'
-    },
-    {
-      title: ContentType.Sources,
-      content: <ServiceTabs contentType={ContentType.Sources}/>,
-      icon: <FaNetworkWired/>,
-      hideTitle: false,
-      padding: 'none'
-    },
-    {
-      title: ContentType.Maintenance,
-      content: <ServiceTabs contentType={ContentType.Maintenance}/>,
-      icon: <FaArchive/>,
-      hideTitle: false,
-      padding: 'none'
-    },
-    {
-      title: ContentType.Settings,
-      content: <ServiceTabs contentType={ContentType.Settings}/>,
-      icon: <FaCog/>,
-      hideTitle: true,
-      padding: 'none'
-    },
-    {
-      title: ContentType.HelpGuide,
-      content: <ServiceTabs contentType={ContentType.HelpGuide}/>,
+  const {state} = useAppContext('SideNav')
+  const {debug} = state
+  const pages:SidebarNavigationPage[] = useMemo(()=>{
+    let sideNavPages:SidebarNavigationPage[] = [
+      {
+        title: ContentType.Packages,
+        content: <PackagesPage/>,
+        icon: <FaBox/>,
+        hideTitle: false,
+        padding: 'none'
+      },
+      {
+        title: ContentType.Install,
+        content: <ServiceTabs contentType={ContentType.Install}/>,
+        icon: <FaStore/>,
+        hideTitle: false,
+        padding: 'none'
+      },
+      {
+        title: ContentType.Sources,
+        content: <ServiceTabs contentType={ContentType.Sources}/>,
+        icon: <FaNetworkWired/>,
+        hideTitle: false,
+        padding: 'none'
+      },
+      {
+        title: ContentType.Maintenance,
+        content: <ServiceTabs contentType={ContentType.Maintenance}/>,
+        icon: <FaArchive/>,
+        hideTitle: false,
+        padding: 'none'
+      },
+      {
+        title: ContentType.Settings,
+        content: <ServiceTabs contentType={ContentType.Settings}/>,
+        icon: <FaCog/>,
+        hideTitle: true,
+        padding: 'none'
+      },
+      {
+        title: ContentType.HelpGuide,
+        content: <ServiceTabs contentType={ContentType.HelpGuide}/>,
+        icon: <FaPuzzlePiece/>,
+        hideTitle: true,
+        padding: 'none'
+      }
+    ]
+    if (debug) sideNavPages.push({
+      title: "Debug",
+      content: <Debug/>,
       icon: <FaPuzzlePiece/>,
-      hideTitle: true,
+      hideTitle: false,
       padding: 'none'
-    }
-  ], [])
+    })
+    return sideNavPages
+  }, [])
   return (
     <SidebarNavigation pages={pages} />
   )
