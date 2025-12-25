@@ -1,10 +1,11 @@
 {
-  "name": "AutoFlatpaks",
+  "name": "AutoFlatpaks-UI",
   "author": "jurassicplayer",
   "flags": ["root"],
+  "api_version": 1,
   "publish": {
     "tags": ["flatpak", "package-management", "utility", "update", "root"],
-    "description": "A plugin to manage, notify, and automatically update flatpaks on your steamdeck console",
+    "description": "A plugin to manage, notify, and automatically update flatpaks on your SteamOS console",
     "image": "https://github.com/jurassicplayer/decky-autoflatpaks/raw/main/assets/thumbnail.png"
   }
 }
