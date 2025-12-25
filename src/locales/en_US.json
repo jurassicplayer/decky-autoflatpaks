@@ -1,0 +1,23 @@
+{
+  "translation": {
+    "apply": "Apply",
+    "error": {
+      "applicationBusy": "Application currently busy, please try again later."
+    },
+    "settings": {
+      "enabledServices": {
+        "header": "Enabled Services"
+      },
+      "notifications": {
+        "header": "Notifications",
+        "subheader": "Choose to show a notification toast, play a sound, or both."
+      },
+      "other": {
+        "header": "Other"
+      },
+      "plugin": {
+        "header": "Plugin"
+      }
+    }
+  }
+}

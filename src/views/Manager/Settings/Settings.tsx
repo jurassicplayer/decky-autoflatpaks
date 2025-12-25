@@ -1,11 +1,27 @@
-import { DialogButton, DialogControlsSection, DialogControlsSectionHeader, ToggleField } from "@decky/ui"
+import { DialogButton, DialogControlsSection, DialogControlsSectionHeader, DialogSubHeader, SliderField, ToggleField } from "@decky/ui"
 import { DefaultSettings, SettingKey, SettingsManager } from "../../../plugin/plugin.settings"
 import { PluginSettings } from "../../../plugin/plugin.types"
 import { useEffect, useMemo, useState } from "react"
 import { logger } from "../../../plugin/backend"
 import { useAppContext } from "../../../plugin/app.context"
+import { useTranslation } from "react-i18next"
 import { ActionType, AppState } from "../../../plugin/app.context.types"
+
+
+/*##FIXME##
+- Extend showToast/playSound functionality
+  - Add an array of notification types (like steamclient's separate toggles for each notification type)
+  - Toggling showToast/playSound will enable/disable all notification types
+- Add showInBell functionality?
+  - SteamClient has a way of not including toasts in the QAM's Bell Notifications, no idea how atm since
+    decky-loader's default always sends to the Bell Notifications
+- Add control for update interval
+  - Recreate janky QAM spinners for number input?
+  - Use dropdowns with a set number of days(0-365)/hours(0-12)/minutes(0-60)?
+  - 
+*/
 export default function Content(){
+  const { t } = useTranslation()
   const {state, dispatch, reloadSources} = useAppContext("PluginSettingsPage")
   const { serviceConstructors, activeServices, debug, appState } = state
   const [enabledServices, setEnabledServices] = useState<Record<string, boolean>>({})
@@ -51,7 +67,7 @@ export default function Content(){
   }
   const onSave = async () => {
     if (appState != AppState.IDLE) {
-      dispatch({type: ActionType.ADD_ERROR, payload: new Error('Application currently busy, please try again later.')})
+      dispatch({type: ActionType.ADD_ERROR, payload: new Error(t('error.applicationBusy'))})
       return
     }
     dispatch({type: ActionType.SET_APPSTATE, payload: AppState.BUSY})
@@ -115,8 +131,8 @@ export default function Content(){
   return (
     <>
       <DialogControlsSection>
-        <DialogButton disabled={!valid || appState === AppState.BUSY} onClick={onSave}>Apply</DialogButton>
-        <DialogControlsSectionHeader>Enabled Services</DialogControlsSectionHeader>
+        <DialogButton disabled={!valid || appState === AppState.BUSY} onClick={onSave}>{t('apply')}</DialogButton>
+        <DialogControlsSectionHeader>{t('settings.enabledServices.header')}</DialogControlsSectionHeader>
         {Object.keys(serviceConstructors).map((sourceKey)=> {
           let SourceIcon = serviceConstructors[sourceKey].sourceIcon
           return (
@@ -134,7 +150,7 @@ export default function Content(){
         })}
       </DialogControlsSection>
       <DialogControlsSection>
-        <DialogControlsSectionHeader>Plugin</DialogControlsSectionHeader>
+        <DialogControlsSectionHeader>{t('settings.plugin.header')}</DialogControlsSectionHeader>
         <ToggleField
           checked={checkOnBoot}
           disabled={appState === AppState.BUSY}
@@ -152,7 +168,8 @@ export default function Content(){
         />
       </DialogControlsSection>
       <DialogControlsSection>
-        <DialogControlsSectionHeader>Notifications</DialogControlsSectionHeader>
+        <DialogControlsSectionHeader>{t('settings.notifications.header')}</DialogControlsSectionHeader>
+        <DialogSubHeader>{t('settings.notifications.subheader')}</DialogSubHeader>
         <ToggleField
           checked={showToast}
           disabled={appState === AppState.BUSY}
@@ -169,13 +186,23 @@ export default function Content(){
         />
       </DialogControlsSection>
       <DialogControlsSection>
-        <DialogControlsSectionHeader>Other</DialogControlsSectionHeader>
+        <DialogControlsSectionHeader>{t('settings.other.header')}</DialogControlsSectionHeader>
         <ToggleField
           checked={debugFlag}
           indentLevel={1}
-          label="Enable Debug Mode"
+          label="Developer Mode"
           onChange={setDebugFlag}
         />
+        {debug?
+          <SliderField
+            value={processInterval}
+            min={1}
+            max={30}
+            label="Event Loop Delay"
+            description="Sets the delay (in minutes) inbetween event processing loops"
+            onChange={setProcessInterval}
+          />
+        :null}
       </DialogControlsSection>
     </>
   )
