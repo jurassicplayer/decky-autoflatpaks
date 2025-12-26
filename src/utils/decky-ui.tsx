@@ -8,7 +8,7 @@ const DialogBodyTextStyling:CSSProperties = {
 export const DialogBodyText:FC<DialogCommonProps> = (props) => {
   if (props.style !== undefined) props.style = {...props.style, ...DialogBodyTextStyling}
   return(
-    <DeckyDialogBodyText style={DialogBodyTextStyling} {...props}/>
+    <DeckyDialogBodyText {...props}/>
   )
 }
 

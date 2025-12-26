@@ -1,11 +1,11 @@
 import { Focusable, SidebarNavigation, SidebarNavigationPage, Tab, Tabs } from "@decky/ui"
 import { FC, useEffect, useMemo, useState } from "react"
 import PackagesPage from "./Packages"
-import PluginSettings from "./Settings/Settings"
+import PluginSettings from "./Settings"
 import { FaArchive, FaBox, FaCog, FaNetworkWired, FaPuzzlePiece, FaStore } from "react-icons/fa"
 import { logger } from "../../plugin/backend"
 import { useAppContext } from "../../plugin/app.context"
-import Debug from "../Debug"
+import Debug from "./Debug"
 
 enum ContentType {
   Packages = 'Packages',

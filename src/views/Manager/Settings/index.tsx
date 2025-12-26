@@ -1,12 +1,11 @@
 import { DialogBody, DialogButton, DialogControlsSection, DialogSubHeader, SliderField, ToggleField } from "@decky/ui"
-import { DialogBodyText } from "../../../plugin/decky-ui"
+import { DialogBodyText } from "../../../utils/decky-ui"
 import { DefaultSettings, SettingKey, SettingsManager } from "../../../plugin/plugin.settings"
 import { PluginSettings } from "../../../plugin/plugin.types"
 import { useEffect, useMemo, useState } from "react"
 import { logger } from "../../../plugin/backend"
-import { useAppContext } from "../../../plugin/app.context"
+import { ActionType, AppState, useAppContext } from "../../../plugin/app.context"
 import { useTranslation } from "react-i18next"
-import { ActionType, AppState } from "../../../plugin/app.context.types"
 
 
 /*##FIXME##
