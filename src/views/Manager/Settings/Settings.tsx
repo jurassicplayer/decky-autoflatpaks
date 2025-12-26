@@ -168,8 +168,7 @@ export default function Content(){
         />
       </DialogControlsSection>
       <DialogControlsSection>
-        <DialogControlsSectionHeader>{t('settings.notifications.header')}</DialogControlsSectionHeader>
-        <DialogSubHeader>{t('settings.notifications.subheader')}</DialogSubHeader>
+        <DialogControlsSectionHeader>{t('settings.notifications.header')}<DialogSubHeader>{t('settings.notifications.subheader')}</DialogSubHeader></DialogControlsSectionHeader>
         <ToggleField
           checked={showToast}
           disabled={appState === AppState.BUSY}
