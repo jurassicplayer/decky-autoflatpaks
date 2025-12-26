@@ -1,19 +1,17 @@
 import { DialogBodyText as DeckyDialogBodyText, DialogCommonProps } from "@decky/ui"
 import { CSSProperties, FC } from "react"
 
-const DialogBodyTextStyling:CSSProperties = {
+const dialogBodyTextStyling:CSSProperties = {
   fontSize: "0.75rem"
 }
 
 export const DialogBodyText:FC<DialogCommonProps> = (props) => {
-  if (props.style !== undefined) props.style = {...props.style, ...DialogBodyTextStyling}
+  const mergedStyle:CSSProperties = props.style ? {...props.style, ...dialogBodyTextStyling} : dialogBodyTextStyling
   return(
-    <DeckyDialogBodyText {...props}/>
+    <DeckyDialogBodyText {...props} style={mergedStyle}/>
   )
 }
 
-
-// Replace the original export directly
 const ModifiedDeckyUI = {
   DialogBodyText
 }
