@@ -2,7 +2,7 @@ import { ComponentType, createContext, FC, ReactNode, useContext, useEffect, use
 import { routerHook } from "@decky/api"
 import { PackageServices } from "../services"
 import { getAppInfo, logger } from "./backend"
-import { SettingKey, SettingsManager } from "./plugin.settings"
+import { DefaultSettings, SettingKey, SettingsManager } from "./plugin.settings"
 import { ContextState, AppAction, ActionType, AppState, AppContext } from "./app.context.types"
 
 // // For autocomplete
@@ -43,7 +43,7 @@ export const initialState:ContextState = {
   serviceConstructors: PackageServices,
   activeServices: [],
   errorLog: [],
-  debugMode: false,
+  debugMode: DefaultSettings.debug,
   appName: "AutoFlatpaks",
   appVersion: "0.0.0",
   appState: AppState.BUSY
