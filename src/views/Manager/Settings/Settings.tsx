@@ -144,6 +144,7 @@ export default function Content(){
         <DialogControlsSection>
           <DialogButton disabled={!valid || appState === AppState.BUSY} onClick={onSave}>{t('common:button.apply')}</DialogButton>
           <DialogSubHeader>{t('settings:enabledServices.subheader')}</DialogSubHeader>
+          <DialogBodyText>{t('settings:enabledServices.dialogbodytext')}</DialogBodyText>
           {Object.keys(serviceConstructors).map((sourceKey)=> {
             let SourceIcon = serviceConstructors[sourceKey].sourceIcon
             return (
@@ -177,6 +178,7 @@ export default function Content(){
             description={t('settings:plugin.unattendedUpgrades.description')}
             onChange={setUnattendedUpgrades}
           />
+          <div>Add Update Interval control here</div>
         </DialogControlsSection>
         <DialogControlsSection>
           <DialogSubHeader>{t('settings:notifications.subheader')}</DialogSubHeader>

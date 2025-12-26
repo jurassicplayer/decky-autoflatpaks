@@ -10,7 +10,8 @@
   },
   "settings": {
     "enabledServices": {
-      "subheader": "Enabled Services"
+      "dialogbodytext": "Enable usage/management of supported package services.",
+      "subheader": "Services"
     },
     "notifications": {
       "dialogbodytext": "Choose to show a notification toast, play a sound, or both.",
