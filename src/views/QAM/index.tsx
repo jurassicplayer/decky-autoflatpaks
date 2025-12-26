@@ -1,5 +1,7 @@
 import { ButtonItem, PanelSection, PanelSectionRow, Router, ToggleField } from "@decky/ui"
 import { ActionType, useAppContext } from "../../plugin/app.context"
+import { useTranslation } from "react-i18next"
+import { DialogBodyText } from "../../utils/decky-ui"
 
 /* ##FIXME##
 - Status bar on top
@@ -13,8 +15,9 @@ import { ActionType, useAppContext } from "../../plugin/app.context"
 
 export default function Content() {
   const {state, dispatch} = useAppContext("QAM")
-  const setDebug = (checked:boolean) => {
-    dispatch({type: ActionType.SET_DEBUGMODE, payload: checked})
+  const { t } = useTranslation()
+  const setTemporaryMode = (actionType: ActionType.SET_DEBUGMODE|ActionType.SET_TOASTMODE|ActionType.SET_SOUNDMODE|ActionType.SET_CHECKFORUPDATEMODE, checked:boolean)=>{
+    dispatch({type: actionType, payload: checked})
   }
   const onClick01 = async () => {
     Router.CloseSideMenus()
@@ -28,6 +31,7 @@ export default function Content() {
   }
 
   return (
+    <>
     <PanelSection title="Panel Section">
       <PanelSectionRow>
         <ButtonItem
@@ -51,7 +55,39 @@ export default function Content() {
           onClick={onClick03}
         />
       </PanelSectionRow>
-      <ToggleField checked={state.debugMode} onChange={setDebug} />
     </PanelSection>
+    <PanelSection title="Temporary Modes">
+      <DialogBodyText style={{marginBottom:"8px"}}>{t('quickaccessmenu:temporaryMode.dialogbodytext')}</DialogBodyText>
+      <PanelSectionRow>
+        <ToggleField
+          label={t('quickaccessmenu:temporaryMode.toast.label')}
+          checked={state.toastMode}
+          onChange={(checked)=>setTemporaryMode(ActionType.SET_TOASTMODE, checked)}
+        />
+      </PanelSectionRow>
+      <PanelSectionRow>
+        <ToggleField
+          label={t('quickaccessmenu:temporaryMode.sound.label')}
+          checked={state.soundMode}
+          onChange={(checked)=>setTemporaryMode(ActionType.SET_SOUNDMODE, checked)}
+        />
+      </PanelSectionRow>
+      <PanelSectionRow>
+        <ToggleField
+          label={t('quickaccessmenu:temporaryMode.checkforupdate.label')}
+          checked={state.checkForUpdateMode}
+          onChange={(checked)=>setTemporaryMode(ActionType.SET_CHECKFORUPDATEMODE, checked)}
+        />
+      </PanelSectionRow>
+      <PanelSectionRow>
+        <ToggleField
+          label={t('settings:plugin.developerMode.label')}
+          checked={state.debugMode}
+          onChange={(checked)=>setTemporaryMode(ActionType.SET_DEBUGMODE, checked)}
+          bottomSeparator="none"
+        />
+      </PanelSectionRow>
+    </PanelSection>
+    </>
   )
 }

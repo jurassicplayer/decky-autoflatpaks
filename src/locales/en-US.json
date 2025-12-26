@@ -1,13 +1,4 @@
 {
-  "error": {
-    "applicationBusy": "Application currently busy, please try again later.",
-    "failedToSave": "Failed to save."
-  },
-  "common": {
-    "button": {
-      "apply": "Apply"
-    }
-  },
   "settings": {
     "enabledServices": {
       "dialogbodytext": "Enable usage/management of supported package services.",
@@ -42,6 +33,29 @@
         "description": "Automatically update packages when updates are available.",
         "label": "Unattended Upgrades"
       }
+    }
+  },
+  "quickaccessmenu": {
+    "temporaryMode": {
+      "checkforupdate": {
+        "label": "Update Check"
+      },
+      "dialogbodytext": "Disable feature until next boot.",
+      "sound": {
+        "label": "Notification Sounds"
+      },
+      "toast": {
+        "label": "Toast Notifications"
+      }
+    }
+  },
+  "error": {
+    "applicationBusy": "Application currently busy, please try again later.",
+    "failedToSave": "Failed to save."
+  },
+  "common": {
+    "button": {
+      "apply": "Apply"
     }
   },
   "translation": {}
