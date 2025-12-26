@@ -174,6 +174,7 @@ export class PluginService implements AppContext {
       // Check for updates
       // var commandret:boolean = await call flatpak update and not update
       // if (!commandret) { return } // Check stderr for data. If no data, assume that the command didn't fail (calling flatpak update and then not updating returns 1)
+      // Write lastCheckedTimestamp to localstorage
       if (!unattendedUpgrades) {
         // Unattended updates
         // await call flatpak update and update

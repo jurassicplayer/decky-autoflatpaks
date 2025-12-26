@@ -10,7 +10,6 @@ import { DialogBodyText } from "../../utils/decky-ui"
 - Install updates button
 - Show list of available updates when present (click on status bar)
 - Show last checked/next check timestamp (save/read timestamp to/from localstorage)
-- Temporary disable notification/sound/update check
 */
 
 export default function Content() {

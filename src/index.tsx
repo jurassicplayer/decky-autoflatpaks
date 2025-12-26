@@ -1,10 +1,10 @@
 import { definePlugin, routerHook } from "@decky/api"
 import { staticClasses } from "@decky/ui"
 import { FaShip } from "react-icons/fa"
-import i18n from "./locales/i18n"
-import QAM from "./views/QAM"
 import { AppContextProvider, PluginService, withAppContext } from "./plugin/app.context"
 import { logger } from "./plugin/backend"
+import i18n from "./locales/i18n"
+import QAM from "./views/QAM"
 import Manager from "./views/Manager"
 
 export default definePlugin(() => {
