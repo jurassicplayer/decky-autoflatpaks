@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next"
 - Add control for update interval
   - Recreate janky QAM spinners for number input?
   - Use dropdowns with a set number of days(0-365)/hours(0-12)/minutes(0-60)?
-  - 
+  - Some kind of cron-style input?
 */
 export default function Content(){
   const { t } = useTranslation()
