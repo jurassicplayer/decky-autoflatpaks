@@ -3,6 +3,7 @@ import { loadSettings, saveSettings, getSettings, setSettings, logger } from "./
 
 export enum SettingKey {
   version = "version",
+  debug = "debug",
   showToast = "showToast",
   playSound = "playSound",
   checkOnBoot = "checkOnBoot",
@@ -14,6 +15,7 @@ export enum SettingKey {
 
 export const DefaultSettings:PluginSettings = {
   version: 2,
+  debug: false,
   showToast: false,
   playSound: false,
   checkOnBoot: false,

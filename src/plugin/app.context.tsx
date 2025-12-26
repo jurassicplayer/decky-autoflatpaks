@@ -124,9 +124,10 @@ export class PluginService implements AppContext {
     logger.debug("Mounting plugin")
     const {appName, appVersion} = await getAppInfo()
     this.dispatch({type: ActionType.SET_APPINFO, payload: {appName, appVersion}})
+    const {debug, checkOnBoot, unattendedUpgrades} = await SettingsManager.getSettings([SettingKey.debug, SettingKey.checkOnBoot, SettingKey.unattendedUpgrades])
+    this.dispatch({type: ActionType.SET_DEBUG, payload: debug})
     await this.reloadSources()
     logger.debug("Handle plugin CheckOnBoot/UnattendedUpgrades...")
-    const {checkOnBoot, unattendedUpgrades} = await SettingsManager.getSettings([SettingKey.checkOnBoot, SettingKey.unattendedUpgrades])
     if (checkOnBoot) {
       // Check for updates
       // var commandret:boolean = await call flatpak update and not update

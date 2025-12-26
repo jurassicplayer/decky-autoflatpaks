@@ -1,4 +1,5 @@
-import { DialogButton, DialogControlsSection, DialogControlsSectionHeader, DialogSubHeader, SliderField, ToggleField } from "@decky/ui"
+import { DialogBody, DialogButton, DialogControlsSection, DialogSubHeader, SliderField, ToggleField } from "@decky/ui"
+import { DialogBodyText } from "../../../plugin/decky-ui"
 import { DefaultSettings, SettingKey, SettingsManager } from "../../../plugin/plugin.settings"
 import { PluginSettings } from "../../../plugin/plugin.types"
 import { useEffect, useMemo, useState } from "react"
@@ -23,10 +24,10 @@ import { ActionType, AppState } from "../../../plugin/app.context.types"
 export default function Content(){
   const { t } = useTranslation()
   const {state, dispatch, reloadSources} = useAppContext("PluginSettingsPage")
-  const { serviceConstructors, activeServices, debug, appState } = state
+  const { serviceConstructors, activeServices, appState } = state
   const [enabledServices, setEnabledServices] = useState<Record<string, boolean>>({})
-  const [debugFlag, setDebugFlag] = useState<boolean>(debug)
   const [userSettings, setUserSettings] = useState<Partial<PluginSettings>>(DefaultSettings)
+  const [debug, setDebug] = useState<boolean>(DefaultSettings.debug)
   const [showToast, setShowToast] = useState<boolean>(DefaultSettings.showToast)
   const [playSound, setPlaySound] = useState<boolean>(DefaultSettings.playSound)
   const [checkOnBoot, setCheckOnBoot] = useState<boolean>(DefaultSettings.checkOnBoot)
@@ -45,13 +46,16 @@ export default function Content(){
     logger.debug("Enabled services: ", enabledServices)
     logger.debug("Current user settings: ", userSettings)
     let newSettings:Partial<PluginSettings> = {}
+    if (debug !== userSettings.debug) {
+      newSettings.debug = debug
+      dispatch({type: ActionType.SET_DEBUG, payload: debug})
+    }
     if (showToast !== userSettings.showToast) newSettings.showToast = showToast
     if (playSound !== userSettings.playSound) newSettings.playSound = playSound
     if (checkOnBoot !== userSettings.checkOnBoot) newSettings.checkOnBoot = checkOnBoot
     if (unattendedUpgrades !== userSettings.unattendedUpgrades) newSettings.unattendedUpgrades = unattendedUpgrades
     if (processInterval !== userSettings.processInterval) newSettings.processInterval = processInterval
     if (updateInterval !== userSettings.updateInterval) newSettings.updateInterval = updateInterval
-    if (debugFlag !== debug) dispatch({type: ActionType.SET_DEBUG, payload: debugFlag})
 
     let inactiveSources = Object.keys(serviceConstructors).filter(id => !enabledServices[id])
     let currentActiveServices = activeToEnabledServices()
@@ -67,14 +71,14 @@ export default function Content(){
   }
   const onSave = async () => {
     if (appState != AppState.IDLE) {
-      dispatch({type: ActionType.ADD_ERROR, payload: new Error(t('error.applicationBusy'))})
+      dispatch({type: ActionType.ADD_ERROR, payload: new Error(t('error:applicationBusy'))})
       return
     }
     dispatch({type: ActionType.SET_APPSTATE, payload: AppState.BUSY})
     try {
       await saveSettings()
     } catch (error) {
-      dispatch({type: ActionType.ADD_ERROR, payload: new Error('Save failed.')})
+      dispatch({type: ActionType.ADD_ERROR, payload: new Error(t('error:failedToSave'))})
     } finally {
       dispatch({type: ActionType.SET_APPSTATE, payload: AppState.IDLE})
     }
@@ -90,6 +94,7 @@ export default function Content(){
     logger.debug("views/Settings/Settings.tsx mounting...")
     setEnabledServices(activeToEnabledServices())
     SettingsManager.getSettings([
+      SettingKey.debug,
       SettingKey.showToast,
       SettingKey.playSound,
       SettingKey.checkOnBoot,
@@ -98,6 +103,7 @@ export default function Content(){
       SettingKey.updateInterval
     ]).then((settings)=>{
       setUserSettings(settings)
+      if(settings.debug) setDebug(settings.debug)
       if(settings.showToast) setShowToast(settings.showToast)
       if(settings.playSound) setPlaySound(settings.playSound)
       if(settings.checkOnBoot) setCheckOnBoot(settings.checkOnBoot)
@@ -107,102 +113,109 @@ export default function Content(){
     })
   },[])
 
-  // Valid if something changed compared to original props.settings
+  // Valid if something changed compared to current user settings
   const valid = useMemo(
     () => {
       let currentActiveServices = activeToEnabledServices()
       let enabledServicesChanged = Object.keys(serviceConstructors).some(key => !!enabledServices[key] !== !!currentActiveServices[key])
       return (
+        debug !== userSettings.debug ||
         showToast !== userSettings.showToast ||
         playSound !== userSettings.playSound ||
         checkOnBoot !== userSettings.checkOnBoot ||
         unattendedUpgrades !== userSettings.unattendedUpgrades ||
         processInterval !== userSettings.processInterval ||
         updateInterval !== userSettings.updateInterval ||
-        debugFlag !== debug ||
         enabledServicesChanged
       )
     },
     [
-      enabledServices, showToast, playSound, checkOnBoot, unattendedUpgrades, processInterval, updateInterval, debug,
-      activeServices, userSettings.showToast, userSettings.playSound, userSettings.checkOnBoot, userSettings.unattendedUpgrades, userSettings.processInterval, userSettings.updateInterval, debugFlag
+      enabledServices, debug, showToast, playSound, checkOnBoot, unattendedUpgrades, processInterval, updateInterval,
+      activeServices, userSettings.debug, userSettings.showToast, userSettings.playSound, userSettings.checkOnBoot, userSettings.unattendedUpgrades, userSettings.processInterval, userSettings.updateInterval,
     ]
   )
   return (
     <>
-      <DialogControlsSection>
-        <DialogButton disabled={!valid || appState === AppState.BUSY} onClick={onSave}>{t('apply')}</DialogButton>
-        <DialogControlsSectionHeader>{t('settings.enabledServices.header')}</DialogControlsSectionHeader>
-        {Object.keys(serviceConstructors).map((sourceKey)=> {
-          let SourceIcon = serviceConstructors[sourceKey].sourceIcon
-          return (
-            <ToggleField
-              key={sourceKey}
-              checked={!!enabledServices[sourceKey]}
-              disabled={appState === AppState.BUSY}
-              icon={<SourceIcon/>}
-              bottomSeparator="none"
-              indentLevel={1}
-              label={serviceConstructors[sourceKey].sourceDisplayName}
-              onChange={(value)=>{onServiceChange(sourceKey, value)}}
-            />
-          )
-        })}
-      </DialogControlsSection>
-      <DialogControlsSection>
-        <DialogControlsSectionHeader>{t('settings.plugin.header')}</DialogControlsSectionHeader>
-        <ToggleField
-          checked={checkOnBoot}
-          disabled={appState === AppState.BUSY}
-          indentLevel={1}
-          label="Check for Updates on Boot"
-          onChange={setCheckOnBoot}
-        />
-        <ToggleField
-          checked={unattendedUpgrades}
-          disabled={appState === AppState.BUSY}
-          indentLevel={1}
-          label="Unattended Upgrades"
-          description="Automatically update packages when updates are available"
-          onChange={setUnattendedUpgrades}
-        />
-      </DialogControlsSection>
-      <DialogControlsSection>
-        <DialogControlsSectionHeader>{t('settings.notifications.header')}<DialogSubHeader>{t('settings.notifications.subheader')}</DialogSubHeader></DialogControlsSectionHeader>
-        <ToggleField
-          checked={showToast}
-          disabled={appState === AppState.BUSY}
-          indentLevel={1}
-          label="Show Toast Notifications"
-          onChange={setShowToast}
-        />
-        <ToggleField
-          checked={playSound}
-          disabled={appState === AppState.BUSY}
-          indentLevel={1}
-          label="Play Notification Sound"
-          onChange={setPlaySound}
-        />
-      </DialogControlsSection>
-      <DialogControlsSection>
-        <DialogControlsSectionHeader>{t('settings.other.header')}</DialogControlsSectionHeader>
-        <ToggleField
-          checked={debugFlag}
-          indentLevel={1}
-          label="Developer Mode"
-          onChange={setDebugFlag}
-        />
-        {debug?
-          <SliderField
-            value={processInterval}
-            min={1}
-            max={30}
-            label="Event Loop Delay"
-            description="Sets the delay (in minutes) inbetween event processing loops"
-            onChange={setProcessInterval}
+      <DialogBody>
+        <DialogControlsSection>
+          <DialogButton disabled={!valid || appState === AppState.BUSY} onClick={onSave}>{t('common:button.apply')}</DialogButton>
+          <DialogSubHeader>{t('settings:enabledServices.subheader')}</DialogSubHeader>
+          {Object.keys(serviceConstructors).map((sourceKey)=> {
+            let SourceIcon = serviceConstructors[sourceKey].sourceIcon
+            return (
+              <ToggleField
+                key={sourceKey}
+                checked={!!enabledServices[sourceKey]}
+                disabled={appState === AppState.BUSY}
+                icon={<SourceIcon/>}
+                bottomSeparator="none"
+                indentLevel={1}
+                label={serviceConstructors[sourceKey].sourceDisplayName}
+                onChange={(value)=>{onServiceChange(sourceKey, value)}}
+              />
+            )
+          })}
+        </DialogControlsSection>
+        <DialogControlsSection>
+          <DialogSubHeader>{t('settings:plugin.subheader')}</DialogSubHeader>
+          <ToggleField
+            checked={checkOnBoot}
+            disabled={appState === AppState.BUSY}
+            indentLevel={1}
+            label={t('settings:plugin.checkOnBoot.label')}
+            onChange={setCheckOnBoot}
           />
-        :null}
-      </DialogControlsSection>
+          <ToggleField
+            checked={unattendedUpgrades}
+            disabled={appState === AppState.BUSY}
+            indentLevel={1}
+            label={t('settings:plugin.unattendedUpgrades.label')}
+            description={t('settings:plugin.unattendedUpgrades.description')}
+            onChange={setUnattendedUpgrades}
+          />
+        </DialogControlsSection>
+        <DialogControlsSection>
+          <DialogSubHeader>{t('settings:notifications.subheader')}</DialogSubHeader>
+          <DialogBodyText>{t('settings:notifications.dialogbodytext')}</DialogBodyText>
+          <ToggleField
+            checked={showToast}
+            disabled={appState === AppState.BUSY}
+            indentLevel={1}
+            label={t('settings:plugin.showToast.label')}
+            onChange={setShowToast}
+          />
+          <ToggleField
+            checked={playSound}
+            disabled={appState === AppState.BUSY}
+            indentLevel={1}
+            label={t('settings:plugin.playSound.label')}
+            onChange={setPlaySound}
+          />
+        </DialogControlsSection>
+        <DialogControlsSection>
+          <DialogSubHeader>{t('settings:other.subheader')}</DialogSubHeader>
+          <ToggleField
+            checked={debug}
+            indentLevel={1}
+            label={t('settings:plugin.developerMode.label')}
+            onChange={setDebug}
+          />
+          {debug?
+            <SliderField
+              value={processInterval}
+              min={1}
+              max={30}
+              showValue={true}
+              editableValue={true}
+              notchTicksVisible={true}
+              indentLevel={1}
+              label={t('settings:plugin.processInterval.label')}
+              description={t('settings:plugin.processInterval.description')}
+              onChange={setProcessInterval}
+            />
+          :null}
+        </DialogControlsSection>
+      </DialogBody>
     </>
   )
 }
