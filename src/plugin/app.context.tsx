@@ -101,9 +101,9 @@ export const initialState:ContextState = {
   activeServices: [],
   errorLog: [],
   debugMode: DefaultSettings.debug,
-  toastMode: false,
-  soundMode: false,
-  checkForUpdateMode: false,
+  toastMode: true,
+  soundMode: true,
+  checkForUpdateMode: true,
   appName: "AutoFlatpaks",
   appVersion: "0.0.0",
   appState: AppState.BUSY
