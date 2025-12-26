@@ -1,0 +1,47 @@
+{
+  "error": {
+    "applicationBusy": "Application currently busy, please try again later.",
+    "failedToSave": "Failed to save."
+  },
+  "common": {
+    "button": {
+      "apply": "Apply"
+    }
+  },
+  "settings": {
+    "enabledServices": {
+      "subheader": "Enabled Services"
+    },
+    "notifications": {
+      "dialogbodytext": "Choose to show a notification toast, play a sound, or both.",
+      "subheader": "Notifications"
+    },
+    "other": {
+      "subheader": "Other"
+    },
+    "plugin": {
+      "checkOnBoot": {
+        "label": "Check for Updates on Boot"
+      },
+      "developerMode": {
+        "label": "Developer Mode"
+      },
+      "playSound": {
+        "label": "Play Notification Sounds"
+      },
+      "processInterval": {
+        "description": "Sets the delay (in minutes) inbetween event processing loops.",
+        "label": "Event Loop Delay"
+      },
+      "showToast": {
+        "label": "Show Toast Notifications"
+      },
+      "subheader": "Plugin",
+      "unattendedUpgrades": {
+        "description": "Automatically update packages when updates are available.",
+        "label": "Unattended Upgrades"
+      }
+    }
+  },
+  "translation": {}
+}
