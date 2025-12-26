@@ -66,7 +66,7 @@ export default function Content(){
     let newSettings:Partial<PluginSettings> = {}
     if (debug !== userSettings.debug) {
       newSettings.debug = debug
-      dispatch({type: ActionType.SET_DEBUG, payload: debug})
+      dispatch({type: ActionType.SET_DEBUGMODE, payload: debug})
     }
     if (showToast !== userSettings.showToast) newSettings.showToast = showToast
     if (playSound !== userSettings.playSound) newSettings.playSound = playSound

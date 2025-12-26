@@ -1,64 +1,72 @@
-import { ComponentType, createContext, FC, ReactNode, useContext, useEffect, useState } from "react"
+import { ComponentType, createContext, Dispatch, FC, ReactNode, useContext, useEffect, useState } from "react"
 import { routerHook } from "@decky/api"
 import { PackageServices } from "../services"
 import { getAppInfo, logger } from "./backend"
 import { DefaultSettings, SettingKey, SettingsManager } from "./plugin.settings"
-import { ContextState, AppAction, ActionType, AppState, AppContext } from "./app.context.types"
+import { SourceService, SourceServiceCtor } from "./source.service"
 
-// // For autocomplete
-// export enum ActionType {
-//   SET_APPINFO = 'SET_APPINFO',
-//   SET_APPSTATE = 'SET_APPSTATE',
-//   SET_DEBUG = 'SET_DEBUG',
-//   SET_ERRORLOG = 'SET_ERRORLOG',
-//   SET_SERVICES = 'SET_SERVICES',
-//   ADD_ERROR = 'ADD_ERROR'
-// }
-// // For autocomplete
-// export enum AppState {
-//   IDLE = 'IDLE',
-//   BUSY = 'BUSY',
-//   FAIL = 'FAIL'
-// }
+//#region Enums/Interfaces/Types
+//#region Enums
+// For autocomplete
+export enum ActionType {
+  SET_APPINFO = 'SET_APPINFO',
+  SET_APPSTATE = 'SET_APPSTATE',
+  SET_DEBUGMODE = 'SET_DEBUGMODE',
+  SET_TOASTMODE = 'SET_TOASTMODE',
+  SET_SOUNDMODE = 'SET_SOUNDMODE',
+  SET_CHECKFORUPDATEMODE = 'SET_CHECKFORUPDATEMODE',
+  SET_ERRORLOG = 'SET_ERRORLOG',
+  SET_SERVICES = 'SET_SERVICES',
+  ADD_ERROR = 'ADD_ERROR'
+}
+// For autocomplete
+export enum AppState {
+  IDLE = 'IDLE',
+  BUSY = 'BUSY',
+  FAIL = 'FAIL'
+}
+//#endregion
 
-// export type AppAction =
-//   | { type: ActionType.SET_APPINFO; payload: { appName: string; appVersion: string } }
-//   | { type: ActionType.SET_APPSTATE; payload: AppState }
-//   | { type: ActionType.SET_DEBUG; payload: boolean }
-//   | { type: ActionType.SET_ERRORLOG; payload: Error[] }
-//   | { type: ActionType.SET_SERVICES; payload: SourceService<any, any>[] }
-//   | { type: ActionType.ADD_ERROR; payload: Error }
+//#region Types
+export type AppAction =
+  | { type: ActionType.SET_APPINFO; payload: { appName: string; appVersion: string } }
+  | { type: ActionType.SET_APPSTATE; payload: AppState }
+  | { type: ActionType.SET_DEBUGMODE; payload: boolean }
+  | { type: ActionType.SET_TOASTMODE; payload: boolean }
+  | { type: ActionType.SET_SOUNDMODE; payload: boolean }
+  | { type: ActionType.SET_CHECKFORUPDATEMODE; payload: boolean }
+  | { type: ActionType.SET_ERRORLOG; payload: Error[] }
+  | { type: ActionType.SET_SERVICES; payload: SourceService<any, any>[] }
+  | { type: ActionType.ADD_ERROR; payload: Error }
+//#endregion
 
-// export interface ContextState {
-//   serviceConstructors:Record<string, SourceServiceCtor<any, any>>
-//   activeServices:SourceService<any, any>[]
-//   errorLog:Error[]
-//   debug:boolean
-//   appName:string
-//   appVersion:string
-//   appState:AppState
-// }
-
-export const initialState:ContextState = {
-  serviceConstructors: PackageServices,
-  activeServices: [],
-  errorLog: [],
-  debugMode: DefaultSettings.debug,
-  appName: "AutoFlatpaks",
-  appVersion: "0.0.0",
-  appState: AppState.BUSY
+//#region Interfaces
+export interface ContextState {
+  serviceConstructors:Record<string, SourceServiceCtor<any, any>>
+  activeServices:SourceService<any, any>[]
+  errorLog:Error[]
+  debugMode:boolean
+  toastMode:boolean
+  soundMode:boolean
+  checkForUpdateMode:boolean
+  appName:string
+  appVersion:string
+  appState:AppState
 }
 
-// export interface AppContext {
-//   state: ContextState
-//   dispatch: Dispatch<AppAction>
-//   subscribe(origin:string, listener: ()=>void): ()=>void 
-//   onMount(): Promise<void>
-//   onDismount(): void
-//   reloadSources(): Promise<void>
-//   onTest(): void
-// }
+export interface AppContext {
+  state: ContextState
+  dispatch: Dispatch<AppAction>
+  subscribe(origin:string, listener: ()=>void): ()=>void 
+  onMount(): Promise<void>
+  onDismount(): void
+  reloadSources(): Promise<void>
+  onTest(): void
+}
+//#endregion
+//#endregion
 
+//#region Application Context
 const AppContext = createContext<AppContext|null>(null)
 export const useAppContext = (origin:string) => {
   const context = useContext(AppContext)
@@ -69,6 +77,36 @@ export const useAppContext = (origin:string) => {
     return unsubscribe
   }, [context])
   return context
+}
+
+export const AppContextProvider:FC<{children:ReactNode}> = ({children}) => {
+  return (
+    <AppContext.Provider value={PluginService.getInstance()}>
+      {children}
+    </AppContext.Provider>
+  )
+}
+
+export const withAppContext = <P extends object>(WrappedComponent:ComponentType<P>):FC<P> => {
+  return (props: P) => {
+    return (
+      <AppContextProvider><WrappedComponent {...props} /></AppContextProvider>
+    )
+  }
+}
+//#endregion
+
+export const initialState:ContextState = {
+  serviceConstructors: PackageServices,
+  activeServices: [],
+  errorLog: [],
+  debugMode: DefaultSettings.debug,
+  toastMode: false,
+  soundMode: false,
+  checkForUpdateMode: false,
+  appName: "AutoFlatpaks",
+  appVersion: "0.0.0",
+  appState: AppState.BUSY
 }
 
 export class PluginService implements AppContext {
@@ -106,7 +144,10 @@ export class PluginService implements AppContext {
     switch (action.type) {
       case ActionType.SET_APPINFO: return {...state, appName: action.payload.appName, appVersion: action.payload.appVersion}
       case ActionType.SET_APPSTATE: return {...state, appState: action.payload}
-      case ActionType.SET_DEBUG: return {...state, debugMode: action.payload}
+      case ActionType.SET_DEBUGMODE: return {...state, debugMode: action.payload}
+      case ActionType.SET_TOASTMODE: return {...state, toastMode: action.payload}
+      case ActionType.SET_SOUNDMODE: return {...state, soundMode: action.payload}
+      case ActionType.SET_CHECKFORUPDATEMODE: return {...state, checkForUpdateMode: action.payload}
       case ActionType.SET_ERRORLOG: return {...state, errorLog: action.payload}
       case ActionType.ADD_ERROR: return {...state, errorLog: [...state.errorLog, action.payload]}
       case ActionType.SET_SERVICES:
@@ -120,12 +161,13 @@ export class PluginService implements AppContext {
   }
   // #endregion
 
+  //#region Context Methods
   onMount = async () => {
     logger.debug("Mounting plugin")
     const {appName, appVersion} = await getAppInfo()
     this.dispatch({type: ActionType.SET_APPINFO, payload: {appName, appVersion}})
     const {debug, checkOnBoot, unattendedUpgrades} = await SettingsManager.getSettings([SettingKey.debug, SettingKey.checkOnBoot, SettingKey.unattendedUpgrades])
-    this.dispatch({type: ActionType.SET_DEBUG, payload: debug ?? initialState.debugMode})
+    this.dispatch({type: ActionType.SET_DEBUGMODE, payload: debug ?? initialState.debugMode})
     await this.reloadSources()
     logger.debug("Handle plugin CheckOnBoot/UnattendedUpgrades...")
     if (checkOnBoot) {
@@ -165,20 +207,6 @@ export class PluginService implements AppContext {
     this.dispatch({type: ActionType.SET_SERVICES, payload: activeServices})
   }
   onTest = () => {}
+  //#endregion
 }
 
-export const AppContextProvider:FC<{children:ReactNode}> = ({children}) => {
-  return (
-    <AppContext.Provider value={PluginService.getInstance()}>
-      {children}
-    </AppContext.Provider>
-  )
-}
-
-export const withAppContext = <P extends object>(WrappedComponent:ComponentType<P>):FC<P> => {
-  return (props: P) => {
-    return (
-      <AppContextProvider><WrappedComponent {...props} /></AppContextProvider>
-    )
-  }
-}
