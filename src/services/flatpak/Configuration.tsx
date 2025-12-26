@@ -1,4 +1,4 @@
-import { TextField, ToggleField, DialogButton } from "@decky/ui"
+import { ToggleField, DialogButton } from "@decky/ui"
 import { PackageService, SettingsType } from "./Service"
 import { useMemo, useState } from "react"
 import { logger } from "../../plugin/backend"
@@ -14,7 +14,7 @@ export function ConfigurationComponent(props: ConfigurationComponentProps){
   const { settings } = props
   logger.debug(`Settings obtained by parent: ${JSON.stringify(settings)}`)
   const [cooked, setCooked] = useState(settings.aggressiveFilterEnabled)
-  const [recipe, setRecipe] = useState(settings.environmentVariables)
+  const [recipe, _] = useState(settings.environmentVariables)
   
   // Valid if something changed compared to original props.settings
   const valid = useMemo(

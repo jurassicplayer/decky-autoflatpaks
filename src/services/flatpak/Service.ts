@@ -2,7 +2,7 @@ import { FC } from "react"
 import { FaGithub } from "react-icons/fa"
 import { logger } from "../../plugin/backend"
 import { SourcePackage, SourceService, SourceSettings } from "../../plugin/source.service"
-import { ConfigurationComponent, ConfigurationComponentProps } from "./SourceConfiguration"
+import { ConfigurationComponent, ConfigurationComponentProps } from "./Configuration"
 
 export type SettingsType = SourceSettings & {
   aggressiveFilterEnabled: boolean
