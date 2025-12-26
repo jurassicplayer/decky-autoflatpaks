@@ -42,7 +42,7 @@ export default function Content() {
           onClick={onClick03}
         />
       </PanelSectionRow>
-      <ToggleField checked={state.debug} onChange={setDebug} />
+      <ToggleField checked={state.debugMode} onChange={setDebug} />
     </PanelSection>
   )
 }

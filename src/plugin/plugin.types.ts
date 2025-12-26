@@ -1,5 +1,6 @@
 export type PluginSettings = {
   version: number
+  debug: boolean
   showToast: boolean
   playSound: boolean
   checkOnBoot: boolean

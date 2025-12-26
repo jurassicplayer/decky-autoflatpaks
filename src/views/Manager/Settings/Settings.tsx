@@ -41,6 +41,25 @@ export default function Content(){
       [serviceKey]: value
     }))
   }
+  const loadSettings = async ()=>{
+    let settings = await SettingsManager.getSettings([
+      SettingKey.debug,
+      SettingKey.showToast,
+      SettingKey.playSound,
+      SettingKey.checkOnBoot,
+      SettingKey.unattendedUpgrades,
+      SettingKey.processInterval,
+      SettingKey.updateInterval
+    ])
+    setUserSettings(settings)
+    if(settings.debug) setDebug(settings.debug)
+    if(settings.showToast) setShowToast(settings.showToast)
+    if(settings.playSound) setPlaySound(settings.playSound)
+    if(settings.checkOnBoot) setCheckOnBoot(settings.checkOnBoot)
+    if(settings.unattendedUpgrades) setUnattendedUpgrades(settings.unattendedUpgrades)
+    if(settings.processInterval) setProcessInterval(settings.processInterval)
+    if(settings.updateInterval) setUpdateInterval(settings.updateInterval)
+  }
   const saveSettings = async ()=>{
     logger.debug("Saving plugin settings...")
     logger.debug("Enabled services: ", enabledServices)
@@ -67,6 +86,8 @@ export default function Content(){
     if (Object.keys(newSettings).length === 0) return
     logger.debug("Pushing settings: ", newSettings)
     await SettingsManager.setSettings(newSettings)
+    // Reload settings to refresh validity check
+    await loadSettings()
     if (enabledServicesChanged) await reloadSources()
   }
   const onSave = async () => {
@@ -93,24 +114,7 @@ export default function Content(){
   useEffect(()=>{
     logger.debug("views/Settings/Settings.tsx mounting...")
     setEnabledServices(activeToEnabledServices())
-    SettingsManager.getSettings([
-      SettingKey.debug,
-      SettingKey.showToast,
-      SettingKey.playSound,
-      SettingKey.checkOnBoot,
-      SettingKey.unattendedUpgrades,
-      SettingKey.processInterval,
-      SettingKey.updateInterval
-    ]).then((settings)=>{
-      setUserSettings(settings)
-      if(settings.debug) setDebug(settings.debug)
-      if(settings.showToast) setShowToast(settings.showToast)
-      if(settings.playSound) setPlaySound(settings.playSound)
-      if(settings.checkOnBoot) setCheckOnBoot(settings.checkOnBoot)
-      if(settings.unattendedUpgrades) setUnattendedUpgrades(settings.unattendedUpgrades)
-      if(settings.processInterval) setProcessInterval(settings.processInterval)
-      if(settings.updateInterval) setUpdateInterval(settings.updateInterval)
-    })
+    loadSettings()
   },[])
 
   // Valid if something changed compared to current user settings

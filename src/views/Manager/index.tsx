@@ -18,7 +18,7 @@ enum ContentType {
 
 export default function SideNavContent(){
   const {state} = useAppContext('SideNav')
-  const {debug} = state
+  const {debugMode} = state
   const pages:SidebarNavigationPage[] = useMemo(()=>{
     let sideNavPages:SidebarNavigationPage[] = [
       {
@@ -64,7 +64,7 @@ export default function SideNavContent(){
         padding: 'none'
       }
     ]
-    if (debug) sideNavPages.push({
+    if (debugMode) sideNavPages.push({
       title: "Debug",
       content: <Debug/>,
       icon: <FaPuzzlePiece/>,
@@ -72,7 +72,7 @@ export default function SideNavContent(){
       padding: 'none'
     })
     return sideNavPages
-  }, [])
+  }, [debugMode])
   return (
     <SidebarNavigation pages={pages} />
   )

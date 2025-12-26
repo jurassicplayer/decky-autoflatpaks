@@ -43,7 +43,7 @@ export const initialState:ContextState = {
   serviceConstructors: PackageServices,
   activeServices: [],
   errorLog: [],
-  debug: false,
+  debugMode: false,
   appName: "AutoFlatpaks",
   appVersion: "0.0.0",
   appState: AppState.BUSY
@@ -106,7 +106,7 @@ export class PluginService implements AppContext {
     switch (action.type) {
       case ActionType.SET_APPINFO: return {...state, appName: action.payload.appName, appVersion: action.payload.appVersion}
       case ActionType.SET_APPSTATE: return {...state, appState: action.payload}
-      case ActionType.SET_DEBUG: return {...state, debug: action.payload}
+      case ActionType.SET_DEBUG: return {...state, debugMode: action.payload}
       case ActionType.SET_ERRORLOG: return {...state, errorLog: action.payload}
       case ActionType.ADD_ERROR: return {...state, errorLog: [...state.errorLog, action.payload]}
       case ActionType.SET_SERVICES:
@@ -125,7 +125,7 @@ export class PluginService implements AppContext {
     const {appName, appVersion} = await getAppInfo()
     this.dispatch({type: ActionType.SET_APPINFO, payload: {appName, appVersion}})
     const {debug, checkOnBoot, unattendedUpgrades} = await SettingsManager.getSettings([SettingKey.debug, SettingKey.checkOnBoot, SettingKey.unattendedUpgrades])
-    this.dispatch({type: ActionType.SET_DEBUG, payload: debug})
+    this.dispatch({type: ActionType.SET_DEBUG, payload: debug ?? initialState.debugMode})
     await this.reloadSources()
     logger.debug("Handle plugin CheckOnBoot/UnattendedUpgrades...")
     if (checkOnBoot) {

@@ -29,7 +29,7 @@ export interface ContextState {
   serviceConstructors:Record<string, SourceServiceCtor<any, any>>
   activeServices:SourceService<any, any>[]
   errorLog:Error[]
-  debug:boolean
+  debugMode:boolean
   appName:string
   appVersion:string
   appState:AppState
