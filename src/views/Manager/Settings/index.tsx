@@ -1,5 +1,5 @@
-import { DialogBody, DialogButton, DialogControlsSection, DialogSubHeader, SliderField, ToggleField } from "@decky/ui"
-import { DialogBodyText } from "../../../utils/decky-ui"
+import { DialogBody, DialogButton, DialogControlsSection, DialogSubHeader, Focusable, SliderField, ToggleField } from "@decky/ui"
+import { DayHourMinuteSpinner, DialogBodyText } from "../../../common/custom-components"
 import { DefaultSettings, SettingKey, SettingsManager } from "../../../plugin/plugin.settings"
 import { PluginSettings } from "../../../plugin/plugin.types"
 import { useEffect, useMemo, useState } from "react"
@@ -103,7 +103,6 @@ export default function Content(){
       dispatch({type: ActionType.SET_APPSTATE, payload: AppState.IDLE})
     }
   }
-
   const activeToEnabledServices = ():Record<string, boolean> => {
     let enabledServices:Record<string, boolean> = {}
     activeServices.forEach(service=>{ enabledServices[service.sourceKey] = true })
@@ -138,7 +137,10 @@ export default function Content(){
     ]
   )
   return (
-    <>
+    <Focusable
+      onSecondaryActionDescription={valid?t('common:button.apply'):null}
+      onSecondaryButton={valid&&appState===AppState.IDLE?onSave:()=>null}
+      >
       <DialogBody>
         <DialogControlsSection>
           <DialogButton disabled={!valid || appState === AppState.BUSY} onClick={onSave}>{t('common:button.apply')}</DialogButton>
@@ -177,7 +179,13 @@ export default function Content(){
             description={t('settings:plugin.unattendedUpgrades.description')}
             onChange={setUnattendedUpgrades}
           />
-          <div>Add Update Interval control here</div>
+          <DayHourMinuteSpinner
+            label="Update Interval"
+            description="Regular interval to perform automatic checks for updates."
+            value={updateInterval}
+            onChange={setUpdateInterval}
+            indentLevel={1}
+          />
         </DialogControlsSection>
         <DialogControlsSection>
           <DialogSubHeader>{t('settings:notifications.subheader')}</DialogSubHeader>
@@ -221,6 +229,6 @@ export default function Content(){
           :null}
         </DialogControlsSection>
       </DialogBody>
-    </>
+    </Focusable>
   )
 }

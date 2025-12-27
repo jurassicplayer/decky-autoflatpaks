@@ -2,7 +2,7 @@ import { Focusable } from "@decky/ui"
 import { PackagePageContextProvider } from "./components/PackagePageContext"
 import PackageList from "./components/PackageList"
 import PackageDetails from "./components/PackageDetails"
-import { flexRow } from "./components/PackagePage.css"
+import { flexRow } from "../../../common/styles.css"
 
 interface temporaryProps {
   id?:string

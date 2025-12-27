@@ -1,6 +1,6 @@
 import { DialogButton } from "@decky/ui"
 import { usePackagePageContext } from "./PackagePageContext"
-import { flexColumn } from "./PackagePage.css"
+import { flexColumn } from "../../../../common/styles.css"
 
 interface PackageListItemProps {
   name:string

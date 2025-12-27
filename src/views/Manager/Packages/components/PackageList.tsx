@@ -1,6 +1,6 @@
 import { Focusable } from "@decky/ui"
 import PackageListItem from "./PackageListItem"
-import { flexSplitScreen } from "./PackagePage.css"
+import { flexSplitScreen } from "../../../../common/styles.css"
 
 export default function PackageList(){
   const packages = [

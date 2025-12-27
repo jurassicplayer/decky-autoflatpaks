@@ -1,6 +1,6 @@
 import { DialogButton, Focusable } from "@decky/ui"
 import { PackageDetailsType, usePackagePageContext } from "./PackagePageContext"
-import { cardStyle, flexSplitScreen } from "./PackagePage.css"
+import { cardStyle, flexSplitScreen } from "../../../../common/styles.css"
 
 
 export default function PackageDetails(){
