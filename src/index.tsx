@@ -14,7 +14,7 @@ export default definePlugin(() => {
   })
   return {
     name: "AutoFlatpaks-UI",
-    title: <div className={staticClasses.Title}>AutoFlatpaks</div>,
+    title: <div className={staticClasses.Title}>{pluginService.state.appName}</div>,
     content: <AppContextProvider><QAM/></AppContextProvider>,
     icon: <FaShip />,
     onDismount() {

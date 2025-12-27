@@ -47,6 +47,7 @@ export function HorizontalSpinner(props: HorizontalSpinnerProps) {
   const onClickDown = ()=>setClampedValue(value-1)
 
   return (
+    //@ts-ignore --indent-level warning
     <div style={{...SpinnerRowStyle, '--indent-level': indentLevel, ...bottomSeparatorStyle[bottomSeparator]}}>
       <div style={flexColumn}>
         <div>{label}</div>

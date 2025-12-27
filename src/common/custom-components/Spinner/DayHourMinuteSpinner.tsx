@@ -33,6 +33,7 @@ export function DayHourMinuteSpinner(props: DayHourMinuteSpinnerProps) {
     if (onChange) onChange(mergeMinutes(days, hours, minutes))
   }
   return (
+    //@ts-ignore --indent-level warning
     <div style={{...SpinnerRowStyle, '--indent-level': indentLevel, ...bottomSeparatorStyle[bottomSeparator]}}>
             <div style={flexColumn}>
               <div>{label}</div>
