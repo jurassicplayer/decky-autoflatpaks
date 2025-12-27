@@ -1,9 +1,8 @@
 import { Export, findModuleExport } from "@decky/ui"
 
 export const NavSoundMap = findModuleExport(
-  (e:Export) => e?.toString && e.toString().includes('ToastMisc')
+  (e:Export) => e?.ToastMisc, 1
 )
-console.log("NavSoundMap: ", NavSoundMap)
 
 
 export class SteamCssVariables {

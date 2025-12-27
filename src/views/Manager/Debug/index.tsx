@@ -1,33 +1,31 @@
-import { toaster } from "@decky/api"
-import { DialogButton } from "@decky/ui"
+import { Focusable, Tab, Tabs } from "@decky/ui"
+import { useState } from "react"
+
+import Toaster from "./ComponentPlayground/Toast"
+
+const components = [
+  {name: "Toaster", Component:Toaster},
+]
 
 export default function Content(){
-  const sendToast = ()=>{
-    // title: ReactNode;
-    // body: ReactNode;
-    // subtext?: ReactNode;
-    // logo?: ReactNode;
-    // icon?: ReactNode;
-    // timestamp?: Date;
-    // onClick?: () => void;
-    // className?: string;
-    // contentClassName?: string;
-    // duration?: number;
-    // expiration?: number;
-    // critical?: boolean;
-    // eType?: number;
-    // sound?: number;
-    // showNewIndicator?: boolean;
-    // playSound?: boolean;
-    // showToast?: boolean;
-    toaster.toast({
-      title: "ToastTitle",
-      body: "ToastBody"
-    })
-  }
+  const tabs:Tab[] = components.map(({name, Component})=>{
+    return {
+      id: name,
+      title: name,
+      content: <Component/>
+    } as Tab
+  })
+  const [currentRoute, setCurrentRoute] = useState<string>(tabs[0].id)
+
   return (
-    <>
-    <DialogButton onClick={sendToast}>Send toast</DialogButton>
-    </>
+    <Focusable style={{minWidth: "100%", minHeight: "100%"}}>
+      {tabs.length > 0 ?
+        <Tabs
+          activeTab={currentRoute}
+          onShowTab={setCurrentRoute}
+          tabs={tabs}
+        />
+      :null}
+    </Focusable>
   )
 }
