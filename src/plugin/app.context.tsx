@@ -1,4 +1,4 @@
-import { ComponentType, createContext, Dispatch, FC, ReactNode, useContext, useEffect, useState } from "react"
+import { createContext, Dispatch, FC, ReactNode, useContext, useEffect, useState } from "react"
 import { routerHook } from "@decky/api"
 import { PackageServices } from "../services"
 import { getAppInfo, logger } from "./backend"
@@ -7,7 +7,6 @@ import { SourceService, SourceServiceCtor } from "./source.service"
 
 //#region Enums/Interfaces/Types
 //#region Enums
-// For autocomplete
 export enum ActionType {
   SET_APPINFO = 'SET_APPINFO',
   SET_APPSTATE = 'SET_APPSTATE',
@@ -17,13 +16,21 @@ export enum ActionType {
   SET_CHECKFORUPDATEMODE = 'SET_CHECKFORUPDATEMODE',
   SET_ERRORLOG = 'SET_ERRORLOG',
   SET_SERVICES = 'SET_SERVICES',
-  ADD_ERROR = 'ADD_ERROR'
+  ADD_ERROR = 'ADD_ERROR',
+  ADD_ROUTE = 'ADD_ROUTE',
+  DEL_ROUTE = 'DEL_ROUTE',
+  ADD_HOOK = 'ADD_HOOK',
+  DEL_HOOK = 'DEL_HOOK'
 }
-// For autocomplete
 export enum AppState {
   IDLE = 'IDLE',
   BUSY = 'BUSY',
   FAIL = 'FAIL'
+}
+export enum HookType {
+  ON_RESUME = 'ON_RESUME',
+  ON_SHUTDOWN = 'ON_SHUTDOWN',
+  ON_SUSPEND = 'ON_SUSPEND',
 }
 //#endregion
 
@@ -38,12 +45,23 @@ export type AppAction =
   | { type: ActionType.SET_ERRORLOG; payload: Error[] }
   | { type: ActionType.SET_SERVICES; payload: SourceService<any, any>[] }
   | { type: ActionType.ADD_ERROR; payload: Error }
+  | { type: ActionType.ADD_ROUTE; payload: { path: string, component: FC } }
+  | { type: ActionType.DEL_ROUTE; payload: string }
+  | { type: ActionType.ADD_HOOK; payload: { hookType: HookType, callback: CallableFunction } }
+  | { type: ActionType.DEL_HOOK; payload: HookType }
+
+export type Hook = {
+  type:HookType
+  unregister?:CallableFunction
+}
 //#endregion
 
 //#region Interfaces
 export interface ContextState {
   serviceConstructors:Record<string, SourceServiceCtor<any, any>>
   activeServices:SourceService<any, any>[]
+  activeRoutes:string[]
+  activeHooks:Hook[]
   errorLog:Error[]
   debugMode:boolean
   toastMode:boolean
@@ -87,7 +105,7 @@ export const AppContextProvider:FC<{children:ReactNode}> = ({children}) => {
   )
 }
 
-export const withAppContext = <P extends object>(WrappedComponent:ComponentType<P>):FC<P> => {
+export const withAppContext = <P extends object>(WrappedComponent:FC<P>):FC<P> => {
   return (props: P) => {
     return (
       <AppContextProvider><WrappedComponent {...props} /></AppContextProvider>
@@ -99,6 +117,8 @@ export const withAppContext = <P extends object>(WrappedComponent:ComponentType<
 export const initialState:ContextState = {
   serviceConstructors: PackageServices,
   activeServices: [],
+  activeRoutes: [],
+  activeHooks: [],
   errorLog: [],
   debugMode: DefaultSettings.debug,
   toastMode: true,
@@ -115,7 +135,7 @@ export class PluginService implements AppContext {
     logger.debug("Creating PluginService instance...")
   }
   // #region Singleton shared context handling
-  private static _instance: PluginService
+  private static _instance: AppContext
   private listeners = new Set<{origin:string, callback:()=>void}>()
   static getInstance = ():AppContext => {
     if (!PluginService._instance) { PluginService._instance = new PluginService() }
@@ -156,6 +176,18 @@ export class PluginService implements AppContext {
         ))
         for (const service of servicesToUnload) { service._onUnload() }
         return {...state, activeServices: action.payload}
+      case ActionType.ADD_ROUTE:
+        if(this.state.activeRoutes.includes(action.payload.path)) return state
+        routerHook.addRoute(action.payload.path, withAppContext(action.payload.component))
+        logger.debug(`Route added: ${action.payload.path}`)
+        return {...state, activeRoutes: [...state.activeRoutes, action.payload.path]}
+      case ActionType.DEL_ROUTE:
+        if (!state.activeRoutes.includes(action.payload)) return state
+        routerHook.removeRoute(action.payload)
+        logger.debug(`Route removed: ${action.payload}`)
+        return {...state, activeRoutes: state.activeRoutes.filter(p => p !== action.payload)}
+      case ActionType.ADD_HOOK:
+      case ActionType.DEL_HOOK:
       default: return state
     }
   }
@@ -184,7 +216,9 @@ export class PluginService implements AppContext {
   }
   onDismount = () => {
     logger.debug("Dismounting plugin")
-    routerHook.removeRoute("/autoflatpaks/manager")
+    for (let route of this.state.activeRoutes){
+      this.dispatch({type: ActionType.DEL_ROUTE, payload: route})
+    }
   }
   reloadSources = async () => {
     logger.debug("Reloading addon services...")
