@@ -1,7 +1,7 @@
 import { ButtonItem, PanelSection, PanelSectionRow, Router, ToggleField } from "@decky/ui"
 import { ActionType, useAppContext } from "../../plugin/app.context"
 import { useTranslation } from "react-i18next"
-import { DialogBodyText } from "../../utils/decky-ui"
+import { DialogBodyText } from "../../common/custom-components"
 
 /* ##FIXME##
 - Status bar on top

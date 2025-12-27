@@ -23,6 +23,7 @@ export const getAppInfo = callable<[], AppInfo>('getAppInfo')
 // Or maybe just have separate python files for each service where they can define their own commands
 export const callCommand = callable<any, any>('CallCommand')
 
+// ##FIXME## Maybe extend logger to automatically send context dispatch on error/critical
 export class logger {
   static loggingPrefix = '[AutoFlatpaks] '
   static consoleLog(prefix:string, msg:string, obj?:any){

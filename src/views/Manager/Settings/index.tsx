@@ -12,13 +12,13 @@ import { useTranslation } from "react-i18next"
 - Extend showToast/playSound functionality
   - Add an array of notification types (like steamclient's separate toggles for each notification type)
   - Toggling showToast/playSound will enable/disable all notification types
-- Add showInBell functionality?
+  - Drop playSound config option entirely and just read the SteamOS configuration instead?
+    - If the SteamOS configuration to play sound is disabled, all of the decky toasts won't be able to play sounds anyways
+    - Could keep config option and still read SteamOS configuration/show proper toggled states
+- Add showInBell functionality
   - SteamClient has a way of not including toasts in the QAM's Bell Notifications, no idea how atm since
     decky-loader's default always sends to the Bell Notifications
-- Add control for update interval
-  - Recreate janky QAM spinners for number input?
-  - Use dropdowns with a set number of days(0-365)/hours(0-12)/minutes(0-60)?
-  - Some kind of cron-style input?
+  - Could do the janky way of sending a toast with an expiration=1 and showNewIndicator=false
 */
 export default function Content(){
   const { t } = useTranslation()
