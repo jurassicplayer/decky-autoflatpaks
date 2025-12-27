@@ -1,4 +1,19 @@
 {
+  "quickaccessmenu": {
+    "temporaryMode": {
+      "checkforupdate": {
+        "label": "Update Check"
+      },
+      "dialogbodytext": "Disable feature until next boot.",
+      "sound": {
+        "label": "Notification Sounds"
+      },
+      "title": "Temporary Modes",
+      "toast": {
+        "label": "Toast Notifications"
+      }
+    }
+  },
   "settings": {
     "enabledServices": {
       "dialogbodytext": "Enable usage/management of supported package services.",
@@ -32,20 +47,6 @@
       "unattendedUpgrades": {
         "description": "Automatically upgrade packages when updates are available.",
         "label": "Unattended Upgrades"
-      }
-    }
-  },
-  "quickaccessmenu": {
-    "temporaryMode": {
-      "checkforupdate": {
-        "label": "Update Check"
-      },
-      "dialogbodytext": "Disable feature until next boot.",
-      "sound": {
-        "label": "Notification Sounds"
-      },
-      "toast": {
-        "label": "Toast Notifications"
       }
     }
   },

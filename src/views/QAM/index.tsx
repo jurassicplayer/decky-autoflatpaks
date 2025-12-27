@@ -55,7 +55,7 @@ export default function Content() {
         />
       </PanelSectionRow>
     </PanelSection>
-    <PanelSection title="Temporary Modes">
+    <PanelSection title={t('quickaccessmenu:temporaryMode.title')}>
       <DialogBodyText style={{marginBottom:"8px"}}>{t('quickaccessmenu:temporaryMode.dialogbodytext')}</DialogBodyText>
       <PanelSectionRow>
         <ToggleField
