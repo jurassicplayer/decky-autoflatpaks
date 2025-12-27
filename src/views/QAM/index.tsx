@@ -3,13 +3,13 @@ import { ActionType, useAppContext } from "../../plugin/app.context"
 import { useTranslation } from "react-i18next"
 import { DialogBodyText } from "../../common/custom-components"
 
-/* ##FIXME##
-- Status bar on top
-- Manage app button
-- Check for updates button
-- Install updates button
-- Show list of available updates when present (click on status bar)
-- Show last checked/next check timestamp (save/read timestamp to/from localstorage)
+/*
+##TODO: Add status bar on top
+##TODO: Add manage app button
+##TODO: Check for updates button
+##TODO: Install updates button
+##TODO: Show list of available updates when present (click on status bar)
+##TODO: Show last checked/next check timestamp (save/read timestamp to/from localstorage)
 */
 
 export default function Content() {

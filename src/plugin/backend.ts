@@ -13,7 +13,7 @@ type AppInfo = {
   appVersion: string
 }
 export const getAppInfo = callable<[], AppInfo>('getAppInfo')
-// Need to come up with a structure for data passed to callcommand
+// ##TODO:? Come up with a structure for data passed to callcommand
 // - environment variables
 // - command
 // - flags
@@ -22,8 +22,10 @@ export const getAppInfo = callable<[], AppInfo>('getAppInfo')
 // - data to enter when prompted?
 // Or maybe just have separate python files for each service where they can define their own commands
 export const callCommand = callable<any, any>('CallCommand')
+//#endregion
 
-// ##FIXME## Maybe extend logger to automatically send context dispatch on error/critical
+//#region Frontend Logger
+// ##TODO:? Maybe extend logger to automatically send context dispatch on error/critical
 export class logger {
   static loggingPrefix = '[AutoFlatpaks] '
   static consoleLog(prefix:string, msg:string, obj?:any){
@@ -49,3 +51,4 @@ export class logger {
     this.consoleLog('Critical: ', msg, obj)
   }
 }
+//#endregion
