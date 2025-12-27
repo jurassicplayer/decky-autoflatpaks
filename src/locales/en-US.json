@@ -30,7 +30,7 @@
       },
       "subheader": "Plugin",
       "unattendedUpgrades": {
-        "description": "Automatically update packages when updates are available.",
+        "description": "Automatically upgrade packages when updates are available.",
         "label": "Unattended Upgrades"
       }
     }
