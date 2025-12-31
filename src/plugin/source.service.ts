@@ -24,6 +24,8 @@ export type PackageListItemProps<PackageType> = {
   pkg: PackageType
 }
 
+//##TODO: Add sourceNotificationRegistry
+//##TODO: Register notifications into notification registry
 // A generic constructor type for any SourceService subclass
 export type SourceServiceCtor<SettingsType extends SourceSettings, PackageType extends SourcePackage> = {
   sourceKey: string

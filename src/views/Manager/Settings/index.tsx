@@ -12,6 +12,8 @@ import { PackageServices } from "../../../services"
 /*
 ##TODO: Extend showToast/playSound functionality
   - ##TODO: Add an array of notification types (like steamclient's separate toggles for each notification type)
+  - Arrays should be `inactiveToastNotifications`, `inactiveSoundNotifications`, and `inactiveBellNotifications`
+    - In the event of extending the plugin, with new toast types, by default they will be enabled without any extra code
   - Toggling showToast/playSound will enable/disable all notification types
   - Drop playSound config option entirely and just read the SteamOS configuration instead?
     - If the SteamOS configuration to play sound is disabled, all of the decky toasts won't be able to play sounds anyways
@@ -20,7 +22,6 @@ import { PackageServices } from "../../../services"
   - SteamClient has a way of not including toasts in the QAM's Bell Notifications, no idea how atm since
     decky-loader's default always sends to the Bell Notifications
   - ##TODO: Could do the janky way of sending a toast with an expiration=1 and showNewIndicator=false
-  - ##TODO:? Add debug option to set ToastData expiration?
 */
 export default function Content(){
   const { t } = useTranslation()

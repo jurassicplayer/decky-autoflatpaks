@@ -20,6 +20,7 @@ export const DefaultSettings:SettingsType = {
   recipe: "just add water"
 }
 
+//##TODO: Add example PackageNotificationRegistry
 export class PackageService extends SourceService<SettingsType, PackageType> {
   static readonly sourceKey:string = "example"
   static readonly sourceDisplayName:string = "Example"
@@ -31,6 +32,7 @@ export class PackageService extends SourceService<SettingsType, PackageType> {
     super(PackageService.sourceKey, PackageService.sourceDisplayName, PackageService.sourceIcon, PackageService.defaultSettings)
     logger.debug("Constructing class instance of service: ", PackageService.sourceKey)
     logger.debug("Class instance settings: ", this._settings)
+    //##TODO: Register PackageNotificationRegistry
   }
   _onMigrate(): Error[] { logger.debug("On example service migrate"); return [] }
   _onLoad(): Error[] { logger.debug("On example service load"); return [] }
