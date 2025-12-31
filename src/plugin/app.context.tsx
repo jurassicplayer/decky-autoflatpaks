@@ -3,24 +3,18 @@ import { routerHook } from "@decky/api"
 import { PackageServices } from "../services"
 import { getAppInfo, logger } from "./backend"
 import { DefaultSettings, SettingKey, SettingsManager } from "./plugin.settings"
-import { SourceService, SourceServiceCtor } from "./source.service"
+import { SourceService } from "./source.service"
+import { getLocalStorage, setLocalStorage, StorageKey } from "../common/utils"
 
 //#region Enums/Interfaces/Types
 //#region Enums
 export enum ActionType {
-  SET_APPINFO = 'SET_APPINFO',
   SET_APPSTATE = 'SET_APPSTATE',
   SET_DEBUGMODE = 'SET_DEBUGMODE',
-  SET_TOASTMODE = 'SET_TOASTMODE',
-  SET_SOUNDMODE = 'SET_SOUNDMODE',
-  SET_CHECKFORUPDATEMODE = 'SET_CHECKFORUPDATEMODE',
+  SET_LASTCHECKTIMESTAMP = 'SET_LASTCHECKTIMESTAMP',
   SET_ERRORLOG = 'SET_ERRORLOG',
   SET_SERVICES = 'SET_SERVICES',
   ADD_ERROR = 'ADD_ERROR',
-  ADD_ROUTE = 'ADD_ROUTE',
-  DEL_ROUTE = 'DEL_ROUTE',
-  ADD_HOOK = 'ADD_HOOK',
-  DEL_HOOK = 'DEL_HOOK'
 }
 export enum AppState {
   IDLE = 'IDLE',
@@ -35,52 +29,58 @@ export enum HookType {
 //#endregion
 
 //#region Types
-export type AppAction =
-  | { type: ActionType.SET_APPINFO; payload: { appName: string; appVersion: string } }
-  | { type: ActionType.SET_APPSTATE; payload: AppState }
-  | { type: ActionType.SET_DEBUGMODE; payload: boolean }
-  | { type: ActionType.SET_TOASTMODE; payload: boolean }
-  | { type: ActionType.SET_SOUNDMODE; payload: boolean }
-  | { type: ActionType.SET_CHECKFORUPDATEMODE; payload: boolean }
-  | { type: ActionType.SET_ERRORLOG; payload: Error[] }
-  | { type: ActionType.SET_SERVICES; payload: SourceService<any, any>[] }
-  | { type: ActionType.ADD_ERROR; payload: Error }
-  | { type: ActionType.ADD_ROUTE; payload: { path: string, component: FC } }
-  | { type: ActionType.DEL_ROUTE; payload: string }
-  | { type: ActionType.ADD_HOOK; payload: { hookType: HookType, callback: CallableFunction } }
-  | { type: ActionType.DEL_HOOK; payload: HookType }
-
 export type Hook = {
   type:HookType
   unregister?:CallableFunction
 }
+export type UIAction =
+  | { type: ActionType.SET_APPSTATE; payload: AppState }
+  | { type: ActionType.SET_DEBUGMODE; payload: boolean }
+  | { type: ActionType.SET_LASTCHECKTIMESTAMP; payload: Date }
+  | { type: ActionType.SET_ERRORLOG; payload: Error[] }
+  | { type: ActionType.SET_SERVICES; payload: SourceService<any, any>[] }
+  | { type: ActionType.ADD_ERROR; payload: Error }
 //#endregion
 
 //#region Interfaces
 export interface ContextState {
-  serviceConstructors:Record<string, SourceServiceCtor<any, any>>
-  activeServices:SourceService<any, any>[]
-  activeRoutes:string[]
-  activeHooks:Hook[]
-  errorLog:Error[]
+  appState:AppState
   debugMode:boolean
+  lastCheckTimestamp:Date
+  errorLog:Error[]
+  activeServices:SourceService<any, any>[]
+
   toastMode:boolean
   soundMode:boolean
   checkForUpdateMode:boolean
   appName:string
   appVersion:string
-  appState:AppState
+  activeRoutes:string[]
+  activeHooks:Hook[]
 }
 
-export interface AppContext {
-  state: ContextState
-  dispatch: Dispatch<AppAction>
-  subscribe(origin:string, listener: ()=>void): ()=>void 
-  onMount(): Promise<void>
-  onDismount(): void
-  reloadSources(): Promise<void>
-  onTest(): void
+export interface NonUIContext {
+  registerHook(type: HookType):void
+  unregisterHook(type: HookType):void
+  unregisterHooks():void
+  registerRoute(path:string, component:FC):void
+  unregisterRoute(path:string):void
+  unregisterRoutes():void
 }
+
+export interface UIContext {
+  readonly state:ContextState
+  dispatch:Dispatch<UIAction>
+  subscribe(origin:string, listener:()=>void):()=>void 
+  onMount():Promise<void>
+  onDismount():void
+  reloadSources():Promise<void>
+  setLastCheckTimestamp(timestamp: Date):void
+  setServices(activeServices:SourceService<any, any>[]):void
+  onTest():void
+}
+
+export interface AppContext extends UIContext, NonUIContext {}
 //#endregion
 //#endregion
 
@@ -99,7 +99,7 @@ export const useAppContext = (origin:string) => {
 
 export const AppContextProvider:FC<{children:ReactNode}> = ({children}) => {
   return (
-    <AppContext.Provider value={PluginService.getInstance()}>
+    <AppContext.Provider value={AppService.getInstance()}>
       {children}
     </AppContext.Provider>
   )
@@ -115,31 +115,33 @@ export const withAppContext = <P extends object>(WrappedComponent:FC<P>):FC<P> =
 //#endregion
 
 export const initialState:ContextState = {
-  serviceConstructors: PackageServices,
-  activeServices: [],
-  activeRoutes: [],
-  activeHooks: [],
-  errorLog: [],
+  appState: AppState.BUSY,
   debugMode: DefaultSettings.debug,
+  lastCheckTimestamp: new Date(1753),
+  activeServices: [],
+  errorLog: [],
+
   toastMode: true,
   soundMode: true,
   checkForUpdateMode: true,
   appName: "AutoFlatpaks",
   appVersion: "0.0.0",
-  appState: AppState.BUSY
+  activeRoutes: [],
+  activeHooks: [],
 }
 
-export class PluginService implements AppContext {
-  state:ContextState = initialState
+export class AppService implements AppContext {
   private constructor() {
-    logger.debug("Creating PluginService instance...")
+    logger.debug("Creating AppService instance...")
   }
   // #region Singleton shared context handling
+  private _state:ContextState = initialState
+  public get state():ContextState { return {...this._state} }
   private static _instance: AppContext
   private listeners = new Set<{origin:string, callback:()=>void}>()
   static getInstance = ():AppContext => {
-    if (!PluginService._instance) { PluginService._instance = new PluginService() }
-    return PluginService._instance
+    if (!AppService._instance) { AppService._instance = new AppService() }
+    return AppService._instance
   }
   public subscribe(origin:string, listener: ()=>void) {
     const listenerObject = {origin:origin, callback:listener}
@@ -150,65 +152,51 @@ export class PluginService implements AppContext {
       logger.debug(`Unsubscribed ${origin} total subscribers: ${this.listeners.size}`)
     }
   }
-  public dispatch = (action:AppAction):ContextState => {
-    this.state = this.reducer(this.state, action)
+  public dispatch = (action:UIAction):ContextState => {
+    this._state = this.reducer(this.state, action)
     logger.debug(`Dispatch action: ${JSON.stringify(action)}`)
     this.notify()
-    return this.state
+    return this._state
   }
   private notify() { for (const listener of this.listeners){
     logger.debug(`Firing notification for ${listener.origin}`)
     listener.callback()}
   }
-  private reducer(state:ContextState, action:AppAction):ContextState {
+  private reducer(state:ContextState, action:UIAction):ContextState {
     switch (action.type) {
-      case ActionType.SET_APPINFO: return {...state, appName: action.payload.appName, appVersion: action.payload.appVersion}
       case ActionType.SET_APPSTATE: return {...state, appState: action.payload}
       case ActionType.SET_DEBUGMODE: return {...state, debugMode: action.payload}
-      case ActionType.SET_TOASTMODE: return {...state, toastMode: action.payload}
-      case ActionType.SET_SOUNDMODE: return {...state, soundMode: action.payload}
-      case ActionType.SET_CHECKFORUPDATEMODE: return {...state, checkForUpdateMode: action.payload}
+      case ActionType.SET_LASTCHECKTIMESTAMP: return {...state, lastCheckTimestamp: action.payload}
       case ActionType.SET_ERRORLOG: return {...state, errorLog: action.payload}
       case ActionType.ADD_ERROR: return {...state, errorLog: [...state.errorLog, action.payload]}
-      case ActionType.SET_SERVICES:
-        const servicesToUnload = state.activeServices.filter(prevService => !action.payload.some(
-          currentService => currentService.sourceKey === prevService.sourceKey
-        ))
-        for (const service of servicesToUnload) { service._onUnload() }
-        return {...state, activeServices: action.payload}
-      case ActionType.ADD_ROUTE:
-        if(this.state.activeRoutes.includes(action.payload.path)) return state
-        routerHook.addRoute(action.payload.path, withAppContext(action.payload.component))
-        logger.debug(`Route added: ${action.payload.path}`)
-        return {...state, activeRoutes: [...state.activeRoutes, action.payload.path]}
-      case ActionType.DEL_ROUTE:
-        if (!state.activeRoutes.includes(action.payload)) return state
-        routerHook.removeRoute(action.payload)
-        logger.debug(`Route removed: ${action.payload}`)
-        return {...state, activeRoutes: state.activeRoutes.filter(p => p !== action.payload)}
-      case ActionType.ADD_HOOK:
-      case ActionType.DEL_HOOK:
+      case ActionType.SET_SERVICES: return {...state, activeServices: action.payload}
       default: return state
     }
   }
   // #endregion
 
-  //#region Context Methods
+  //#region UIContext Methods
   onMount = async () => {
-    logger.debug("Mounting plugin")
+    logger.debug("Mounting plugin...")
     const {appName, appVersion} = await getAppInfo()
-    this.dispatch({type: ActionType.SET_APPINFO, payload: {appName, appVersion}})
+    this._state.appName = appName
+    this._state.appVersion = appVersion
+    logger.debug(`Loaded appInfo: ${appName}, ${appVersion}`)
+    const lastCheckTimestamp = getLocalStorage(StorageKey.LAST_CHECKED_TIMESTAMP)
+    if (lastCheckTimestamp) this.dispatch({type: ActionType.SET_LASTCHECKTIMESTAMP, payload: lastCheckTimestamp})
+    logger.debug(`Loaded lastCheckTimestamp: ${lastCheckTimestamp}`)
     const {debug, checkOnBoot, unattendedUpgrades} = await SettingsManager.getSettings([SettingKey.debug, SettingKey.checkOnBoot, SettingKey.unattendedUpgrades])
     this.dispatch({type: ActionType.SET_DEBUGMODE, payload: debug ?? initialState.debugMode})
     await this.reloadSources()
     logger.debug("Handle plugin CheckOnBoot/UnattendedUpgrades...")
     if (checkOnBoot) {
+      // ##TODO: Implement check on boot
       // Check for updates
       // var commandret:boolean = await call flatpak update and not update
       // if (!commandret) { return } // Check stderr for data. If no data, assume that the command didn't fail (calling flatpak update and then not updating returns 1)
       // Write lastCheckedTimestamp to localstorage
       if (!unattendedUpgrades) {
-        // Unattended updates
+      // ##TODO: Implement unattended upgrades
         // await call flatpak update and update
       }
     }
@@ -216,9 +204,8 @@ export class PluginService implements AppContext {
   }
   onDismount = () => {
     logger.debug("Dismounting plugin")
-    for (let route of this.state.activeRoutes){
-      this.dispatch({type: ActionType.DEL_ROUTE, payload: route})
-    }
+    this.unregisterRoutes()
+    this.unregisterHooks()
   }
   reloadSources = async () => {
     logger.debug("Reloading addon services...")
@@ -241,7 +228,58 @@ export class PluginService implements AppContext {
     }
     this.dispatch({type: ActionType.SET_SERVICES, payload: activeServices})
   }
+  setLastCheckTimestamp(timestamp:Date){
+    setLocalStorage(StorageKey.LAST_CHECKED_TIMESTAMP, timestamp)
+    this.dispatch({type: ActionType.SET_LASTCHECKTIMESTAMP, payload: timestamp})
+  }
+  setServices(activeServices:SourceService<any, any>[]){
+    const servicesToUnload = this.state.activeServices.filter(prevService => !activeServices.some(
+      currentService => currentService.sourceKey === prevService.sourceKey
+    ))
+    for (const service of servicesToUnload) { service._onUnload() }
+    this.dispatch({type: ActionType.SET_SERVICES, payload: activeServices})
+  }
   onTest = () => {}
+  //#endregion
+
+  //#region NonUIContext Methods
+  //#region Hook Management
+  public registerHook(type:HookType): void {
+    if (this.state.activeHooks.some(hook => hook.type === type)) return
+    const unregister:CallableFunction|undefined = ()=>{}
+    const hook:Hook = {type:type, unregister: unregister}
+    this._state.activeHooks.push(hook)
+    // Add hook to activeHooks before checking if unregister function exists to prevent being able to continuously add more of the same hook
+    if (!unregister) throw new Error('Registered hook without an unregister function, will not be able to clean up properly.')
+  }
+  public unregisterHook(type:HookType): void {
+    const index = this.state.activeHooks.findIndex(hook => hook.type === type)
+    if (index === -1) return
+    const hook = this.state.activeHooks[index]
+    if (hook.unregister) {
+      hook.unregister()
+      this._state.activeHooks = this.state.activeHooks.filter(({type}) => type !== hook.type)
+    }
+  }
+  public unregisterHooks(): void {
+    this.state.activeHooks.forEach(({type}) => { this.unregisterHook(type) })
+  }
+  //#endregion
+  //#region Route Management
+  public registerRoute(path: string, component: FC): void {
+    if (this.state.activeRoutes.some(route => route === path)) return
+    routerHook.addRoute(path, withAppContext(component))
+    this._state.activeRoutes.push(path)
+  }
+  public unregisterRoute(path: string): void {
+    const index = this.state.activeRoutes.findIndex(route => route === path)
+    if (index === -1) return
+    routerHook.removeRoute(path)
+  }
+  public unregisterRoutes(): void {
+    this._state.activeRoutes.forEach(route => { this.unregisterRoute(route) })
+  }
+  //#endregion
   //#endregion
 }
 
