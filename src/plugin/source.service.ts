@@ -1,6 +1,6 @@
 import { FC } from "react"
 import { SettingsManager } from "./plugin.settings"
-import { PluginSettings } from "./plugin.types"
+import { PluginSettings } from "./plugin"
 import { logger } from "./backend"
 
 //#region types

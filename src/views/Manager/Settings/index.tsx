@@ -1,7 +1,7 @@
 import { DialogBody, DialogButton, DialogControlsSection, DialogSubHeader, Focusable, SliderField, ToggleField } from "@decky/ui"
 import { DayHourMinuteSpinner, DialogBodyText } from "../../../common/custom-components"
 import { DefaultSettings, SettingKey, SettingsManager } from "../../../plugin/plugin.settings"
-import { PluginSettings } from "../../../plugin/plugin.types"
+import { PluginSettings } from "../../../plugin/plugin"
 import { useEffect, useMemo, useState } from "react"
 import { logger } from "../../../plugin/backend"
 import { ActionType, AppState, useAppContext } from "../../../plugin/app.context"

@@ -1,4 +1,4 @@
-import { PluginSettings } from "./plugin.types"
+import { PluginSettings } from "./plugin"
 import { loadSettings, saveSettings, getSettings, setSettings, logger } from "./backend"
 
 export enum SettingKey {
