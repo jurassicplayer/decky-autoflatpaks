@@ -13,11 +13,8 @@ import { DialogBodyText } from "../../common/custom-components"
 */
 
 export default function Content() {
-  const {state, dispatch} = useAppContext("QAM")
+  const {state, dispatch, setToastMode, setSoundMode, setCheckForUpdateMode} = useAppContext("QAM")
   const { t } = useTranslation()
-  const setTemporaryMode = (actionType: ActionType.SET_DEBUGMODE|ActionType.SET_TOASTMODE|ActionType.SET_SOUNDMODE|ActionType.SET_CHECKFORUPDATEMODE, checked:boolean)=>{
-    dispatch({type: actionType, payload: checked})
-  }
   const onClick01 = async () => {
     Router.CloseSideMenus()
     Router.Navigate("/autoflatpaks/manager")
@@ -61,28 +58,28 @@ export default function Content() {
         <ToggleField
           label={t('quickaccessmenu:temporaryMode.toast.label')}
           checked={state.toastMode}
-          onChange={(checked)=>setTemporaryMode(ActionType.SET_TOASTMODE, checked)}
+          onChange={(checked)=>setToastMode(checked)}
         />
       </PanelSectionRow>
       <PanelSectionRow>
         <ToggleField
           label={t('quickaccessmenu:temporaryMode.sound.label')}
           checked={state.soundMode}
-          onChange={(checked)=>setTemporaryMode(ActionType.SET_SOUNDMODE, checked)}
+          onChange={(checked)=>setSoundMode(checked)}
         />
       </PanelSectionRow>
       <PanelSectionRow>
         <ToggleField
           label={t('quickaccessmenu:temporaryMode.checkforupdate.label')}
           checked={state.checkForUpdateMode}
-          onChange={(checked)=>setTemporaryMode(ActionType.SET_CHECKFORUPDATEMODE, checked)}
+          onChange={(checked)=>setCheckForUpdateMode(checked)}
         />
       </PanelSectionRow>
       <PanelSectionRow>
         <ToggleField
           label={t('settings:plugin.developerMode.label')}
           checked={state.debugMode}
-          onChange={(checked)=>setTemporaryMode(ActionType.SET_DEBUGMODE, checked)}
+          onChange={(checked)=>dispatch({type: ActionType.SET_DEBUGMODE, payload: checked})}
           bottomSeparator="none"
         />
       </PanelSectionRow>

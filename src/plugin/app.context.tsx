@@ -60,8 +60,11 @@ export interface ContextState {
 }
 
 export interface NonUIContext {
-  registerHook(type: HookType):void
-  unregisterHook(type: HookType):void
+  setToastMode(value:boolean):void
+  setSoundMode(value:boolean):void
+  setCheckForUpdateMode(value:boolean):void
+  registerHook(type:HookType):void
+  unregisterHook(type:HookType):void
   unregisterHooks():void
   registerRoute(path:string, component:FC):void
   unregisterRoute(path:string):void
@@ -76,7 +79,6 @@ export interface UIContext {
   onDismount():void
   reloadSources():Promise<void>
   setLastCheckTimestamp(timestamp: Date):void
-  setServices(activeServices:SourceService<any, any>[]):void
   onTest():void
 }
 
@@ -176,7 +178,7 @@ export class AppService implements AppContext {
   // #endregion
 
   //#region UIContext Methods
-  onMount = async () => {
+  public onMount = async () => {
     logger.debug("Mounting plugin...")
     const {appName, appVersion} = await getAppInfo()
     this._state.appName = appName
@@ -202,12 +204,12 @@ export class AppService implements AppContext {
     }
     this.dispatch({type: ActionType.SET_APPSTATE, payload: AppState.IDLE})
   }
-  onDismount = () => {
+  public onDismount = () => {
     logger.debug("Dismounting plugin")
     this.unregisterRoutes()
     this.unregisterHooks()
   }
-  reloadSources = async () => {
+  public reloadSources = async () => {
     logger.debug("Reloading addon services...")
     let activeServices = []
     const { inactiveSources } = await SettingsManager.getSettings([SettingKey.inactiveSources])
@@ -226,23 +228,28 @@ export class AppService implements AppContext {
       }
       activeServices.push(serviceInstance)
     }
-    this.dispatch({type: ActionType.SET_SERVICES, payload: activeServices})
+    this.setServices(activeServices)
   }
-  setLastCheckTimestamp(timestamp:Date){
+  public setLastCheckTimestamp(timestamp:Date){
     setLocalStorage(StorageKey.LAST_CHECKED_TIMESTAMP, timestamp)
     this.dispatch({type: ActionType.SET_LASTCHECKTIMESTAMP, payload: timestamp})
   }
-  setServices(activeServices:SourceService<any, any>[]){
+  private setServices(activeServices:SourceService<any, any>[]){
     const servicesToUnload = this.state.activeServices.filter(prevService => !activeServices.some(
       currentService => currentService.sourceKey === prevService.sourceKey
     ))
     for (const service of servicesToUnload) { service._onUnload() }
     this.dispatch({type: ActionType.SET_SERVICES, payload: activeServices})
   }
-  onTest = () => {}
+  public onTest = () => {}
   //#endregion
 
   //#region NonUIContext Methods
+  //#region Mode Management
+  public setToastMode(value: boolean){ this._state.toastMode = value }
+  public setSoundMode(value: boolean){ this._state.soundMode = value }
+  public setCheckForUpdateMode(value: boolean){ this._state.checkForUpdateMode = value }
+  //#endregion
   //#region Hook Management
   public registerHook(type:HookType): void {
     if (this.state.activeHooks.some(hook => hook.type === type)) return
