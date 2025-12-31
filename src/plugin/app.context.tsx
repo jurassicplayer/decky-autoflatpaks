@@ -224,12 +224,12 @@ export class PluginService implements AppContext {
     logger.debug("Reloading addon services...")
     let activeServices = []
     const { inactiveSources } = await SettingsManager.getSettings([SettingKey.inactiveSources])
-    for (const PackageServiceKey in this.state.serviceConstructors) {
+    for (const PackageServiceKey in PackageServices) {
       if (inactiveSources?.includes(PackageServiceKey)) { 
         logger.debug("Service marked as inactive, skipping: ", PackageServiceKey)
         continue
       }
-      const serviceInstance = new this.state.serviceConstructors[PackageServiceKey]()
+      const serviceInstance = new PackageServices[PackageServiceKey]()
       try {
         await serviceInstance._onMigrate()
         await serviceInstance.loadSettings()

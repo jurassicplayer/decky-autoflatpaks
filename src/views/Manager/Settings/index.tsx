@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react"
 import { logger } from "../../../plugin/backend"
 import { ActionType, AppState, useAppContext } from "../../../plugin/app.context"
 import { useTranslation } from "react-i18next"
+import { PackageServices } from "../../../services"
 
 
 /*
@@ -24,7 +25,7 @@ import { useTranslation } from "react-i18next"
 export default function Content(){
   const { t } = useTranslation()
   const {state, dispatch, reloadSources} = useAppContext("PluginSettingsPage")
-  const { serviceConstructors, activeServices, appState } = state
+  const { activeServices, appState } = state
   const [enabledServices, setEnabledServices] = useState<Record<string, boolean>>({})
   const [userSettings, setUserSettings] = useState<Partial<PluginSettings>>(DefaultSettings)
   const [debug, setDebug] = useState<boolean>(DefaultSettings.debug)
@@ -76,9 +77,9 @@ export default function Content(){
     if (processInterval !== userSettings.processInterval) newSettings.processInterval = processInterval
     if (updateInterval !== userSettings.updateInterval) newSettings.updateInterval = updateInterval
 
-    let inactiveSources = Object.keys(serviceConstructors).filter(id => !enabledServices[id])
+    let inactiveSources = Object.keys(PackageServices).filter(id => !enabledServices[id])
     let currentActiveServices = activeToEnabledServices()
-    let enabledServicesChanged = Object.keys(serviceConstructors)
+    let enabledServicesChanged = Object.keys(PackageServices)
       .some(key => !!enabledServices[key] !== !!currentActiveServices[key])
     if (enabledServicesChanged) newSettings.inactiveSources = inactiveSources
 
@@ -120,7 +121,7 @@ export default function Content(){
   const valid = useMemo(
     () => {
       let currentActiveServices = activeToEnabledServices()
-      let enabledServicesChanged = Object.keys(serviceConstructors).some(key => !!enabledServices[key] !== !!currentActiveServices[key])
+      let enabledServicesChanged = Object.keys(PackageServices).some(key => !!enabledServices[key] !== !!currentActiveServices[key])
       return (
         debug !== userSettings.debug ||
         showToast !== userSettings.showToast ||
@@ -147,8 +148,8 @@ export default function Content(){
           <DialogButton disabled={!valid || appState === AppState.BUSY} onClick={onSave}>{t('common:button.apply')}</DialogButton>
           <DialogSubHeader>{t('settings:enabledServices.subheader')}</DialogSubHeader>
           <DialogBodyText>{t('settings:enabledServices.dialogbodytext')}</DialogBodyText>
-          {Object.keys(serviceConstructors).map((sourceKey)=> {
-            let SourceIcon = serviceConstructors[sourceKey].sourceIcon
+          {Object.keys(PackageServices).map((sourceKey)=> {
+            let SourceIcon = PackageServices[sourceKey].sourceIcon
             return (
               <ToggleField
                 key={sourceKey}
@@ -157,7 +158,7 @@ export default function Content(){
                 icon={<SourceIcon/>}
                 bottomSeparator="none"
                 indentLevel={1}
-                label={serviceConstructors[sourceKey].sourceDisplayName}
+                label={PackageServices[sourceKey].sourceDisplayName}
                 onChange={(value)=>{onServiceChange(sourceKey, value)}}
               />
             )
