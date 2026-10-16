@@ -50,7 +50,8 @@ export class Backend {
     
     this.intervalID = setInterval(()=>{
       // @ts-ignore
-      let currentState = window.SystemPowerStore.batteryState
+      const currentState = window.SystemPowerStore?.batteryState
+      if (currentState == null || !Number.isFinite(currentState.eACState)) return
       if (currentState != this.pseudoBatteryState) this.setBatteryStateChange(currentState)
     }, 1000)
   }
